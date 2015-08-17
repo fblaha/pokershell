@@ -1,24 +1,36 @@
-import cmd
 import sys
 
+from cliff.app import App
+from cliff.commandmanager import CommandManager
 
-class MinskShell(cmd.Cmd):
+
+class MinksShell(App):
+    NAME = 'minsk'
+
     def __init__(self):
-        cmd.Cmd.__init__(self)
-        self.intro = 'Welcome to the Minsk shell.   Type help or ? to list commands.\n'
-        self.prompt = '(minsk) '
+        super(MinksShell, self).__init__(
+            description='Minsk Shell',
+            version='0.1',
+            command_manager=CommandManager('minsk.commands'),
+            deferred_help=True,
+        )
+        self.prompt = 'x'
 
-    def do_hello(self, arg):
-        """Just hello"""
-        print("hello again", arg, "!")
+    def initialize_app(self, argv):
+        self.LOG.debug('initialize_app')
 
-    def do_quit(self, arg):
-        """Quit shell"""
-        sys.exit(1)
+    def prepare_to_run_command(self, cmd):
+        self.LOG.debug('prepare_to_run_command %s', cmd.__class__.__name__)
 
-    # shortcuts
-    do_q = do_quit
+    def clean_up(self, cmd, result, err):
+        self.LOG.debug('clean_up %s', cmd.__class__.__name__)
+        if err:
+            self.LOG.debug('got an error: %s', err)
+
+
+def main(argv=sys.argv[1:]):
+    return MinksShell().run(argv)
 
 
 if __name__ == '__main__':
-    MinskShell().cmdloop()
+    sys.exit(main(sys.argv[1:]))
