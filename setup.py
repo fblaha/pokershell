@@ -33,7 +33,7 @@ setup(
             'minsk = minsk.shell:main'
         ],
         'minsk.commands': [
-            'simple = minsk.commands:Simple',
+            'hand = minsk.commands:Hand',
         ],
     },
 

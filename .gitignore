@@ -30,3 +30,6 @@ doc/source/api
 .coverage
 *,cover
 cover
+
+#Cliff
+command.txt
