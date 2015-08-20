@@ -10,8 +10,8 @@ class TestCard(testtools.TestCase):
         self.assertEqual('2♣', str(Card.parse('2c')))
 
     def test_parse_negative(self):
-        self.assertRaises(ValueError, Card.parse, 'Xs')
-        self.assertRaises(ValueError, Card.parse, 'Jx')
+        self.assertRaises(IndexError, Card.parse, 'Xs')
+        self.assertRaises(IndexError, Card.parse, 'Jx')
 
     def test_eq(self):
         c1 = Card.parse('js')
