@@ -1,9 +1,7 @@
 import logging
 
 from cliff.command import Command
-
-from pokereval.card import Card
-from pokereval.hand_evaluator import HandEvaluator
+from minsk.model import Card
 
 
 class Hand(Command):
@@ -18,7 +16,7 @@ class Hand(Command):
         return parser
 
     def take_action(self, parsed_args):
-        hole = [Card(2, 1), Card(2, 2)]
-        board = []
-        score = HandEvaluator.evaluate_hand(hole, board)
-        self.app.stdout.write(score)
+        card1 = Card.parse(parsed_args.first)
+        card2 = Card.parse(parsed_args.second)
+        self.app.stdout.write(card1)
+        self.app.stdout.write(card2)

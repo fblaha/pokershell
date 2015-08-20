@@ -25,19 +25,18 @@ class Card:
     def suit(self):
         return self._suit
 
-    @suit.setter
-    def suit(self, value):
-        self._check_suite(value)
-        self._suit = value
-
     @property
     def rank(self):
         return self._rank
 
-    @rank.setter
-    def rank(self, value):
-        self._check_rank(value)
-        self._rank = value
+    def __key(self):
+        return self._rank, self._suit
+
+    def __eq__(self, y):
+        return isinstance(y, self.__class__) and self.__key() == y.__key()
+
+    def __hash__(self):
+        return hash(self.__key())
 
     @staticmethod
     def parse(card_str):
