@@ -18,3 +18,17 @@ class TestCard(testtools.TestCase):
         c2 = Card.parse('Js')
         self.assertEqual(c1, c2)
         self.assertEqual(1, len({c1, c2}))
+
+    def test_cmp_rank(self):
+        c1 = Card.parse('js')
+        c2 = Card.parse('Qs')
+        self.assertTrue(c1 < c2)
+        self.assertFalse(c1 > c2)
+        self.assertTrue(c1 <= c2)
+        self.assertTrue(c1 >= c1)
+
+    def test_cmp_suit(self):
+        c1 = Card.parse('qc')
+        c2 = Card.parse('Qs')
+        self.assertTrue(c1 < c2)
+        self.assertFalse(c1 > c2)
