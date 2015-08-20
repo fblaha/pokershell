@@ -8,6 +8,9 @@ class Suit(Enum):
     HEARTS = '♥', 'h', 'hearts'
     SPADES = '♠', 's', 'spades'
 
+    def __repr__(self):
+        return self.value[0]
+
 
 class Rank(Enum):
     DEUCE = '2', 2
@@ -23,6 +26,9 @@ class Rank(Enum):
     QUEEN = 'Q', 12
     KING = 'K', 13
     ACE = 'A', 1
+
+    def __repr__(self):
+        return self.value[0]
 
 
 _SUIT_ORD = {suit: i for i, suit in enumerate(Suit)}
@@ -55,16 +61,27 @@ class Card:
     def __lt__(self, other):
         return self.__key() < other.__key()
 
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return repr(self._rank) + repr(self._suit)
+
     @staticmethod
     def parse(card_str):
         if len(card_str) != 2:
             raise ValueError('Invalid card: {0}'.format(card_str))
         rank_str = card_str[0].upper()
         suit_str = card_str[1].lower()
+        if rank_str not in {r.value[0] for r in Rank}:
+            raise ValueError('Invalid rank: {0}'.format(rank_str))
+        if suit_str not in {s.value[1] for s in Suit}:
+            raise ValueError('Invalid rank: {0}'.format(rank_str))
         rank = [rank for rank in Rank if rank.value[0] == rank_str][0]
         suit = [suit for suit in Suit if suit.value[1] == suit_str][0]
-
         return Card(rank, suit)
 
-    def __str__(self):
-        return self._rank.value[0] + self._suit.value[0]
+    @staticmethod
+    def parse_combo(line):
+        cards_str = line.split()
+        return [Card.parse(card) for card in cards_str]

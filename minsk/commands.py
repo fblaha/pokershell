@@ -1,11 +1,12 @@
 import logging
 
 from cliff.command import Command
+
 from minsk.model import Card
 
 
 class Hand(Command):
-    "A simple command that prints a message."
+    """A simple command that prints a message."""
 
     log = logging.getLogger(__name__)
 
