@@ -1,7 +1,7 @@
 import testtools
 
 from minsk.eval.four import FourEvaluator
-from minsk.model import Card
+import minsk.model
 
 
 class TestFourEvaluator(testtools.TestCase):
@@ -10,6 +10,11 @@ class TestFourEvaluator(testtools.TestCase):
         self.evaluator = FourEvaluator()
 
     def test_eval(self):
-        combo = Card.parse_combo('Js Jc Jh 2c 3c')
+        combo = minsk.model.Card.parse_combo('Js Jc Jh 2c 3c')
         outs = self.evaluator.get_outs(*combo)
-        self.assertEqual({Card.parse('Jd')}, outs)
+        self.assertEqual({minsk.model.Card.parse('Jd')}, outs)
+
+    def test_find(self):
+        combo = minsk.model.Card.parse_combo('Js Jc 2h Jh 2c 3c Jd')
+        result = self.evaluator.find(*combo)
+        self.assertEqual((minsk.model.Hand.FOUR_OF_KIND, minsk.model.Rank.JACK), result)
