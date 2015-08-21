@@ -21,3 +21,5 @@ class FourEvaluator:
         for rank, cards in by_rank.items():
             if len(cards) == 4 and {h1, h2} & cards:
                 return minsk.model.Hand.FOUR_OF_KIND, rank
+            elif len(cards) == 3 and {h1, h2} & cards:
+                return minsk.model.Hand.THREE_OF_KIND, rank

@@ -1,6 +1,6 @@
 import testtools
 
-from minsk.eval.four import FourEvaluator
+from minsk.eval.kind import FourEvaluator
 import minsk.model
 
 
