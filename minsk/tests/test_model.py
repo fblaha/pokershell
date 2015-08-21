@@ -1,3 +1,5 @@
+import pickle
+
 import testtools
 
 from minsk.model import Card, Deck
@@ -23,6 +25,11 @@ class TestCard(testtools.TestCase):
         c1 = Card.parse('js')
         c2 = Card.parse('Js')
         self.assertEqual(id(c1), id(c2))
+
+    def test_pickle(self):
+        orig = Card.parse('9s')
+        loaded = pickle.loads(pickle.dumps(orig))
+        self.assertEqual(orig, loaded)
 
     def test_cmp_rank(self):
         c1 = Card.parse('js')
@@ -57,3 +64,10 @@ class TestDeck(testtools.TestCase):
                     break
 
         self.assertEqual(52, len(set(all_cards())))
+
+    def test_pickle(self):
+        orig = Deck()
+        orig.shuffle()
+        dump = pickle.dumps(orig)
+        loaded = pickle.loads(dump)
+        self.assertEqual(orig, loaded)

@@ -101,3 +101,9 @@ class Deck:
     def pop(self):
         if self._cards:
             return self._cards.pop()
+
+    def __key(self):
+        return self._cards
+
+    def __eq__(self, y):
+        return isinstance(y, self.__class__) and self.__key() == y.__key()
