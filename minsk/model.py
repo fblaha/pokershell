@@ -5,6 +5,7 @@ import random
 import minsk.utils
 
 
+@enum.unique
 class Suit(enum.Enum):
     CLUBS = '♣', 'c', 'clubs'
     DIAMONDS = '♦', 'd', 'diamonds'
@@ -15,6 +16,8 @@ class Suit(enum.Enum):
         return self.value[0]
 
 
+@functools.total_ordering
+@enum.unique
 class Rank(enum.Enum):
     DEUCE = '2', 2
     THREE = '3', 3
@@ -28,12 +31,18 @@ class Rank(enum.Enum):
     JACK = 'J', 11
     QUEEN = 'Q', 12
     KING = 'K', 13
-    ACE = 'A', 1
+    ACE = 'A', 14
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value[1] < other.value[1]
+        return NotImplemented
 
     def __repr__(self):
         return self.value[0]
 
 
+@enum.unique
 class Hand(enum.IntEnum):
     HIGH_CARD = 1
     ONE_PAIR = 2
