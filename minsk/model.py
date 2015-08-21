@@ -1,6 +1,8 @@
 from enum import Enum
 from functools import total_ordering
 
+from minsk.utils import MementoMetaclass
+
 
 class Suit(Enum):
     CLUBS = '♣', 'c', 'clubs'
@@ -36,7 +38,8 @@ _RANK_ORD = {rank: i for i, rank in enumerate(Rank)}
 
 
 @total_ordering
-class Card:
+class Card(metaclass=MementoMetaclass):
+
     def __init__(self, rank, suit):
         self._rank = rank
         self._suit = suit

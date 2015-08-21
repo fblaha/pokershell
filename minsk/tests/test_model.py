@@ -19,6 +19,11 @@ class TestCard(testtools.TestCase):
         self.assertEqual(c1, c2)
         self.assertEqual(1, len({c1, c2}))
 
+    def test_memento(self):
+        c1 = Card.parse('js')
+        c2 = Card.parse('Js')
+        self.assertEqual(id(c1), id(c2))
+
     def test_cmp_rank(self):
         c1 = Card.parse('js')
         c2 = Card.parse('Qs')
