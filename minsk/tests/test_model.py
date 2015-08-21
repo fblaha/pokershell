@@ -1,13 +1,13 @@
 import testtools
 
-from minsk.model import Card
+from minsk.model import Card, Deck
 
 
 class TestCard(testtools.TestCase):
     def test_parse(self):
-        self.assertEqual('J♠', str(Card.parse('js')))
-        self.assertEqual('J♣', str(Card.parse('Jc')))
-        self.assertEqual('2♣', str(Card.parse('2c')))
+        self.assertEqual('J♠', repr(Card.parse('js')))
+        self.assertEqual('J♣', repr(Card.parse('Jc')))
+        self.assertEqual('2♣', repr(Card.parse('2c')))
 
     def test_parse_negative(self):
         self.assertRaises(ValueError, Card.parse, 'Xs')
@@ -37,3 +37,23 @@ class TestCard(testtools.TestCase):
         c2 = Card.parse('Qs')
         self.assertTrue(c1 < c2)
         self.assertFalse(c1 > c2)
+
+
+class TestDeck(testtools.TestCase):
+    def test_shuffle(self):
+        deck = Deck()
+        deck.shuffle()
+        print(deck)
+
+    def test_pop(self):
+
+        def all_cards():
+            deck = Deck()
+            while True:
+                card = deck.pop()
+                if card:
+                    yield card
+                else:
+                    break
+
+        self.assertEqual(52, len(set(all_cards())))
