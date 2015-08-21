@@ -1,6 +1,6 @@
 import testtools
 
-from minsk.eval.kind import FourEvaluator
+from minsk.eval.kind import FourEvaluator, ThreeEvaluator
 import minsk.model
 
 
@@ -18,3 +18,14 @@ class TestFourEvaluator(testtools.TestCase):
         combo = minsk.model.Card.parse_combo('Js Jc 2h Jh 2c 3c Jd')
         result = self.evaluator.find(*combo)
         self.assertEqual((minsk.model.Hand.FOUR_OF_KIND, minsk.model.Rank.JACK), result)
+
+
+class TestThreeEvaluator(testtools.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.evaluator = ThreeEvaluator()
+
+    def test_find(self):
+        combo = minsk.model.Card.parse_combo('Js Jc 2h Jh 2c 3c')
+        result = self.evaluator.find(*combo)
+        self.assertEqual((minsk.model.Hand.THREE_OF_KIND, minsk.model.Rank.JACK), result)

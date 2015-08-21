@@ -1,11 +1,16 @@
-from collections import defaultdict
+import collections
 
 import minsk.model
 
 
-class FourEvaluator:
+class KindEvaluator:
+    def __init__(self, hand, count):
+        super().__init__()
+        self._hand = hand
+        self._count = count
+
     def get_outs(self, *args):
-        by_rank = defaultdict(list)
+        by_rank = collections.defaultdict(list)
         for card in args:
             by_rank[card.rank].append(card)
         for rank, cards in by_rank.items():
@@ -15,11 +20,19 @@ class FourEvaluator:
 
     def find(self, *args):
         h1, h2 = args[0:2]
-        by_rank = defaultdict(set)
+        by_rank = collections.defaultdict(set)
         for card in args:
             by_rank[card.rank].add(card)
         for rank, cards in by_rank.items():
-            if len(cards) == 4 and {h1, h2} & cards:
-                return minsk.model.Hand.FOUR_OF_KIND, rank
-            elif len(cards) == 3 and {h1, h2} & cards:
-                return minsk.model.Hand.THREE_OF_KIND, rank
+            if len(cards) == self._count and {h1, h2} & cards:
+                return self._hand, rank
+
+
+class FourEvaluator(KindEvaluator):
+    def __init__(self):
+        super().__init__(minsk.model.Hand.FOUR_OF_KIND, 4)
+
+
+class ThreeEvaluator(KindEvaluator):
+    def __init__(self):
+        super().__init__(minsk.model.Hand.THREE_OF_KIND, 3)
