@@ -33,6 +33,12 @@ class Rank(enum.Enum):
     KING = 'K', 13
     ACE = 'A', 14
 
+    @staticmethod
+    def from_ord(num):
+        for rank in Rank:
+            if rank.value[1] == num:
+                return rank
+
     def __lt__(self, other):
         if self.__class__ is other.__class__:
             return self.value[1] < other.value[1]
@@ -101,11 +107,6 @@ class Card(metaclass=minsk.utils.MementoMetaclass):
         rank = [rank for rank in Rank if rank.value[0] == rank_str][0]
         suit = [suit for suit in Suit if suit.value[1] == suit_str][0]
         return Card(rank, suit)
-
-    @staticmethod
-    def parse_combo(line):
-        cards_str = line.split()
-        return [Card.parse(card) for card in cards_str]
 
 
 class Deck:

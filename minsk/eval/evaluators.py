@@ -79,3 +79,36 @@ class FlushEvaluator(eval.AbstractEvaluator):
                 card_rank = lambda card: card.rank
                 sorted_cards = sorted(biggest, key=card_rank, reverse=True)[0:5]
                 return [card.rank for card in sorted_cards]
+
+
+class StraightEvaluator(eval.AbstractEvaluator):
+    def find(self, context):
+        return self._find(context.cards)
+
+    @staticmethod
+    def _find(cards):
+        ranks = {card.rank for card in cards}
+        rank_nums = {rank.value[1] for rank in ranks}
+        if model.Rank.ACE in ranks:
+            rank_nums.add(1)
+        upper_ranks = []
+        for rank_ord in rank_nums:
+            upper = rank_ord + 5
+            if all(r in rank_nums for r in range(rank_ord, upper)):
+                upper_ranks.append(model.Rank.from_ord(upper - 1))
+        if upper_ranks:
+            upper_ranks.sort(reverse=True)
+            return upper_ranks[0:1]
+
+
+class StraightFlushEvaluator(StraightEvaluator):
+    def find(self, context):
+        collected_ranks = []
+        for suit_set in context.by_suit.values():
+            if len(suit_set) >= 5:
+                result = self._find(suit_set)
+                if result:
+                    collected_ranks += result
+        if collected_ranks:
+            collected_ranks.sort(reverse=True)
+            return collected_ranks[0:1]

@@ -10,6 +10,10 @@ class EvalContext:
         self._by_suit = None
 
     @property
+    def cards(self):
+        return self._cards
+
+    @property
     def by_rank(self):
         if self._by_rank:
             return self._by_rank
