@@ -1,9 +1,10 @@
 import collections
 
 import minsk.model as model
+import minsk.eval as eval
 
 
-class KindEvaluator:
+class KindEvaluator(eval.AbstractEvaluator):
     def __init__(self, hand, count):
         super().__init__()
         self._hand = hand
@@ -44,7 +45,7 @@ class HighCardEvaluator(KindEvaluator):
         super().__init__(model.Hand.HIGH_CARD, 1)
 
 
-class FullHouseEvaluator:
+class FullHouseEvaluator(eval.AbstractEvaluator):
     def find(self, context):
         ranks3 = context.get_ranks(3)
         if ranks3:

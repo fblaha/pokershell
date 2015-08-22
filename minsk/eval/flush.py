@@ -1,4 +1,7 @@
-class FlushEvaluator:
+import minsk.eval as eval
+
+
+class FlushEvaluator(eval.AbstractEvaluator):
     def find(self, context):
         by_suit = context.by_suit
         sorted_sets = sorted(by_suit.values(), key=len, reverse=True)
