@@ -7,6 +7,7 @@ class EvalContext:
         super().__init__()
         self._cards = cards
         self._by_rank = None
+        self._by_suit = None
 
     @property
     def by_rank(self):
