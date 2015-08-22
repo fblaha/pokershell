@@ -6,35 +6,35 @@ class EvalContext:
     def __init__(self, *cards):
         super().__init__()
         self._cards = cards
-        self._by_rank = None
-        self._by_suit = None
+        self._rank_dict = None
+        self._suit_dict = None
 
     @property
     def cards(self):
         return self._cards
 
     @property
-    def by_rank(self):
-        if self._by_rank:
-            return self._by_rank
-        self._by_rank = collections.defaultdict(set)
+    def rank_dict(self):
+        if self._rank_dict:
+            return self._rank_dict
+        self._rank_dict = collections.defaultdict(set)
         for card in self._cards:
-            self._by_rank[card.rank].add(card)
-        return self._by_rank
+            self._rank_dict[card.rank].add(card)
+        return self._rank_dict
 
     @property
-    def by_suit(self):
-        if self._by_suit:
-            return self._by_suit
-        self._by_suit = collections.defaultdict(set)
+    def suit_dict(self):
+        if self._suit_dict:
+            return self._suit_dict
+        self._suit_dict = collections.defaultdict(set)
         for card in self._cards:
-            self._by_suit[card.suit].add(card)
-        return self._by_suit
+            self._suit_dict[card.suit].add(card)
+        return self._suit_dict
 
-    @functools.lru_cache(maxsize=10)
+    @functools.lru_cache()
     def get_ranks(self, count, check_better=True):
         ranks = []
-        for rank, cards in self.by_rank.items():
+        for rank, cards in self.rank_dict.items():
             if check_better and len(cards) > count:
                 raise ValueError('Better hand is there: {0}'.format(cards))
             elif len(cards) == count:

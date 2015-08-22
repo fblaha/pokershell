@@ -20,11 +20,6 @@ class TestFourEvaluator(testtools.TestCase):
         super().setUp()
         self.evaluator = minsk.eval.evaluators.FourEvaluator()
 
-    def test_eval(self):
-        combo = parse_combo('Js Jc Jh 2c 3c')
-        outs = self.evaluator.get_outs(*combo)
-        self.assertEqual({model.Card.parse('Jd')}, outs)
-
     def test_find(self):
         result = self.evaluator.find(create_context('Js Jc 2h Jh 2c 3c Jd'))
         self.assertEqual((model.Rank.JACK,), result)

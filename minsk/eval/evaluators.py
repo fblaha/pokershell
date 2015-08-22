@@ -1,5 +1,3 @@
-import collections
-
 import minsk.model as model
 import minsk.eval as eval
 
@@ -9,15 +7,6 @@ class KindEvaluator(eval.AbstractEvaluator):
         super().__init__()
         self._hand = hand
         self._count = count
-
-    def get_outs(self, *args):
-        by_rank = collections.defaultdict(list)
-        for card in args:
-            by_rank[card.rank].append(card)
-        for rank, cards in by_rank.items():
-            if len(cards) == 3:
-                suit = set(model.Suit) - {card.suit for card in cards}
-                return {model.Card(rank, suit.pop())}
 
     def find(self, context):
         ranks = context.get_ranks(self._count)
@@ -71,7 +60,7 @@ import minsk.eval as eval
 
 class FlushEvaluator(eval.AbstractEvaluator):
     def find(self, context):
-        by_suit = context.by_suit
+        by_suit = context.suit_dict
         sorted_sets = sorted(by_suit.values(), key=len, reverse=True)
         if sorted_sets:
             biggest = sorted_sets[0]
@@ -83,10 +72,10 @@ class FlushEvaluator(eval.AbstractEvaluator):
 
 class StraightEvaluator(eval.AbstractEvaluator):
     def find(self, context):
-        return self._find(context.cards)
+        return self._find_straight(context.cards)
 
     @staticmethod
-    def _find(cards):
+    def _find_straight(cards):
         ranks = {card.rank for card in cards}
         rank_nums = {rank.value[1] for rank in ranks}
         if model.Rank.ACE in ranks:
@@ -104,9 +93,9 @@ class StraightEvaluator(eval.AbstractEvaluator):
 class StraightFlushEvaluator(StraightEvaluator):
     def find(self, context):
         collected_ranks = []
-        for suit_set in context.by_suit.values():
+        for suit_set in context.suit_dict.values():
             if len(suit_set) >= 5:
-                result = self._find(suit_set)
+                result = self._find_straight(suit_set)
                 if result:
                     collected_ranks += result
         if collected_ranks:
