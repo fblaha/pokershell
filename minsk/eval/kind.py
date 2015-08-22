@@ -56,3 +56,11 @@ class FullHouseEvaluator(eval.AbstractEvaluator):
             ranks2.sort(reverse=True)
             if ranks2:
                 return ranks3[0], ranks2[0]
+
+
+class TwoPairsEvaluator(eval.AbstractEvaluator):
+    def find(self, context):
+        ranks2 = context.get_ranks(2)
+        if len(ranks2) >= 2:
+            ranks1 = context.get_ranks(1, check_better=False)
+            return ranks2[0], ranks2[1], ranks1[0]

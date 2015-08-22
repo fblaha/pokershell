@@ -8,5 +8,6 @@ class FlushEvaluator(eval.AbstractEvaluator):
         if sorted_sets:
             biggest = sorted_sets[0]
             if len(biggest) >= 5:
-                sorted_cards = sorted(biggest, key=lambda card: card.rank, reverse=True)
+                card_rank = lambda card: card.rank
+                sorted_cards = sorted(biggest, key=card_rank, reverse=True)[0:5]
                 return [card.rank for card in sorted_cards]

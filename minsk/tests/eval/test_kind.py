@@ -1,12 +1,9 @@
 import testtools
 
-import minsk.eval.context as context
 import minsk.model as model
-
 from minsk.eval.kind import FourEvaluator, ThreeEvaluator, \
-    OnePairEvaluator, HighCardEvaluator, FullHouseEvaluator
-
-parse = model.Card.parse_combo
+    OnePairEvaluator, HighCardEvaluator, FullHouseEvaluator, TwoPairsEvaluator
+from minsk.tests.eval import create_context
 
 
 class TestFourEvaluator(testtools.TestCase):
@@ -15,13 +12,12 @@ class TestFourEvaluator(testtools.TestCase):
         self.evaluator = FourEvaluator()
 
     def test_eval(self):
-        combo = parse('Js Jc Jh 2c 3c')
+        combo = model.Card.parse_combo('Js Jc Jh 2c 3c')
         outs = self.evaluator.get_outs(*combo)
         self.assertEqual({model.Card.parse('Jd')}, outs)
 
     def test_find(self):
-        combo = parse('Js Jc 2h Jh 2c 3c Jd')
-        result = self.evaluator.find(context.EvalContext(*combo))
+        result = self.evaluator.find(create_context('Js Jc 2h Jh 2c 3c Jd'))
         self.assertEqual((model.Rank.JACK,), result)
 
 
@@ -31,8 +27,7 @@ class TestThreeEvaluator(testtools.TestCase):
         self.evaluator = ThreeEvaluator()
 
     def test_find(self):
-        combo = parse('2h 2c 2d 5h Jh Js Jc')
-        result = self.evaluator.find(context.EvalContext(*combo))
+        result = self.evaluator.find(create_context('2h 2c 2d 5h Jh Js Jc'))
         self.assertEqual((model.Rank.JACK,), result)
 
 
@@ -42,13 +37,12 @@ class TestOnePairEvaluator(testtools.TestCase):
         self.evaluator = OnePairEvaluator()
 
     def test_find(self):
-        combo = parse('2h 2c 5h Jh qs Jc')
-        result = self.evaluator.find(context.EvalContext(*combo))
+        result = self.evaluator.find(create_context('2h 2c 5h Jh qs Jc'))
         self.assertEqual((model.Rank.JACK,), result)
 
     def test_find_better(self):
-        combo = parse('2h 2c 2d 5h Jh qs Jc')
-        self.assertRaises(ValueError, self.evaluator.find, context.EvalContext(*combo))
+        context = create_context('2h 2c 2d 5h Jh qs Jc')
+        self.assertRaises(ValueError, self.evaluator.find, context)
 
 
 class TestHighCardEvaluator(testtools.TestCase):
@@ -57,22 +51,29 @@ class TestHighCardEvaluator(testtools.TestCase):
         self.evaluator = HighCardEvaluator()
 
     def test_find(self):
-        combo = parse('2h  5h Jh qs')
-        result = self.evaluator.find(context.EvalContext(*combo))
+        result = self.evaluator.find(create_context('2h  5h Jh qs'))
         self.assertEqual((model.Rank.QUEEN,), result)
 
 
-class TestFullHousedEvaluator(testtools.TestCase):
+class TestFullHouseEvaluator(testtools.TestCase):
     def setUp(self):
         super().setUp()
         self.evaluator = FullHouseEvaluator()
 
     def test_find_32(self):
-        combo = parse('2h 2c 2d 5h Jh Jc')
-        result = self.evaluator.find(context.EvalContext(*combo))
+        result = self.evaluator.find(create_context('2h 2c 2d 5h Jh Jc'))
         self.assertEqual((model.Rank.DEUCE, model.Rank.JACK), result)
 
     def test_find_33(self):
-        combo = parse('2h 2c 2d 5h Jh Jc Jd')
-        result = self.evaluator.find(context.EvalContext(*combo))
+        result = self.evaluator.find(create_context('2h 2c 2d 5h Jh Jc Jd'))
         self.assertEqual((model.Rank.JACK, model.Rank.DEUCE), result)
+
+
+class TestTwoPairsEvaluator(testtools.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.evaluator = TwoPairsEvaluator()
+
+    def test_find(self):
+        result = self.evaluator.find(create_context('2h 2c 5h Jh Jc'))
+        self.assertEqual((model.Rank.JACK, model.Rank.DEUCE, model.Rank.FIVE), result)
