@@ -67,7 +67,7 @@ class FlushEvaluator(eval.AbstractEvaluator):
             if len(biggest) >= 5:
                 card_rank = lambda card: card.rank
                 sorted_cards = sorted(biggest, key=card_rank, reverse=True)[0:5]
-                return [card.rank for card in sorted_cards]
+                return tuple(card.rank for card in sorted_cards)
 
 
 class StraightEvaluator(eval.AbstractEvaluator):
@@ -87,7 +87,7 @@ class StraightEvaluator(eval.AbstractEvaluator):
                 upper_ranks.append(model.Rank.from_ord(upper - 1))
         if upper_ranks:
             upper_ranks.sort(reverse=True)
-            return upper_ranks[0:1]
+            return tuple(upper_ranks[0:1])
 
 
 class StraightFlushEvaluator(StraightEvaluator):
