@@ -79,7 +79,7 @@ class TestFlushEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.evaluator = evaluators.FlushEvaluator()
 
     def test_find6(self):
-        result = self.evaluator.find(self.create_context('Js Jc 5c Jh 2c 3c Jc qc'))
+        result = self.evaluator.find(self.create_context('Js Jc 5c Jh 2c 3c 4d qc'))
         self.assertEqual((model.Rank.QUEEN, model.Rank.JACK, model.Rank.FIVE),
                          result[0:3])
 
@@ -98,7 +98,7 @@ class TestStraightEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.evaluator = evaluators.StraightEvaluator()
 
     def test_find_best(self):
-        result = self.evaluator.find(self.create_context('Js qc tc 9h 8c 7c Jc qc'))
+        result = self.evaluator.find(self.create_context('Js qc tc 9h 8c 7c Jc qh'))
         self.assertEqual((model.Rank.QUEEN,), result)
 
     def test_find(self):
