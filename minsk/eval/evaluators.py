@@ -100,4 +100,4 @@ class StraightFlushEvaluator(StraightEvaluator):
                     collected_ranks += result
         if collected_ranks:
             collected_ranks.sort(reverse=True)
-            return collected_ranks[0:1]
+            return tuple(collected_ranks[0:1])

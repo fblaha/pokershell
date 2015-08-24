@@ -121,12 +121,12 @@ class TestStraightFlushEvaluator(testtools.TestCase, common.TestUtilsMixin):
 
     def test_find(self):
         result = self.evaluator.find(self.create_context('Jh qh th 9h 8h 7h Jc qc'))
-        self.assertEqual([model.Rank.QUEEN], result)
+        self.assertEqual((model.Rank.QUEEN,), result)
 
     def test_find_ace_down(self):
         result = self.evaluator.find(self.create_context('3h 5h 4h 2h Ah 7c Jc qc'))
-        self.assertEqual([model.Rank.FIVE], result)
+        self.assertEqual((model.Rank.FIVE,), result)
 
     def test_find_ace_up(self):
         result = self.evaluator.find(self.create_context('Js Kc Tc Jh 2c Ac Jc qc'))
-        self.assertEqual([model.Rank.ACE], result)
+        self.assertEqual((model.Rank.ACE,), result)
