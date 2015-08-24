@@ -17,12 +17,11 @@ class BruteForceSimulator:
         deck = model.Deck(*cards)
         deck_cards = deck.cards
         if unknown_count:
-            cpu_count = multiprocessing.cpu_count()
-            combinations = list(itertools.combinations(deck_cards, unknown_count))
-            pool = multiprocessing.Pool(cpu_count)
             process_fc = functools.partial(self._process, cards)
+            pool = multiprocessing.Pool()
+            combinations = itertools.combinations(deck_cards, unknown_count)
             partial_results = pool.map(process_fc, combinations)
-            return tuple([sum(x) for x in zip(*partial_results)])
+            return tuple(sum(x) for x in zip(*partial_results))
         else:
             return self.simulate_river(*cards)
 
