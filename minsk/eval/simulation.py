@@ -1,4 +1,7 @@
+import functools
 import itertools
+
+import multiprocessing
 
 import minsk.model as model
 import minsk.eval.manager as manager
@@ -13,16 +16,15 @@ class BruteForceSimulator:
         unknown_count = 7 - len(cards)
         deck = model.Deck(*cards)
         deck_cards = deck.cards
-        win, tie, lose = 0, 0, 0
         if unknown_count:
-            for unknown in itertools.combinations(deck_cards, unknown_count):
-                result = self.simulate_river(*(cards + unknown))
-                win += result[0]
-                tie += result[1]
-                lose += result[2]
+            cpu_count = multiprocessing.cpu_count()
+            combinations = list(itertools.combinations(deck_cards, unknown_count))
+            pool = multiprocessing.Pool(cpu_count)
+            process_fc = functools.partial(self._process, cards)
+            partial_results = pool.map(process_fc, combinations)
+            return tuple([sum(x) for x in zip(*partial_results)])
         else:
             return self.simulate_river(*cards)
-        return win, tie, lose
 
     def simulate_river(self, *cards):
         common = cards[2:]
@@ -43,3 +45,6 @@ class BruteForceSimulator:
             elif best_hand == opponent_best:
                 tie += 1
         return win, tie, lose
+
+    def _process(self, cards, generated):
+        return self.simulate_river(*(cards + generated))
