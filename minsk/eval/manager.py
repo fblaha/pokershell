@@ -1,7 +1,6 @@
 import collections
 
 import minsk.eval.context as context
-
 import minsk.eval.evaluators as evaluators
 import minsk.model as model
 
@@ -19,8 +18,8 @@ class EvaluatorManager:
         (model.Hand.HIGH_CARD, evaluators.HighCardEvaluator()),
     ])
 
-    def find_best_hand(self, *args):
-        ctx = context.EvalContext(*args)
+    def find_best_hand(self, *cards):
+        ctx = context.EvalContext(*cards)
         for hand, evaluator in self._EVALUATORS.items():
             result = evaluator.find(ctx)
             if result:

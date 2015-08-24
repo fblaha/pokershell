@@ -95,6 +95,10 @@ class Card(metaclass=minsk.utils.MementoMetaclass):
         return repr(self._rank) + repr(self._suit)
 
     @staticmethod
+    def all_cards():
+        return (Card(rank, suit) for rank in Rank for suit in Suit)
+
+    @staticmethod
     def parse(card_str):
         if len(card_str) != 2:
             raise ValueError('Invalid card: {0}'.format(card_str))
@@ -110,9 +114,17 @@ class Card(metaclass=minsk.utils.MementoMetaclass):
 
 
 class Deck:
-    def __init__(self):
+    def __init__(self, *excluded_cards):
         super().__init__()
-        self._cards = [Card(rank, suit) for rank in Rank for suit in Suit]
+        excluded_set = set(excluded_cards)
+        self._cards = []
+        for card in Card.all_cards():
+            if card not in excluded_set:
+                self._cards.append(card)
+
+    @property
+    def cards(self):
+        return tuple(self._cards)
 
     def shuffle(self):
         random.shuffle(self._cards)
