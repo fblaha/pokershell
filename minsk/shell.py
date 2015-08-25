@@ -44,6 +44,9 @@ class MinskShell(cmd.Cmd):
         result_table.add_row(result)
         print(result_table)
 
+    def do_EOF(self, line):
+        return True
+
 
 def main():
     MinskShell().cmdloop()
