@@ -29,9 +29,9 @@ class OnePairEvaluator(KindEvaluator):
         super().__init__(model.Hand.ONE_PAIR, 2)
 
 
-class HighCardEvaluator(KindEvaluator):
-    def __init__(self):
-        super().__init__(model.Hand.HIGH_CARD, 1)
+class HighCardEvaluator(eval.AbstractEvaluator):
+    def find(self, context):
+        return context.get_high_ranks(5)
 
 
 class FullHouseEvaluator(eval.AbstractEvaluator):
@@ -53,9 +53,6 @@ class TwoPairsEvaluator(eval.AbstractEvaluator):
         if len(ranks2) >= 2:
             ranks1 = context.get_ranks(1, check_better=False)
             return ranks2[0], ranks2[1], ranks1[0]
-
-
-import minsk.eval as eval
 
 
 class FlushEvaluator(eval.AbstractEvaluator):
@@ -87,7 +84,7 @@ class StraightEvaluator(eval.AbstractEvaluator):
                 upper_ranks.append(model.Rank.from_ord(upper - 1))
         if upper_ranks:
             upper_ranks.sort(reverse=True)
-            return tuple(upper_ranks[0:1])
+            return upper_ranks[0],
 
 
 class StraightFlushEvaluator(StraightEvaluator):
@@ -100,4 +97,4 @@ class StraightFlushEvaluator(StraightEvaluator):
                     collected_ranks += result
         if collected_ranks:
             collected_ranks.sort(reverse=True)
-            return tuple(collected_ranks[0:1])
+            return collected_ranks[0],

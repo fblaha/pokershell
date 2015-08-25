@@ -14,7 +14,7 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
         print(self.simulator.simulate(*cards))
 
     def test_full_house(self):
-        cards = self.parse_cards('As 6c Ad 8s Ac 6d')
+        cards = self.parse_cards('As 6c Ad 8s Ac')
         result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result[0] / sum(result) > 0.9)

@@ -45,8 +45,9 @@ class TestHighCardEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.evaluator = evaluators.HighCardEvaluator()
 
     def test_find(self):
-        result = self.evaluator.find(self.create_context('2h  5h Jh qs'))
-        self.assertEqual((model.Rank.QUEEN,), result)
+        result = self.evaluator.find(self.create_context('2h  5h Jh qs 7c'))
+        self.assertEqual((model.Rank.QUEEN, model.Rank.JACK, model.Rank.SEVEN,
+                          model.Rank.FIVE, model.Rank.DEUCE), result)
 
 
 class TestFullHouseEvaluator(testtools.TestCase, common.TestUtilsMixin):
