@@ -117,6 +117,14 @@ class Card(metaclass=minsk.utils.MementoMetaclass):
         suit = [suit for suit in Suit if suit.value[1] == suit_str][0]
         return Card(rank, suit)
 
+    @classmethod
+    def parse_cards(cls, cards_line):
+        cards_str = cards_line.split()
+        cards = [cls.parse(card) for card in cards_str]
+        if len(cards) != len(set(cards)):
+            raise ValueError('Duplicate cards: {0}'.format(cards_line))
+        return cards
+
 
 class Deck:
     def __init__(self, *excluded_cards):

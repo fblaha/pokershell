@@ -1,1 +1,1 @@
-cliff>=1.14.0
+prettytables=0.7.2
