@@ -45,5 +45,9 @@ class MinskShell(cmd.Cmd):
         print(result_table)
 
 
-if __name__ == '__main__':
+def main():
     MinskShell().cmdloop()
+
+
+if __name__ == '__main__':
+    main()

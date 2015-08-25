@@ -31,10 +31,7 @@ setup(
     entry_points={
         'console_scripts': [
             'minsk = minsk.shell:main'
-        ],
-        'minsk.commands': [
-            'hand = minsk.commands:Hand',
-        ],
+        ]
     },
 
     zip_safe=False,
