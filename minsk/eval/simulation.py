@@ -1,6 +1,4 @@
 import functools
-import itertools
-
 import multiprocessing
 
 import minsk.model as model
@@ -19,7 +17,7 @@ class BruteForceSimulator:
         if unknown_count:
             process_fc = functools.partial(self._process, cards)
             pool = multiprocessing.Pool()
-            combinations = itertools.combinations(deck_cards, unknown_count)
+            combinations = model.Card.all_combinations(deck_cards, unknown_count)
             partial_results = pool.map(process_fc, combinations)
             return tuple(sum(x) for x in zip(*partial_results))
         else:
@@ -31,7 +29,7 @@ class BruteForceSimulator:
         deck_cards = deck.cards
         best_hand = self._manager.find_best_hand(*cards)
         win, tie, lose = 0, 0, 0
-        for opponent in itertools.combinations(deck_cards, 2):
+        for opponent in model.Card.all_combinations(deck_cards, 2):
             opponent_cards = opponent + common
             opponent_best = self._manager.find_best_hand(*opponent_cards)
             if len(best_hand) != len(opponent_best):

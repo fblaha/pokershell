@@ -1,6 +1,7 @@
 import enum
 import functools
 import random
+import itertools
 
 import minsk.utils
 
@@ -97,6 +98,10 @@ class Card(metaclass=minsk.utils.MementoMetaclass):
     @staticmethod
     def all_cards():
         return (Card(rank, suit) for rank in Rank for suit in Suit)
+
+    @staticmethod
+    def all_combinations(cards, r):
+        return itertools.combinations(cards, r)
 
     @staticmethod
     def parse(card_str):
