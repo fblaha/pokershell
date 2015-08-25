@@ -4,32 +4,23 @@ import collections
 class EvalContext:
     def __init__(self, *cards):
         super().__init__()
-        self._cards = cards
-        self._rank_dict = None
-        self._suit_dict = None
+        self.cards = cards
         self._hole_ranks = None
+        self._init_ranks()
+        self._init_suits()
 
-    @property
-    def cards(self):
-        return self._cards
+    def _init_ranks(self):
+        self.rank_dict = collections.defaultdict(list)
+        for card in self.cards:
+            self.rank_dict[card.rank].append(card)
+        self.rank_counts = set(map(len, self.rank_dict.values()))
+        self.rank_num = len(self.rank_dict)
 
-    @property
-    def rank_dict(self):
-        if self._rank_dict:
-            return self._rank_dict
-        self._rank_dict = collections.defaultdict(list)
-        for card in self._cards:
-            self._rank_dict[card.rank].append(card)
-        return self._rank_dict
-
-    @property
-    def suit_dict(self):
-        if self._suit_dict:
-            return self._suit_dict
-        self._suit_dict = collections.defaultdict(list)
-        for card in self._cards:
-            self._suit_dict[card.suit].append(card)
-        return self._suit_dict
+    def _init_suits(self):
+        self.suit_dict = collections.defaultdict(list)
+        for card in self.cards:
+            self.suit_dict[card.suit].append(card)
+        self.max_suit_count = max(map(len, self.suit_dict.values()))
 
     def get_ranks(self, count, check_better=True):
         ranks = []
@@ -44,6 +35,6 @@ class EvalContext:
     @property
     def hole_ranks(self):
         if not self._hole_ranks:
-            hole_ranks = [card.rank for card in self._cards[0:2]]
+            hole_ranks = [card.rank for card in self.cards[0:2]]
             self._hole_ranks = tuple(sorted(hole_ranks, reverse=True))
         return self._hole_ranks

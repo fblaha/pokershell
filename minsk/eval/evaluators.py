@@ -3,31 +3,26 @@ import minsk.eval as eval
 
 
 class KindEvaluator(eval.AbstractEvaluator):
-    def __init__(self, hand, count):
-        super().__init__()
-        self._hand = hand
-        self._count = count
-
     def find(self, context):
-        ranks = context.get_ranks(self._count)
+        ranks = context.get_ranks(self.count)
         if ranks:
             hole_ranks = context.hole_ranks
             return ranks[0], hole_ranks[0], hole_ranks[1]
 
 
 class FourEvaluator(KindEvaluator):
-    def __init__(self):
-        super().__init__(model.Hand.FOUR_OF_KIND, 4)
+    count = 4
+    required_rank_counts = {count}
 
 
 class ThreeEvaluator(KindEvaluator):
-    def __init__(self):
-        super().__init__(model.Hand.THREE_OF_KIND, 3)
+    count = 3
+    required_rank_counts = {count}
 
 
 class OnePairEvaluator(KindEvaluator):
-    def __init__(self):
-        super().__init__(model.Hand.ONE_PAIR, 2)
+    count = 2
+    required_rank_counts = {count}
 
 
 class HighCardEvaluator(eval.AbstractEvaluator):
@@ -36,6 +31,8 @@ class HighCardEvaluator(eval.AbstractEvaluator):
 
 
 class FullHouseEvaluator(eval.AbstractEvaluator):
+    required_rank_counts = {3}
+
     def find(self, context):
         ranks3 = context.get_ranks(3)
         if ranks3:
@@ -49,6 +46,8 @@ class FullHouseEvaluator(eval.AbstractEvaluator):
 
 
 class TwoPairsEvaluator(eval.AbstractEvaluator):
+    required_rank_counts = {2}
+
     def find(self, context):
         ranks2 = context.get_ranks(2)
         if len(ranks2) >= 2:
@@ -57,6 +56,8 @@ class TwoPairsEvaluator(eval.AbstractEvaluator):
 
 
 class FlushEvaluator(eval.AbstractEvaluator):
+    required_suit_count = 5
+
     def find(self, context):
         by_suit = context.suit_dict
         sorted_sets = sorted(by_suit.values(), key=len, reverse=True)
@@ -89,6 +90,8 @@ class StraightEvaluator(eval.AbstractEvaluator):
 
 
 class StraightFlushEvaluator(StraightEvaluator):
+    required_suit_count = 5
+
     def find(self, context):
         collected_ranks = []
         for suit_set in context.suit_dict.values():

@@ -1,4 +1,5 @@
 import cmd
+import time
 
 import prettytable
 
@@ -17,8 +18,12 @@ class MinskShell(cmd.Cmd):
         cards = model.Card.parse_cards(cards)
 
         self.print_input(cards)
+
+        start = time.time()
         result = simulator.simulate(*cards)
         self.print_output(result)
+        elapsed = time.time() - start
+        print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
     def print_output(self, result):
         print('\nOutput :')
