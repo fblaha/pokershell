@@ -24,7 +24,7 @@ class MinskShell(cmd.Cmd):
         print('\nOutput :')
         total = sum(result)
         result_pct = list(map(lambda x: str(round(x / total * 100)) + '%', result))
-        result_table = prettytable.PrettyTable(["Win", "Tie", "Loss"])
+        result_table = prettytable.PrettyTable(['Win', 'Tie', 'Loss'])
         result_table.add_row(result_pct)
         result_table.add_row(result)
         print(result_table)
@@ -44,10 +44,10 @@ class MinskShell(cmd.Cmd):
             row.append(cards[6])
         evaluator_manager = manager.EvaluatorManager()
         hand = evaluator_manager.find_best_hand(*cards)
-        columns.append("Best Hand")
+        columns.append('Hand')
         row.append(hand[0].name)
 
-        columns.append("Ranks")
+        columns.append('Ranks')
         row.append(' '.join(map(repr, hand[1])))
 
         input_table = prettytable.PrettyTable(columns)
