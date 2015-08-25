@@ -1,5 +1,4 @@
 import collections
-import functools
 
 
 class EvalContext:
@@ -32,7 +31,6 @@ class EvalContext:
             self._suit_dict[card.suit].append(card)
         return self._suit_dict
 
-    @functools.lru_cache()
     def get_ranks(self, count, check_better=True):
         ranks = []
         for rank, cards in self.rank_dict.items():

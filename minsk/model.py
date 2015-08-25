@@ -112,7 +112,7 @@ class Card(metaclass=minsk.utils.MementoMetaclass):
         if rank_str not in {r.value[0] for r in Rank}:
             raise ValueError('Invalid rank: {0}'.format(rank_str))
         if suit_str not in {s.value[1] for s in Suit}:
-            raise ValueError('Invalid rank: {0}'.format(rank_str))
+            raise ValueError('Invalid suit: {0}'.format(suit_str))
         rank = [rank for rank in Rank if rank.value[0] == rank_str][0]
         suit = [suit for suit in Suit if suit.value[1] == suit_str][0]
         return Card(rank, suit)
