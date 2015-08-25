@@ -2,6 +2,7 @@ import cmd
 
 import prettytable
 
+import minsk.eval.manager as manager
 import minsk.eval.simulation as simulation
 import minsk.model as model
 
@@ -41,6 +42,14 @@ class MinskShell(cmd.Cmd):
         if len(cards) == 7:
             columns.append('River')
             row.append(cards[6])
+        evaluator_manager = manager.EvaluatorManager()
+        hand = evaluator_manager.find_best_hand(*cards)
+        columns.append("Best Hand")
+        row.append(hand[0].name)
+
+        columns.append("Ranks")
+        row.append(' '.join(map(repr, hand[1])))
+
         input_table = prettytable.PrettyTable(columns)
         input_table.add_row(row)
         print(input_table)
