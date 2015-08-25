@@ -12,7 +12,7 @@ class TestFourEvaluator(testtools.TestCase, common.TestUtilsMixin):
 
     def test_find(self):
         result = self.evaluator.find(self.create_context('Js Jc 2h Jh 2c 3c Jd'))
-        self.assertEqual((model.Rank.JACK,), result)
+        self.assertEqual((model.Rank.JACK, model.Rank.JACK, model.Rank.JACK), result)
 
 
 class TestThreeEvaluator(testtools.TestCase, common.TestUtilsMixin):
@@ -22,7 +22,7 @@ class TestThreeEvaluator(testtools.TestCase, common.TestUtilsMixin):
 
     def test_find(self):
         result = self.evaluator.find(self.create_context('2h 2c 2d 5h Jh Js Jc'))
-        self.assertEqual((model.Rank.JACK,), result)
+        self.assertEqual((model.Rank.JACK, model.Rank.DEUCE, model.Rank.DEUCE), result)
 
 
 class TestOnePairEvaluator(testtools.TestCase, common.TestUtilsMixin):
@@ -32,7 +32,7 @@ class TestOnePairEvaluator(testtools.TestCase, common.TestUtilsMixin):
 
     def test_find(self):
         result = self.evaluator.find(self.create_context('2h 2c 5h Jh qs Jc'))
-        self.assertEqual((model.Rank.JACK,), result)
+        self.assertEqual((model.Rank.JACK, model.Rank.DEUCE, model.Rank.DEUCE), result)
 
     def test_find_better(self):
         context = self.create_context('2h 2c 2d 5h Jh qs Jc')
@@ -46,8 +46,7 @@ class TestHighCardEvaluator(testtools.TestCase, common.TestUtilsMixin):
 
     def test_find(self):
         result = self.evaluator.find(self.create_context('2h  5h Jh qs 7c'))
-        self.assertEqual((model.Rank.QUEEN, model.Rank.JACK, model.Rank.SEVEN,
-                          model.Rank.FIVE, model.Rank.DEUCE), result)
+        self.assertEqual((model.Rank.FIVE, model.Rank.DEUCE), result)
 
 
 class TestFullHouseEvaluator(testtools.TestCase, common.TestUtilsMixin):

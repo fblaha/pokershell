@@ -11,7 +11,8 @@ class KindEvaluator(eval.AbstractEvaluator):
     def find(self, context):
         ranks = context.get_ranks(self._count)
         if ranks:
-            return ranks[0],
+            hole_ranks = context.hole_ranks
+            return ranks[0], hole_ranks[0], hole_ranks[1]
 
 
 class FourEvaluator(KindEvaluator):
@@ -31,7 +32,7 @@ class OnePairEvaluator(KindEvaluator):
 
 class HighCardEvaluator(eval.AbstractEvaluator):
     def find(self, context):
-        return context.get_high_ranks(5)
+        return context.hole_ranks
 
 
 class FullHouseEvaluator(eval.AbstractEvaluator):

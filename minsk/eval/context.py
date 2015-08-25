@@ -7,7 +7,7 @@ class EvalContext:
         self._cards = cards
         self._rank_dict = None
         self._suit_dict = None
-        self._sorted_ranks = None
+        self._hole_ranks = None
 
     @property
     def cards(self):
@@ -41,11 +41,9 @@ class EvalContext:
         ranks.sort(reverse=True)
         return ranks
 
-    def get_high_ranks(self, count):
-        ranks = self._sort_ranks()
-        return tuple(ranks[:count])
-
-    def _sort_ranks(self):
-        if not self._sorted_ranks:
-            self._sorted_ranks = sorted([card.rank for card in self._cards], reverse=True)
-        return self._sorted_ranks
+    @property
+    def hole_ranks(self):
+        if not self._hole_ranks:
+            hole_ranks = [card.rank for card in self._cards[0:2]]
+            self._hole_ranks = tuple(sorted(hole_ranks, reverse=True))
+        return self._hole_ranks
