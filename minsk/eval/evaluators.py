@@ -6,8 +6,10 @@ class KindEvaluator(eval.AbstractEvaluator):
     def find(self, context):
         ranks = context.get_ranks(self.count)
         if ranks:
-            hole_ranks = context.hole_ranks
-            return ranks[0], hole_ranks[0], hole_ranks[1]
+            complement_count = 5 - self.count
+            result = context.best_high_cards[:complement_count]
+            result.insert(0, ranks[0])
+            return tuple(result)
 
 
 class FourEvaluator(KindEvaluator):
@@ -27,7 +29,7 @@ class OnePairEvaluator(KindEvaluator):
 
 class HighCardEvaluator(eval.AbstractEvaluator):
     def find(self, context):
-        return context.hole_ranks
+        return tuple(context.best_high_cards[:5])
 
 
 class FullHouseEvaluator(eval.AbstractEvaluator):
