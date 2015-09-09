@@ -35,8 +35,9 @@ class TestOnePairEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.evaluator = evaluators.OnePairEvaluator()
 
     def test_find(self):
-        result = self.evaluator.find(self.create_context('2h 2c 5h Jh qs Jc'))
-        self.assertEqual((model.Rank.JACK, model.Rank.QUEEN, model.Rank.FIVE), result)
+        result = self.evaluator.find(self.create_context('2h 8c 5h Jh qs Jc'))
+        self.assertEqual((model.Rank.JACK, model.Rank.QUEEN,
+                          model.Rank.EIGHT, model.Rank.FIVE), result)
 
     def test_find_better(self):
         context = self.create_context('2h 2c 2d 5h Jh qs Jc')

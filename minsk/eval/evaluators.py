@@ -7,7 +7,7 @@ class KindEvaluator(eval.AbstractEvaluator):
         ranks = context.get_ranks(self.count)
         if ranks:
             complement_count = 5 - self.count
-            result = context.best_high_cards[:complement_count]
+            result = context.get_complement_ranks(complement_count, ranks[0])
             result.insert(0, ranks[0])
             return tuple(result)
 
@@ -29,7 +29,7 @@ class OnePairEvaluator(KindEvaluator):
 
 class HighCardEvaluator(eval.AbstractEvaluator):
     def find(self, context):
-        return tuple(context.best_high_cards[:5])
+        return tuple(context.get_complement_ranks(5))
 
 
 class FullHouseEvaluator(eval.AbstractEvaluator):
@@ -53,8 +53,8 @@ class TwoPairsEvaluator(eval.AbstractEvaluator):
     def find(self, context):
         ranks2 = context.get_ranks(2)
         if len(ranks2) >= 2:
-            ranks1 = context.get_ranks(1, check_better=False)
-            return ranks2[0], ranks2[1], ranks1[0]
+            complement = context.get_complement_ranks(1, ranks2[0], ranks2[1])
+            return ranks2[0], ranks2[1], complement[0]
 
 
 class FlushEvaluator(eval.AbstractEvaluator):

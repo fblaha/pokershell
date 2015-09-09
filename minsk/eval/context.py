@@ -5,6 +5,7 @@ class EvalContext:
     def __init__(self, *cards):
         super().__init__()
         self.cards = cards
+        self._sorted_ranks = None
         self._hole_ranks = None
         self._best_high_cards = None
         self._init_ranks()
@@ -34,16 +35,10 @@ class EvalContext:
         return ranks
 
     @property
-    def hole_ranks(self):
-        if not self._hole_ranks:
-            hole_ranks = [card.rank for card in self.cards[0:2]]
-            self._hole_ranks = tuple(sorted(hole_ranks, reverse=True))
-        return self._hole_ranks
+    def sorted_ranks(self):
+        if not self._sorted_ranks:
+            self._sorted_ranks = sorted(map(lambda card: card.rank, self.cards), reverse=True)
+        return self._sorted_ranks
 
-    @property
-    def best_high_cards(self):
-        if not self._best_high_cards:
-            _best_high_cards = [rank for rank, cards in self.rank_dict.items()
-                                if len(cards) == 1]
-            self._best_high_cards = sorted(_best_high_cards, reverse=True)
-        return self._best_high_cards
+    def get_complement_ranks(self, count, *exluded_ranks):
+        return [rank for rank in self.sorted_ranks if rank not in exluded_ranks][:count]
