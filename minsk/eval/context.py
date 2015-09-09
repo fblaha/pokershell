@@ -37,8 +37,15 @@ class EvalContext:
     @property
     def sorted_ranks(self):
         if not self._sorted_ranks:
-            self._sorted_ranks = sorted(map(lambda card: card.rank, self.cards), reverse=True)
+            self._sorted_ranks = sorted(
+                map(lambda card: card.rank, self.cards),
+                reverse=True)
         return self._sorted_ranks
 
     def get_complement_ranks(self, count, *exluded_ranks):
-        return [rank for rank in self.sorted_ranks if rank not in exluded_ranks][:count]
+        result = []
+        for rank in self.sorted_ranks:
+            if rank not in exluded_ranks:
+                result.append(rank)
+                if len(result) == count:
+                    return result
