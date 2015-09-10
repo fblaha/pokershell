@@ -1,6 +1,7 @@
 import functools
 import multiprocessing
 import abc
+import random
 
 import minsk.model as model
 import minsk.eval.manager as manager
@@ -60,4 +61,11 @@ class MonteCarloSimulator(AbstractSimulator):
         self._player_num = player_num
 
     def simulate_river(self, *cards):
+        deck = model.Deck(*cards)
+        deck.shuffle()
+        deck_cards = deck.cards
+        for _ in range(10000):
+            others_cards = random.sample(deck_cards, self._player_num * 2)
+            print(others_cards)
+
         return 0, 0, 0
