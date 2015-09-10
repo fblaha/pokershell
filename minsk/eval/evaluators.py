@@ -78,17 +78,13 @@ class StraightEvaluator(eval.AbstractEvaluator):
     @staticmethod
     def _find_straight(cards):
         ranks = {card.rank for card in cards}
-        rank_nums = {rank.value[1] for rank in ranks}
+        rank_nums = sorted(map(lambda rank: rank.value[1], ranks), reverse=True)
         if model.Rank.ACE in ranks:
-            rank_nums.add(1)
-        upper_ranks = []
+            rank_nums.append(1)
         for rank_ord in rank_nums:
-            upper = rank_ord + 5
-            if all(r in rank_nums for r in range(rank_ord, upper)):
-                upper_ranks.append(model.Rank.from_ord(upper - 1))
-        if upper_ranks:
-            upper_ranks.sort(reverse=True)
-            return upper_ranks[0],
+            lower = rank_ord - 4
+            if all(r in rank_nums for r in range(lower, rank_ord + 1)):
+                return model.Rank.from_ord(rank_ord),
 
 
 class StraightFlushEvaluator(StraightEvaluator):
