@@ -1,11 +1,12 @@
 import functools
 import multiprocessing
+import abc
 
 import minsk.model as model
 import minsk.eval.manager as manager
 
 
-class BruteForceSimulator:
+class AbstractSimulator(metaclass=abc.ABCMeta):
     def __init__(self):
         super().__init__()
         self._manager = manager.EvaluatorManager()
@@ -23,6 +24,12 @@ class BruteForceSimulator:
         else:
             return self.simulate_river(*cards)
 
+    @abc.abstractmethod
+    def simulate_river(self, *cards):
+        pass
+
+
+class BruteForceSimulator(AbstractSimulator):
     def simulate_river(self, *cards):
         common = cards[2:]
         deck = model.Deck(*cards)
@@ -45,3 +52,12 @@ class BruteForceSimulator:
 
     def _process(self, cards, generated):
         return self.simulate_river(*(cards + generated))
+
+
+class MonteCarloSimulator(AbstractSimulator):
+    def __init__(self, player_num):
+        super().__init__()
+        self._player_num = player_num
+
+    def simulate_river(self, *cards):
+        return 0, 0, 0
