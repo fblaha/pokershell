@@ -6,24 +6,47 @@ import prettytable
 import minsk.eval.manager as manager
 import minsk.eval.simulation as simulation
 import minsk.model as model
+import minsk.config as config
 
 
 class MinskShell(cmd.Cmd):
     """Minsk shell"""
     prompt = '(minsk) '
 
-    def do_eval(self, cards):
-        """evaluate hand"""
+    def do_bf(self, cards):
+        """evaluate hand - brute force"""
         simulator = simulation.BruteForceSimulator()
+        self.simulate(cards, simulator)
+
+    def do_mc(self, cards):
+        """evaluate hand - monte carlo"""
+        simulator = simulation.MonteCarloSimulator(config.player_num, config.sim_cycles)
+        self.simulate(cards, simulator)
+
+    def simulate(self, cards, simulator):
+        self.print_configuration()
         cards = model.Card.parse_cards(cards)
-
         self.print_input(cards)
-
         start = time.time()
         result = simulator.simulate(*cards)
         self.print_output(result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
+
+    def do_player_num(self, player_num):
+        """set player number"""
+        config.player_num = player_num
+
+    def do_sim_cycles(self, sim_cycles):
+        """set simulation cycles number"""
+        config.sim_cycles = sim_cycles
+
+    def print_configuration(self):
+        print('\nConfiguration :')
+        t = prettytable.PrettyTable(['key', 'value'])
+        for name in ('player_num', 'sim_cycles'):
+            t.add_row([name, getattr(config, name)])
+        print(t)
 
     def print_output(self, result):
         print('\nOutput :')

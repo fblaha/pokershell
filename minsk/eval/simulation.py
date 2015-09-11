@@ -25,6 +25,9 @@ class AbstractSimulator(metaclass=abc.ABCMeta):
         else:
             return self.simulate_river(*cards)
 
+    def _process(self, cards, generated):
+        return self.simulate_river(*(cards + generated))
+
     @abc.abstractmethod
     def simulate_river(self, *cards):
         pass
@@ -51,15 +54,12 @@ class BruteForceSimulator(AbstractSimulator):
                 tie += 1
         return win, tie, lose
 
-    def _process(self, cards, generated):
-        return self.simulate_river(*(cards + generated))
-
 
 class MonteCarloSimulator(AbstractSimulator):
     def __init__(self, player_num, sim_num):
         super().__init__()
-        self._player_num = player_num
-        self._sim_num = sim_num
+        self._player_num = int(player_num)
+        self._sim_num = int(sim_num)
 
     def simulate_river(self, *cards):
         common = cards[2:]
@@ -68,7 +68,7 @@ class MonteCarloSimulator(AbstractSimulator):
         best_hand = self._manager.find_best_hand(*cards)
         win, tie, lose, cnt = 0, 0, 0, 0
         while cnt < self._sim_num:
-            others_cards = random.sample(deck_cards, self._player_num * 2)
+            others_cards = random.sample(deck_cards, (self._player_num - 1) * 2)
             hands = chunks(others_cards, 2)
             for hand in hands:
                 opponent_cards = tuple(hand) + common
