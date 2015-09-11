@@ -56,16 +56,37 @@ class BruteForceSimulator(AbstractSimulator):
 
 
 class MonteCarloSimulator(AbstractSimulator):
-    def __init__(self, player_num):
+    def __init__(self, player_num, sim_num):
         super().__init__()
         self._player_num = player_num
+        self._sim_num = sim_num
 
     def simulate_river(self, *cards):
+        common = cards[2:]
         deck = model.Deck(*cards)
-        deck.shuffle()
         deck_cards = deck.cards
-        for _ in range(10000):
+        best_hand = self._manager.find_best_hand(*cards)
+        win, tie, lose, cnt = 0, 0, 0, 0
+        while cnt < self._sim_num:
             others_cards = random.sample(deck_cards, self._player_num * 2)
-            print(others_cards)
+            hands = chunks(others_cards, 2)
+            for hand in hands:
+                opponent_cards = tuple(hand) + common
+                opponent_best = self._manager.find_best_hand(*opponent_cards)
+                cnt += 1
+                is_tie = False
+                if best_hand < opponent_best:
+                    lose += 1
+                    continue
+                elif best_hand == opponent_best:
+                    is_tie = True
+            if is_tie:
+                tie += 1
+            else:
+                win += 1
+        return win, tie, lose
 
-        return 0, 0, 0
+
+def chunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i + n]

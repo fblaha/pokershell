@@ -30,3 +30,14 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
         result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result[0] / sum(result) < 0.2)
+
+
+class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
+    def setUp(self):
+        super().setUp()
+        self.simulator = simulation.MonteCarloSimulator(2, 10000)
+
+    def test_river_full_house(self):
+        cards = model.Card.parse_cards('2s 6c Ad 8s Ac 6d 9d')
+        result = self.simulator.simulate_river(*cards)
+        print(result)
