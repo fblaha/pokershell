@@ -7,6 +7,11 @@ import minsk.model as model
 import minsk.eval.manager as manager
 
 
+def chunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
+
+
 class AbstractSimulator(metaclass=abc.ABCMeta):
     def __init__(self):
         super().__init__()
@@ -58,8 +63,8 @@ class BruteForceSimulator(AbstractSimulator):
 class MonteCarloSimulator(AbstractSimulator):
     def __init__(self, player_num, sim_num):
         super().__init__()
-        self._player_num = int(player_num)
-        self._sim_num = int(sim_num)
+        self._player_num = player_num
+        self._sim_num = sim_num
 
     def simulate_river(self, *cards):
         common = cards[2:]
@@ -89,6 +94,10 @@ class MonteCarloSimulator(AbstractSimulator):
         return win, tie, lose
 
 
-def chunks(l, n):
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
+class PreFlopSimulator:
+    def __init__(self, player_num):
+        super().__init__()
+        self._player_num = player_num
+
+    def simulate(self, *cards):
+        pass
