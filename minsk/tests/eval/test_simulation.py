@@ -35,9 +35,9 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
 class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
-        self.simulator = simulation.MonteCarloSimulator(2, 10000)
+        self.simulator = simulation.MonteCarloSimulator(2, 1000)
 
     def test_river_full_house(self):
-        cards = model.Card.parse_cards('2s 6c Ad 8s Ac 6d 9d')
+        cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d 9d')
         result = self.simulator.simulate_river(*cards)
         print(result)

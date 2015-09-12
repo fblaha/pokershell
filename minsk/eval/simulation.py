@@ -74,13 +74,15 @@ class MonteCarloSimulator(AbstractSimulator):
                 opponent_cards = tuple(hand) + common
                 opponent_best = self._manager.find_best_hand(*opponent_cards)
                 cnt += 1
-                is_tie = False
+                is_tie, is_lose = False, False
                 if best_hand < opponent_best:
-                    lose += 1
-                    continue
+                    is_lose = True
+                    break
                 elif best_hand == opponent_best:
                     is_tie = True
-            if is_tie:
+            if is_lose:
+                lose += 1
+            elif is_tie:
                 tie += 1
             else:
                 win += 1

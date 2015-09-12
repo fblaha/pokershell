@@ -1,3 +1,3 @@
 player_num = 2
 
-sim_cycles = 10000
+sim_cycles = 1000
