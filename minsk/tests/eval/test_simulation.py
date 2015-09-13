@@ -41,3 +41,24 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d 9d')
         result = self.simulator.simulate_river(*cards)
         print(result)
+
+
+class TestPreFlopSimulator(testtools.TestCase, common.TestUtilsMixin):
+    def setUp(self):
+        super().setUp()
+        self.simulator = simulation.PreFlopSimulator(5)
+
+    def test_not_suited(self):
+        cards = model.Card.parse_cards('As 6c')
+        result = self.simulator.simulate(*cards)
+        self.assertEqual(19.21, result[0])
+
+    def test_suited(self):
+        cards = model.Card.parse_cards('Ac 6c')
+        result = self.simulator.simulate(*cards)
+        self.assertEqual(23.33, result[0])
+
+    def test_pair(self):
+        cards = model.Card.parse_cards('Ac Ad')
+        result = self.simulator.simulate(*cards)
+        self.assertEqual(55.78, result[0])

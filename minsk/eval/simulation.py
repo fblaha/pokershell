@@ -1,6 +1,7 @@
 import functools
 import multiprocessing
 import abc
+import os
 import random
 
 import minsk.model as model
@@ -98,6 +99,40 @@ class PreFlopSimulator:
     def __init__(self, player_num):
         super().__init__()
         self._player_num = player_num
+        self._sim_data = {}
 
-    def simulate(self, *cards):
-        pass
+    def _init_data(self, player_num):
+        if player_num in self._sim_data:
+            return
+        code_dict = {}
+        dir = os.path.dirname(__file__)
+        data_file = os.path.join(dir, 'preflop', str(self._player_num) + '.txt')
+        with open(data_file) as f:
+            content = f.readlines()
+        for line in content:
+            line_split = line.split()
+            code = line_split[1]
+            win = float(line_split[2])
+            tie = float(line_split[3])
+            lose = 100 - win - tie
+            code_dict[code] = (win, tie, lose)
+        self._sim_data[player_num] = code_dict
+
+    def simulate(self, c1, c2):
+        self._init_data(self._player_num)
+        code = self._get_hole_code(c1, c2)
+        return self._sim_data[self._player_num][code]
+
+    def _get_hole_code(self, c1, c2):
+        ranks = sorted([c1.rank, c2.rank])
+        if c1.rank == c2.rank:
+            return self._get_code(ranks)
+        else:
+            if c1.suit == c2.suit:
+                return self._get_code(ranks) + 's'
+            else:
+                return self._get_code(ranks)
+
+    @staticmethod
+    def _get_code(ranks):
+        return ranks[0].value[0] + ranks[1].value[0]
