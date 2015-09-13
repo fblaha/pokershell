@@ -37,6 +37,7 @@ class MinskShell(cmd.Cmd):
         self.print_input(cards)
         if not simulator:
             print('\nNo simulator found!\n')
+            return
         start = time.time()
         result = simulator.simulate(*cards)
         self.print_output(result)
