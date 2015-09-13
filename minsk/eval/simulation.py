@@ -89,10 +89,10 @@ class MonteCarloSimulator(CombinatoricSimulator):
     cards_num = {5, 6, 7}
     players_num = set(range(2, 11))
 
-    def __init__(self, player_num, sim_num):
+    def __init__(self, player_num, sim_cycles):
         super().__init__()
         self._player_num = player_num
-        self._sim_num = sim_num
+        self._sim_cycles = sim_cycles
 
     def simulate_river(self, *cards):
         common = cards[2:]
@@ -100,7 +100,7 @@ class MonteCarloSimulator(CombinatoricSimulator):
         deck_cards = deck.cards
         best_hand = self._manager.find_best_hand(*cards)
         win, tie, lose, cnt = 0, 0, 0, 0
-        while cnt < self._sim_num:
+        while cnt < self._sim_cycles:
             others_cards = random.sample(deck_cards, (self._player_num - 1) * 2)
             hands = chunks(others_cards, 2)
             for hand in hands:
