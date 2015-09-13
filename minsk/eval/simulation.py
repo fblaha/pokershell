@@ -4,6 +4,7 @@ import abc
 import os
 import random
 
+import minsk.config as config
 import minsk.model as model
 import minsk.eval.manager as manager
 
@@ -14,6 +15,19 @@ def chunks(l, n):
 
 
 class AbstractSimulator(metaclass=abc.ABCMeta):
+    priority = 100
+
+    @abc.abstractmethod
+    def simulate(self, *cards):
+        pass
+
+    @classmethod
+    @abc.abstractclassmethod
+    def from_config(cls):
+        pass
+
+
+class CombinatoricSimulator(AbstractSimulator, metaclass=abc.ABCMeta):
     def __init__(self):
         super().__init__()
         self._manager = manager.EvaluatorManager()
@@ -39,7 +53,12 @@ class AbstractSimulator(metaclass=abc.ABCMeta):
         pass
 
 
-class BruteForceSimulator(AbstractSimulator):
+class BruteForceSimulator(CombinatoricSimulator):
+    priority = 0
+    name = 'Brute Force'
+    cards_num = {6, 7}
+    players_num = {2}
+
     def simulate_river(self, *cards):
         common = cards[2:]
         deck = model.Deck(*cards)
@@ -60,8 +79,16 @@ class BruteForceSimulator(AbstractSimulator):
                 tie += 1
         return win, tie, lose
 
+    @classmethod
+    def from_config(cls):
+        return cls()
 
-class MonteCarloSimulator(AbstractSimulator):
+
+class MonteCarloSimulator(CombinatoricSimulator):
+    name = 'Monte Carlo'
+    cards_num = {5, 6, 7}
+    players_num = set(range(2, 10))
+
     def __init__(self, player_num, sim_num):
         super().__init__()
         self._player_num = player_num
@@ -94,8 +121,16 @@ class MonteCarloSimulator(AbstractSimulator):
                 win += 1
         return win, tie, lose
 
+    @classmethod
+    def from_config(cls):
+        return cls(config.player_num, config.sim_cycles)
 
-class PreFlopSimulator:
+
+class PreFlopSimulator(AbstractSimulator):
+    name = 'Pre-flop'
+    cards_num = {2}
+    players_num = set(range(2, 10))
+
     def __init__(self, player_num):
         super().__init__()
         self._player_num = player_num
@@ -136,3 +171,21 @@ class PreFlopSimulator:
     @staticmethod
     def _get_code(ranks):
         return ranks[0].value[0] + ranks[1].value[0]
+
+    @classmethod
+    def from_config(cls):
+        return cls(config.player_num)
+
+
+class SimulatorManager:
+    simulators = (PreFlopSimulator, MonteCarloSimulator, BruteForceSimulator)
+
+    def find_simulator(self, *cards):
+        available = []
+        for simulator in self.simulators:
+            if config.player_num in simulator.players_num \
+                    and len(cards) in simulator.cards_num:
+                available.append(simulator)
+        if available:
+            best = sorted(available, key=lambda sim: sim.priority)[0]
+            return best.from_config()
