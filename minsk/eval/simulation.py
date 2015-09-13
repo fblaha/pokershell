@@ -87,7 +87,7 @@ class BruteForceSimulator(CombinatoricSimulator):
 class MonteCarloSimulator(CombinatoricSimulator):
     name = 'Monte Carlo'
     cards_num = {5, 6, 7}
-    players_num = set(range(2, 10))
+    players_num = set(range(2, 11))
 
     def __init__(self, player_num, sim_num):
         super().__init__()
@@ -129,7 +129,7 @@ class MonteCarloSimulator(CombinatoricSimulator):
 class PreFlopSimulator(AbstractSimulator):
     name = 'Pre-flop'
     cards_num = {2}
-    players_num = set(range(2, 10))
+    players_num = set(range(2, 11))
 
     def __init__(self, player_num):
         super().__init__()
