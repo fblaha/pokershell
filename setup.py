@@ -26,6 +26,8 @@ setup(
 
     namespace_packages=[],
     packages=find_packages(),
+    package_data={
+        'minsk.eval': ['preflop/*.txt']},
     include_package_data=True,
 
     entry_points={

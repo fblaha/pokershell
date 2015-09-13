@@ -15,18 +15,28 @@ class MinskShell(cmd.Cmd):
 
     def do_bf(self, cards):
         """evaluate hand - brute force"""
+        cards = model.Card.parse_cards(cards)
         simulator = simulation.BruteForceSimulator()
+        self.simulate(cards, simulator)
+
+    def do_eval(self, cards):
+        """evaluate hand"""
+        cards = model.Card.parse_cards(cards)
+        manager = simulation.SimulatorManager()
+        simulator = manager.find_simulator(*cards)
         self.simulate(cards, simulator)
 
     def do_mc(self, cards):
         """evaluate hand - monte carlo"""
+        cards = model.Card.parse_cards(cards)
         simulator = simulation.MonteCarloSimulator(config.player_num, config.sim_cycles)
         self.simulate(cards, simulator)
 
     def simulate(self, cards, simulator):
-        self.print_configuration()
-        cards = model.Card.parse_cards(cards)
+        self.print_configuration(simulator)
         self.print_input(cards)
+        if not simulator:
+            print('\nNo simulator found!\n')
         start = time.time()
         result = simulator.simulate(*cards)
         self.print_output(result)
@@ -35,26 +45,32 @@ class MinskShell(cmd.Cmd):
 
     def do_player_num(self, player_num):
         """set player number"""
-        config.player_num = player_num
+        config.player_num = int(player_num)
 
     def do_sim_cycles(self, sim_cycles):
         """set simulation cycles number"""
-        config.sim_cycles = sim_cycles
+        config.sim_cycles = int(sim_cycles)
 
-    def print_configuration(self):
+    def print_configuration(self, simulator):
         print('\nConfiguration :')
         t = prettytable.PrettyTable(['key', 'value'])
         for name in ('player_num', 'sim_cycles'):
             t.add_row([name, getattr(config, name)])
+        t.add_row(['simulator', simulator.name])
         print(t)
 
     def print_output(self, result):
         print('\nOutput :')
-        total = sum(result)
-        result_pct = list(map(lambda x: str(round(x / total * 100)) + '%', result))
         result_table = prettytable.PrettyTable(['Win', 'Tie', 'Loss'])
-        result_table.add_row(result_pct)
-        result_table.add_row(result)
+
+        if isinstance(result[0], int):
+            total = sum(result)
+            result_pct = list(map(lambda x: str(round(x / total * 100)) + '%', result))
+            result_table.add_row(result_pct)
+            result_table.add_row(result)
+        else:
+            result_pct = list(map(lambda x: str(round(x)) + '%', result))
+            result_table.add_row(result_pct)
         print(result_table)
 
     def print_input(self, cards):
@@ -71,12 +87,13 @@ class MinskShell(cmd.Cmd):
             columns.append('River')
             row.append(cards[6])
         evaluator_manager = manager.EvaluatorManager()
-        hand = evaluator_manager.find_best_hand(*cards)
-        columns.append('Hand')
-        row.append(hand[0].name)
+        if len(cards) >= 5:
+            hand = evaluator_manager.find_best_hand(*cards)
+            columns.append('Hand')
+            row.append(hand[0].name)
 
-        columns.append('Ranks')
-        row.append(' '.join(map(repr, hand[1])))
+            columns.append('Ranks')
+            row.append(' '.join(map(repr, hand[1])))
 
         input_table = prettytable.PrettyTable(columns)
         input_table.add_row(row)
