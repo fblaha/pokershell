@@ -56,7 +56,8 @@ class MinskShell(cmd.Cmd):
         t = prettytable.PrettyTable(['key', 'value'])
         for name in ('player_num', 'sim_cycles'):
             t.add_row([name, getattr(config, name)])
-        t.add_row(['simulator', simulator.name])
+        if simulator:
+            t.add_row(['simulator', simulator.name])
         print(t)
 
     def print_output(self, result):
