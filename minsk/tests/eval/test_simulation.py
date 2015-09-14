@@ -1,7 +1,6 @@
 import testtools
 
 import minsk.config as config
-
 import minsk.eval.simulation as simulation
 import minsk.model as model
 import minsk.tests.eval.common as common
@@ -14,7 +13,7 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
 
     def test_river_full_house(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d 9d')
-        result = self.simulator.simulate_river(*cards)
+        result = self.simulator._simulate_river(*cards)
         self.assertTrue(result[0] / sum(result) > 0.9)
 
     def test_turn(self):
@@ -37,11 +36,11 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
 class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
-        self.simulator = simulation.MonteCarloSimulator(2, 1000)
+        self.simulator = simulation.MonteCarloSimulator(5, 10000)
 
     def test_river_full_house(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d 9d')
-        result = self.simulator.simulate_river(*cards)
+        result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result[0] / sum(result) > 0.9)
 

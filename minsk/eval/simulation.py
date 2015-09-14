@@ -37,19 +37,22 @@ class CombinatoricSimulator(AbstractSimulator, metaclass=abc.ABCMeta):
         deck = model.Deck(*cards)
         deck_cards = deck.cards
         if unknown_count:
-            process_fc = functools.partial(self._process, cards)
-            pool = multiprocessing.Pool()
+            parallel_exec_num = len(deck_cards) ** unknown_count
+            fc = functools.partial(self._process, parallel_exec_num, cards)
             combinations = model.Card.all_combinations(deck_cards, unknown_count)
-            partial_results = pool.map(process_fc, combinations)
-            return tuple(sum(x) for x in zip(*partial_results))
+            partial_results = multiprocessing.Pool().map(fc, combinations)
+            return self._sum_partial(partial_results)
         else:
-            return self.simulate_river(*cards)
+            return self._simulate_river(0, *cards)
 
-    def _process(self, cards, generated):
-        return self.simulate_river(*(cards + generated))
+    def _sum_partial(self, partial_results):
+        return tuple(sum(x) for x in zip(*partial_results))
+
+    def _process(self, parallel_exec_num, cards, generated):
+        return self._simulate_river(parallel_exec_num, *(cards + generated))
 
     @abc.abstractmethod
-    def simulate_river(self, *cards):
+    def _simulate_river(self, generated_num, *cards):
         pass
 
 
@@ -59,7 +62,7 @@ class BruteForceSimulator(CombinatoricSimulator):
     cards_num = {6, 7}
     players_num = {2}
 
-    def simulate_river(self, *cards):
+    def _simulate_river(self, _, *cards):
         common = cards[2:]
         deck = model.Deck(*cards)
         deck_cards = deck.cards
@@ -94,13 +97,25 @@ class MonteCarloSimulator(CombinatoricSimulator):
         self._player_num = player_num
         self._sim_cycles = sim_cycles
 
-    def simulate_river(self, *cards):
+    def _simulate_river(self, parallel_exec_num, *cards):
+        if parallel_exec_num:
+            cycles = self._sim_cycles // parallel_exec_num
+            return self._simulate_river_seq(cycles, cards)
+        else:
+            parallel_count = multiprocessing.cpu_count() * 2
+            start_data = [cards] * parallel_count
+            cycles = self._sim_cycles // parallel_count
+            fc = functools.partial(self._simulate_river_seq, cycles)
+            partial_results = multiprocessing.Pool().map(fc, start_data)
+            return self._sum_partial(partial_results)
+
+    def _simulate_river_seq(self, sim_cycles, cards):
         common = cards[2:]
         deck = model.Deck(*cards)
         deck_cards = deck.cards
         best_hand = self._manager.find_best_hand(*cards)
         win, tie, lose, cnt = 0, 0, 0, 0
-        while cnt < self._sim_cycles:
+        while cnt < sim_cycles:
             others_cards = random.sample(deck_cards, (self._player_num - 1) * 2)
             hands = chunks(others_cards, 2)
             for hand in hands:
