@@ -1,7 +1,6 @@
 import testtools
 
 import minsk.model as model
-
 import minsk.tests.eval.common as common
 
 

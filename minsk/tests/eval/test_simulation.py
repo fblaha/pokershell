@@ -44,6 +44,12 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         print(result)
         self.assertTrue(result[0] / sum(result) > 0.9)
 
+    def test_river_seq(self):
+        cards = model.Card.parse_cards('As Ac 7d 8s Jc 6d Ad')
+        result = self.simulator._simulate_river_seq(5000, tuple(cards))
+        print(result)
+        self.assertTrue(result[0] / sum(result) > 0.5)
+
 
 class TestPreFlopSimulator(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
