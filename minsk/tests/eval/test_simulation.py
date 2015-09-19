@@ -38,13 +38,20 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
 class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
-        self.simulator = simulation.MonteCarloSimulator(5, 10000)
+        self.simulator = simulation.MonteCarloSimulator(5, 20000)
 
     def test_river_full_house(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d 9d')
         result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result[0] / sum(result) > 0.9)
+
+    def test_calculator_comparison(self):
+        cards = model.Card.parse_cards('4h 4d 8c 4c Qd')
+        result = self.simulator.simulate(*cards)
+        rate = result[0] / sum(result)
+        print(rate)
+        self.assertTrue(0.75 <= rate <= 0.79)
 
     def test_performance(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d')
@@ -57,8 +64,10 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
     def test_river_seq(self):
         cards = model.Card.parse_cards('As Ac 7d 8s Jc 6d Ad')
         result = self.simulator._simulate_river_seq(5000, tuple(cards))
+        rate = result[0] / sum(result)
         print(result)
-        self.assertTrue(result[0] / sum(result) > 0.5)
+        print(rate)
+        self.assertTrue(rate > 0.5)
 
 
 class TestPreFlopSimulator(testtools.TestCase, common.TestUtilsMixin):

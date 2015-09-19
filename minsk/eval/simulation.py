@@ -115,14 +115,16 @@ class MonteCarloSimulator(CombinatoricSimulator):
         deck_cards = deck.cards
         best_hand = self._manager.find_best_hand(*cards)
         win, tie, lose, cnt = 0, 0, 0, 0
+        others_count = self._player_num - 1
+        sampled_count = others_count * 2
         while cnt < sim_cycles:
-            others_cards = random.sample(deck_cards, (self._player_num - 1) * 2)
+            others_cards = random.sample(deck_cards, sampled_count)
+            cnt += others_count
             hands = chunks(others_cards, 2)
+            is_tie, is_lose = False, False
             for hand in hands:
                 opponent_cards = tuple(hand) + common
                 opponent_best = self._manager.find_best_hand(*opponent_cards)
-                cnt += 1
-                is_tie, is_lose = False, False
                 if best_hand < opponent_best:
                     is_lose = True
                     break

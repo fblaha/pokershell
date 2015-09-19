@@ -67,11 +67,11 @@ class MinskShell(cmd.Cmd):
 
         if isinstance(result[0], int):
             total = sum(result)
-            result_pct = list(map(lambda x: str(round(x / total * 100)) + '%', result))
+            result_pct = list(map(lambda x: str(round(x / total * 100, 2)) + '%', result))
             result_table.add_row(result_pct)
             result_table.add_row(result)
         else:
-            result_pct = list(map(lambda x: str(round(x)) + '%', result))
+            result_pct = list(map(lambda x: str(round(x, 2)) + '%', result))
             result_table.add_row(result_pct)
         print(result_table)
 
