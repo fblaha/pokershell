@@ -6,8 +6,6 @@ class EvalContext:
         super().__init__()
         self.cards = cards
         self._sorted_ranks = None
-        self._hole_ranks = None
-        self._best_high_cards = None
         self._init_ranks()
         self._init_suits()
 

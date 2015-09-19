@@ -70,7 +70,6 @@ class BruteForceSimulator(CombinatoricSimulator):
         win, tie, lose = 0, 0, 0
         for opponent in model.Card.all_combinations(deck_cards, 2):
             opponent_cards = opponent + common
-            # TODO reuse eval context
             opponent_best = self._manager.find_best_hand(*opponent_cards)
             if len(best_hand) != len(opponent_best):
                 raise ValueError('Hands are not comparable: {0} {1}'.
@@ -121,7 +120,6 @@ class MonteCarloSimulator(CombinatoricSimulator):
             hands = chunks(others_cards, 2)
             for hand in hands:
                 opponent_cards = tuple(hand) + common
-                # TODO reuse eval context
                 opponent_best = self._manager.find_best_hand(*opponent_cards)
                 cnt += 1
                 is_tie, is_lose = False, False

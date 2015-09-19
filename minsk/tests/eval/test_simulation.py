@@ -1,3 +1,5 @@
+import time
+
 import testtools
 
 import minsk.config as config
@@ -43,6 +45,14 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result[0] / sum(result) > 0.9)
+
+    def test_performance(self):
+        cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d')
+        start_time = time.time()
+        simulation.MonteCarloSimulator(6, config.sim_cycles).simulate(*cards)
+        elapsed_time = time.time() - start_time
+        print('Elapsed time : %f' % elapsed_time)
+        self.assertTrue(elapsed_time < 10)
 
     def test_river_seq(self):
         cards = model.Card.parse_cards('As Ac 7d 8s Jc 6d Ad')
