@@ -9,11 +9,6 @@ import minsk.model as model
 import minsk.eval.manager as manager
 
 
-def chunks(l, n):
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
-
-
 class AbstractSimulator(metaclass=abc.ABCMeta):
     priority = 100
 
@@ -120,7 +115,7 @@ class MonteCarloSimulator(CombinatoricSimulator):
         while cnt < sim_cycles:
             others_cards = random.sample(deck_cards, sampled_count)
             cnt += others_count
-            hands = chunks(others_cards, 2)
+            hands = zip(others_cards[::2], others_cards[1::2])
             is_tie, is_lose = False, False
             for hand in hands:
                 opponent_cards = tuple(hand) + common
