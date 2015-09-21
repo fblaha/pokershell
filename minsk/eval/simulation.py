@@ -35,12 +35,12 @@ class CombinatoricSimulator(AbstractSimulator, metaclass=abc.ABCMeta):
             parallel_exec_num = len(deck_cards) ** unknown_count
             fc = functools.partial(self._process, parallel_exec_num, cards)
             combinations = model.Card.all_combinations(deck_cards, unknown_count)
-            partial_results = multiprocessing.Pool().map(fc, combinations)
-            return self._sum_partial(partial_results)
+            return self._simulate_parallel(fc, combinations)
         else:
             return self._simulate_river(0, *cards)
 
-    def _sum_partial(self, partial_results):
+    def _simulate_parallel(self, sim_fc, data):
+        partial_results = multiprocessing.Pool().map(sim_fc, data)
         return tuple(sum(x) for x in zip(*partial_results))
 
     def _process(self, parallel_exec_num, cards, generated):
@@ -101,23 +101,20 @@ class MonteCarloSimulator(CombinatoricSimulator):
             start_data = [cards] * parallel_count
             cycles = self._sim_cycles // parallel_count
             fc = functools.partial(self._simulate_river_seq, cycles)
-            partial_results = multiprocessing.Pool().map(fc, start_data)
-            return self._sum_partial(partial_results)
+            return self._simulate_parallel(fc, start_data)
 
     def _simulate_river_seq(self, sim_cycles, cards):
         common = cards[2:]
         deck = model.Deck(*cards)
         deck_cards = deck.cards
         best_hand = self._manager.find_best_hand(*cards)
-        win, tie, lose, cnt = 0, 0, 0, 0
+        win, tie, lose = 0, 0, 0
         others_count = self._player_num - 1
         sampled_count = others_count * 2
-        while cnt < sim_cycles:
+        for _ in range(sim_cycles // others_count):
             others_cards = random.sample(deck_cards, sampled_count)
-            cnt += others_count
-            hands = zip(others_cards[::2], others_cards[1::2])
             is_tie, is_lose = False, False
-            for hand in hands:
+            for hand in zip(others_cards[::2], others_cards[1::2]):
                 opponent_cards = tuple(hand) + common
                 opponent_best = self._manager.find_best_hand(*opponent_cards)
                 if best_hand < opponent_best:
