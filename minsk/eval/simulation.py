@@ -39,7 +39,8 @@ class CombinatoricSimulator(AbstractSimulator, metaclass=abc.ABCMeta):
         else:
             return self._simulate_river(0, *cards)
 
-    def _simulate_parallel(self, sim_fc, data):
+    @staticmethod
+    def _simulate_parallel(sim_fc, data):
         partial_results = multiprocessing.Pool().map(sim_fc, data)
         return tuple(sum(x) for x in zip(*partial_results))
 
