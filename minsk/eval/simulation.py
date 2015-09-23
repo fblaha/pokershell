@@ -231,7 +231,7 @@ class LookUpSimulator(AbstractSimulator):
 
 
 class SimulatorManager:
-    simulators = (LookUpSimulator, HybridMonteCarloSimulator, BruteForceSimulator)
+    simulators = (LookUpSimulator, HybridMonteCarloSimulator, BruteForceSimulator, MonteCarloSimulator)
 
     def find_simulator(self, *cards):
         available = []

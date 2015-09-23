@@ -21,6 +21,10 @@ class TestShell(testtools.TestCase):
         with common.test_config(10000, 5):
             self.shell.do_mc('As 6s')
 
+    def test_monte_carlo_eval(self):
+        with common.test_config(10000, 5):
+            self.shell.do_eval('As 6s 5d')
+
     def test_look_up(self):
         with common.test_config(10000, 5):
             self.shell.do_lu('As 6s')
