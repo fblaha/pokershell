@@ -51,6 +51,18 @@ class CombinatoricSimulator(AbstractSimulator, metaclass=abc.ABCMeta):
     def _simulate_river(self, generated_num, *cards):
         pass
 
+    def _eval_showdown(self, my_hand, common, others_cards):
+        result = 1
+        for hand in zip(others_cards[::2], others_cards[1::2]):
+            opponent_cards = hand + common
+            opponent_best = self._manager.find_best_hand(*opponent_cards)
+            if my_hand < opponent_best:
+                return -1
+                break
+            elif my_hand == opponent_best:
+                result = 0
+        return result
+
 
 class BruteForceSimulator(CombinatoricSimulator):
     priority = 0
@@ -96,36 +108,32 @@ class MonteCarloSimulator(CombinatoricSimulator):
     def _simulate_river(self, parallel_exec_num, *cards):
         if parallel_exec_num:
             cycles = self._sim_cycles // parallel_exec_num
-            return self._simulate_river_seq(cycles, cards)
+            return self._sample_opponents(cycles, cards)
         else:
-            parallel_count = multiprocessing.cpu_count() * 2
-            start_data = [cards] * parallel_count
-            cycles = self._sim_cycles // parallel_count
-            fc = functools.partial(self._simulate_river_seq, cycles)
-            return self._simulate_parallel(fc, start_data)
+            return self._simulate_cards_parallel(self._sim_cycles,
+                                                 self._sample_opponents, *cards)
 
-    def _simulate_river_seq(self, sim_cycles, cards):
+    @classmethod
+    def _simulate_cards_parallel(cls, sim_cycles, fc, *cards):
+        parallel_count = multiprocessing.cpu_count() * 2
+        start_data = (cards,) * parallel_count
+        cycles = sim_cycles // parallel_count
+        fc = functools.partial(fc, cycles)
+        return cls._simulate_parallel(fc, start_data)
+
+    def _sample_opponents(self, sim_cycles, cards):
         common = cards[2:]
-        deck = model.Deck(*cards)
-        deck_cards = deck.cards
-        best_hand = self._manager.find_best_hand(*cards)
+        deck_cards = model.Deck(*cards).cards
+        my_hand = self._manager.find_best_hand(*cards)
         win, tie, lose = 0, 0, 0
         others_count = self._player_num - 1
         sampled_count = others_count * 2
         for _ in range(sim_cycles // others_count):
             others_cards = random.sample(deck_cards, sampled_count)
-            is_tie, is_lose = False, False
-            for hand in zip(others_cards[::2], others_cards[1::2]):
-                opponent_cards = tuple(hand) + common
-                opponent_best = self._manager.find_best_hand(*opponent_cards)
-                if best_hand < opponent_best:
-                    is_lose = True
-                    break
-                elif best_hand == opponent_best:
-                    is_tie = True
-            if is_lose:
+            result = self._eval_showdown(my_hand, common, others_cards)
+            if result == -1:
                 lose += 1
-            elif is_tie:
+            elif result == 0:
                 tie += 1
             else:
                 win += 1
@@ -134,6 +142,40 @@ class MonteCarloSimulator(CombinatoricSimulator):
     @classmethod
     def from_config(cls):
         return cls(config.player_num, config.sim_cycles)
+
+
+class PreFlopMonteCarloSimulator(MonteCarloSimulator):
+    name = 'Pre-flop Monte Carlo'
+    cards_num = set(range(2, 8))
+    players_num = set(range(2, 11))
+
+    def __init__(self, player_num, sim_cycles):
+        super().__init__(player_num, sim_cycles)
+
+    def simulate(self, *cards):
+        return self._simulate_cards_parallel(self._sim_cycles, self._sample, *cards)
+
+    def _sample(self, sim_cycles, cards):
+        common = cards[2:]
+        sampled_common_count = 5 - len(common)
+        deck_cards = model.Deck(*cards).cards
+        win, tie, lose = 0, 0, 0
+        others_count = self._player_num - 1
+        sampled_count = sampled_common_count + others_count * 2
+        for _ in range(sim_cycles // others_count):
+            sampled_cards = tuple(random.sample(deck_cards, sampled_count))
+            sampled_common = sampled_cards[:sampled_common_count]
+            my_cards = cards + sampled_common
+            my_hand = self._manager.find_best_hand(*my_cards)
+            others_cards = sampled_cards[sampled_common_count:]
+            result = self._eval_showdown(my_hand, common + sampled_common, others_cards)
+            if result == -1:
+                lose += 1
+            elif result == 0:
+                tie += 1
+            else:
+                win += 1
+        return win, tie, lose
 
 
 class PreFlopSimulator(AbstractSimulator):
