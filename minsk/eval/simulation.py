@@ -95,8 +95,8 @@ class BruteForceSimulator(CombinatoricSimulator):
         return cls()
 
 
-class MonteCarloSimulator(CombinatoricSimulator):
-    name = 'Monte Carlo'
+class HybridMonteCarloSimulator(CombinatoricSimulator):
+    name = 'Hybrid Monte Carlo'
     cards_num = {5, 6, 7}
     players_num = set(range(2, 11))
 
@@ -144,8 +144,8 @@ class MonteCarloSimulator(CombinatoricSimulator):
         return cls(config.player_num, config.sim_cycles)
 
 
-class PreFlopMonteCarloSimulator(MonteCarloSimulator):
-    name = 'Pre-flop Monte Carlo'
+class MonteCarloSimulator(HybridMonteCarloSimulator):
+    name = 'Monte Carlo'
     cards_num = set(range(2, 8))
     players_num = set(range(2, 11))
 
@@ -178,8 +178,9 @@ class PreFlopMonteCarloSimulator(MonteCarloSimulator):
         return win, tie, lose
 
 
-class PreFlopSimulator(AbstractSimulator):
-    name = 'Pre-flop'
+class LookUpSimulator(AbstractSimulator):
+    priority = 0
+    name = 'Look Up'
     cards_num = {2}
     players_num = set(range(2, 11))
 
@@ -230,7 +231,7 @@ class PreFlopSimulator(AbstractSimulator):
 
 
 class SimulatorManager:
-    simulators = (PreFlopSimulator, MonteCarloSimulator, BruteForceSimulator)
+    simulators = (LookUpSimulator, HybridMonteCarloSimulator, BruteForceSimulator)
 
     def find_simulator(self, *cards):
         available = []

@@ -26,10 +26,22 @@ class MinskShell(cmd.Cmd):
         simulator = manager.find_simulator(*cards)
         self.simulate(cards, simulator)
 
+    def do_hmc(self, cards):
+        """evaluate hand - hybrid monte carlo"""
+        cards = model.Card.parse_cards(cards)
+        simulator = simulation.HybridMonteCarloSimulator(config.player_num, config.sim_cycles)
+        self.simulate(cards, simulator)
+
     def do_mc(self, cards):
         """evaluate hand - monte carlo"""
         cards = model.Card.parse_cards(cards)
         simulator = simulation.MonteCarloSimulator(config.player_num, config.sim_cycles)
+        self.simulate(cards, simulator)
+
+    def do_lu(self, cards):
+        """evaluate hand - loop up"""
+        cards = model.Card.parse_cards(cards)
+        simulator = simulation.LookUpSimulator(config.player_num)
         self.simulate(cards, simulator)
 
     def simulate(self, cards, simulator):

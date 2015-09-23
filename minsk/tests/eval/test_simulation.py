@@ -35,10 +35,10 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.assertTrue(result[0] / sum(result) < 0.2)
 
 
-class TestPreFlopMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
+class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
-        self.simulator = simulation.PreFlopMonteCarloSimulator(5, 20000)
+        self.simulator = simulation.MonteCarloSimulator(5, 20000)
 
     def test_hole_cards(self):
         cards = model.Card.parse_cards('As 6c')
@@ -53,10 +53,10 @@ class TestPreFlopMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.assertTrue(result[1] < result[0] < result[2])
 
 
-class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
+class TestHybridMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
-        self.simulator = simulation.MonteCarloSimulator(5, 20000)
+        self.simulator = simulation.HybridMonteCarloSimulator(5, 20000)
 
     def test_river_full_house(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d 9d')
@@ -74,7 +74,7 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
     def test_performance(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d')
         start_time = time.time()
-        simulation.MonteCarloSimulator(6, config.sim_cycles).simulate(*cards)
+        simulation.HybridMonteCarloSimulator(6, config.sim_cycles).simulate(*cards)
         elapsed_time = time.time() - start_time
         print('Elapsed time : %f' % elapsed_time)
         self.assertTrue(elapsed_time < 10)
@@ -88,10 +88,10 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.assertTrue(rate > 0.5)
 
 
-class TestPreFlopSimulator(testtools.TestCase, common.TestUtilsMixin):
+class TestLookUpSimulator(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
-        self.simulator = simulation.PreFlopSimulator(5)
+        self.simulator = simulation.LookUpSimulator(5)
 
     def test_not_suited(self):
         cards = model.Card.parse_cards('As 6c')
@@ -122,12 +122,12 @@ class TestSimulatorManager(testtools.TestCase):
     def test_preflop(self):
         cards = model.Card.parse_cards('Ac 6c')
         simulator = self.manager.find_simulator(*cards)
-        self.assertIsInstance(simulator, simulation.PreFlopSimulator)
+        self.assertIsInstance(simulator, simulation.LookUpSimulator)
 
     def test_flop(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac')
         simulator = self.manager.find_simulator(*cards)
-        self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
+        self.assertIsInstance(simulator, simulation.HybridMonteCarloSimulator)
 
     def test_turn(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 4d')
@@ -143,10 +143,10 @@ class TestSimulatorManager(testtools.TestCase):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 4d 5h')
         config.player_num = 5
         simulator = self.manager.find_simulator(*cards)
-        self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
+        self.assertIsInstance(simulator, simulation.HybridMonteCarloSimulator)
 
     def test_turn_seven_players(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 4d')
         config.player_num = 7
         simulator = self.manager.find_simulator(*cards)
-        self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
+        self.assertIsInstance(simulator, simulation.HybridMonteCarloSimulator)

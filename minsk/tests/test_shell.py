@@ -1,7 +1,6 @@
 import testtools
 
 import minsk.shell as shell
-
 import minsk.config as config
 import minsk.tests.eval.common as common
 
@@ -14,9 +13,17 @@ class TestShell(testtools.TestCase):
     def test_brute_force(self):
         self.shell.do_bf('As 6c Ad 8s Ac 6d 7d')
 
+    def test_hybrid_monte_carlo(self):
+        with common.test_config(10000, 5):
+            self.shell.do_hmc('As 6c Ad 8s Ac 6d 7d')
+
     def test_monte_carlo(self):
         with common.test_config(10000, 5):
-            self.shell.do_mc('As 6c Ad 8s Ac 6d 7d')
+            self.shell.do_mc('As 6s')
+
+    def test_look_up(self):
+        with common.test_config(10000, 5):
+            self.shell.do_lu('As 6s')
 
     def test_eval(self):
         self.shell.do_eval('As 6c Ad 8s Ac 6d 7d')
