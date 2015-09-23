@@ -15,7 +15,7 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
 
     def test_river_full_house(self):
         cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d 9d')
-        result = self.simulator._simulate_river(*cards)
+        result = self.simulator._simulate_river(-1, cards)
         self.assertTrue(result[0] / sum(result) > 0.9)
 
     def test_turn(self):

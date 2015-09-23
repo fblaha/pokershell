@@ -37,7 +37,7 @@ class CombinatoricSimulator(AbstractSimulator, metaclass=abc.ABCMeta):
             combinations = model.Card.all_combinations(deck_cards, unknown_count)
             return self._simulate_parallel(fc, combinations)
         else:
-            return self._simulate_river(0, *cards)
+            return self._simulate_river(0, cards)
 
     @staticmethod
     def _simulate_parallel(sim_fc, data):
@@ -45,10 +45,10 @@ class CombinatoricSimulator(AbstractSimulator, metaclass=abc.ABCMeta):
         return tuple(sum(x) for x in zip(*partial_results))
 
     def _process(self, parallel_exec_num, cards, generated):
-        return self._simulate_river(parallel_exec_num, *(cards + generated))
+        return self._simulate_river(parallel_exec_num, cards + generated)
 
     @abc.abstractmethod
-    def _simulate_river(self, generated_num, *cards):
+    def _simulate_river(self, generated_num, cards):
         pass
 
     def _eval_showdown(self, my_hand, common, others_cards):
@@ -70,7 +70,7 @@ class BruteForceSimulator(CombinatoricSimulator):
     cards_num = {6, 7}
     players_num = {2}
 
-    def _simulate_river(self, _, *cards):
+    def _simulate_river(self, _, cards):
         common = cards[2:]
         deck = model.Deck(*cards)
         deck_cards = deck.cards
@@ -105,16 +105,16 @@ class HybridMonteCarloSimulator(CombinatoricSimulator):
         self._player_num = player_num
         self._sim_cycles = sim_cycles
 
-    def _simulate_river(self, parallel_exec_num, *cards):
+    def _simulate_river(self, parallel_exec_num, cards):
         if parallel_exec_num:
             cycles = self._sim_cycles // parallel_exec_num
             return self._sample_opponents(cycles, cards)
         else:
             return self._simulate_cards_parallel(self._sim_cycles,
-                                                 self._sample_opponents, *cards)
+                                                 self._sample_opponents, cards)
 
     @classmethod
-    def _simulate_cards_parallel(cls, sim_cycles, fc, *cards):
+    def _simulate_cards_parallel(cls, sim_cycles, fc, cards):
         parallel_count = multiprocessing.cpu_count() * 2
         start_data = (cards,) * parallel_count
         cycles = sim_cycles // parallel_count
@@ -153,7 +153,7 @@ class MonteCarloSimulator(HybridMonteCarloSimulator):
         super().__init__(player_num, sim_cycles)
 
     def simulate(self, *cards):
-        return self._simulate_cards_parallel(self._sim_cycles, self._sample, *cards)
+        return self._simulate_cards_parallel(self._sim_cycles, self._sample, cards)
 
     def _sample(self, sim_cycles, cards):
         common = cards[2:]

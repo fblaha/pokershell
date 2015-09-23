@@ -120,7 +120,7 @@ class Card(metaclass=minsk.utils.MementoMetaclass):
     @classmethod
     def parse_cards(cls, cards_line):
         cards_str = cards_line.split()
-        cards = [cls.parse(card) for card in cards_str]
+        cards = tuple(cls.parse(card) for card in cards_str)
         if len(cards) != len(set(cards)):
             raise ValueError('Duplicate cards: {0}'.format(cards_line))
         return cards
