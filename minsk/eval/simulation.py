@@ -162,7 +162,7 @@ class MonteCarloSimulator(HybridMonteCarloSimulator):
         win, tie, lose = 0, 0, 0
         others_count = self._player_num - 1
         sampled_count = sampled_common_count + others_count * 2
-        for _ in range(sim_cycles // others_count):
+        for _ in range(sim_cycles // 2 // others_count):
             sampled_cards = tuple(random.sample(deck_cards, sampled_count))
             sampled_common = sampled_cards[:sampled_common_count]
             my_cards = cards + sampled_common
