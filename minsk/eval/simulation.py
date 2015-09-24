@@ -104,6 +104,7 @@ class HybridMonteCarloSimulator(CombinatoricSimulator):
         super().__init__()
         self._player_num = player_num
         self._sim_cycles = sim_cycles
+        self._avg_eval_count = self._get_avg_eval_count(player_num - 1)
 
     def _simulate_river(self, parallel_exec_num, cards):
         if parallel_exec_num:
@@ -112,6 +113,15 @@ class HybridMonteCarloSimulator(CombinatoricSimulator):
         else:
             return self._simulate_cards_parallel(self._sim_cycles,
                                                  self._sample_opponents, cards)
+
+    @staticmethod
+    def _get_avg_eval_count(opponents_count):
+        prob, sum = 1.0, 0.0
+        for i in range(1, opponents_count):
+            prob /= 2
+            sum += i * prob
+        sum += opponents_count * prob
+        return sum
 
     @classmethod
     def _simulate_cards_parallel(cls, sim_cycles, fc, cards):
@@ -128,7 +138,7 @@ class HybridMonteCarloSimulator(CombinatoricSimulator):
         win, tie, lose = 0, 0, 0
         others_count = self._player_num - 1
         sampled_count = others_count * 2
-        for _ in range(sim_cycles // others_count):
+        for _ in range(int(sim_cycles / self._avg_eval_count)):
             others_cards = random.sample(deck_cards, sampled_count)
             result = self._eval_showdown(my_hand, common, others_cards)
             if result == -1:
@@ -162,7 +172,7 @@ class MonteCarloSimulator(HybridMonteCarloSimulator):
         win, tie, lose = 0, 0, 0
         others_count = self._player_num - 1
         sampled_count = sampled_common_count + others_count * 2
-        for _ in range(sim_cycles // 2 // others_count):
+        for _ in range(int(sim_cycles / (self._avg_eval_count + 1))):
             sampled_cards = tuple(random.sample(deck_cards, sampled_count))
             sampled_common = sampled_cards[:sampled_common_count]
             my_cards = cards + sampled_common
@@ -231,7 +241,10 @@ class LookUpSimulator(AbstractSimulator):
 
 
 class SimulatorManager:
-    simulators = (LookUpSimulator, HybridMonteCarloSimulator, BruteForceSimulator, MonteCarloSimulator)
+    simulators = (LookUpSimulator,
+                  HybridMonteCarloSimulator,
+                  BruteForceSimulator,
+                  MonteCarloSimulator)
 
     def find_simulator(self, *cards):
         available = []
