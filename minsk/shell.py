@@ -1,5 +1,6 @@
 import cmd
 import time
+import re
 
 import prettytable
 
@@ -15,35 +16,47 @@ class MinskShell(cmd.Cmd):
 
     def do_bf(self, cards):
         """evaluate hand - brute force"""
-        cards = model.Card.parse_cards(cards)
+        cards, _ = self._parse_line(cards)
         simulator = simulation.BruteForceSimulator()
         self.simulate(cards, simulator)
 
     def do_e(self, cards):
         """evaluate hand"""
-        cards = model.Card.parse_cards(cards)
+        cards, player_num = self._parse_line(cards)
         manager = simulation.SimulatorManager()
-        simulator = manager.find_simulator(*cards)
-        self.simulate(cards, simulator)
+        with config.with_config(_player_num=player_num):
+            simulator = manager.find_simulator(*cards)
+            self.simulate(cards, simulator)
+
+    def _parse_line(self, cards):
+        tokens = cards.split()
+        player_num = config.player_num
+        if re.fullmatch('\d', tokens[-1]):
+            player_num = int(tokens[-1])
+            tokens = tokens[:-1]
+        return model.Card.parse_cards(tokens), player_num
 
     def do_hmc(self, cards):
         """evaluate hand - hybrid monte carlo"""
-        cards = model.Card.parse_cards(cards)
-        simulator = simulation.HybridMonteCarloSimulator(
-            config.player_num, config.sim_cycles)
-        self.simulate(cards, simulator)
+        cards, player_num = self._parse_line(cards)
+        with config.with_config(_player_num=player_num):
+            simulator = simulation.HybridMonteCarloSimulator(
+                config.player_num, config.sim_cycles)
+            self.simulate(cards, simulator)
 
     def do_mc(self, cards):
         """evaluate hand - monte carlo"""
-        cards = model.Card.parse_cards(cards)
-        simulator = simulation.MonteCarloSimulator(config.player_num, config.sim_cycles)
-        self.simulate(cards, simulator)
+        cards, player_num = self._parse_line(cards)
+        with config.with_config(_player_num=player_num):
+            simulator = simulation.MonteCarloSimulator(config.player_num, config.sim_cycles)
+            self.simulate(cards, simulator)
 
     def do_lu(self, cards):
         """evaluate hand - loop up"""
-        cards = model.Card.parse_cards(cards)
-        simulator = simulation.LookUpSimulator(config.player_num)
-        self.simulate(cards, simulator)
+        cards, player_num = self._parse_line(cards)
+        with config.with_config(_player_num=player_num):
+            simulator = simulation.LookUpSimulator(config.player_num)
+            self.simulate(cards, simulator)
 
     def simulate(self, cards, simulator):
         self.print_configuration(simulator)

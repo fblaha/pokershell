@@ -14,22 +14,22 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.simulator = simulation.BruteForceSimulator()
 
     def test_river_full_house(self):
-        cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d 9d')
+        cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 6d 9d')
         result = self.simulator._simulate_river(-1, cards)
         self.assertTrue(result[0] / sum(result) > 0.9)
 
     def test_turn(self):
-        cards = model.Card.parse_cards('6s 8c 2h 8h 2c 3c')
+        cards = model.Card.parse_cards_line('6s 8c 2h 8h 2c 3c')
         print(self.simulator.simulate(*cards))
 
     def test_turn_full_house(self):
-        cards = model.Card.parse_cards('As 6c Ad 8s Ac Jd')
+        cards = model.Card.parse_cards_line('As 6c Ad 8s Ac Jd')
         result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result[0] / sum(result) > 0.9)
 
     def test_turn_bad_luck(self):
-        cards = model.Card.parse_cards('2c 4d 8c Js Qd Qc')
+        cards = model.Card.parse_cards_line('2c 4d 8c Js Qd Qc')
         result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result[0] / sum(result) < 0.2)
@@ -41,13 +41,13 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.simulator = simulation.MonteCarloSimulator(5, 10000)
 
     def test_hole_cards(self):
-        cards = model.Card.parse_cards('As 6c')
+        cards = model.Card.parse_cards_line('As 6c')
         result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result[1] < result[0] < result[2])
 
     def test_sample(self):
-        cards = model.Card.parse_cards('As 6c')
+        cards = model.Card.parse_cards_line('As 6c')
         result = self.simulator._sample(5000, tuple(cards))
         print(result)
         self.assertTrue(result[1] < result[0] < result[2])
@@ -70,20 +70,20 @@ class TestHybridMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
                          simulation.HybridMonteCarloSimulator(3, 10000)._avg_eval_count)
 
     def test_river_full_house(self):
-        cards = model.Card.parse_cards('As 6c Ad 8s Ac 6d 9d')
+        cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 6d 9d')
         result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result[0] / sum(result) > 0.9)
 
     def test_calculator_comparison(self):
-        cards = model.Card.parse_cards('4h 4d 8c 4c Qd')
+        cards = model.Card.parse_cards_line('4h 4d 8c 4c Qd')
         result = self.simulator.simulate(*cards)
         rate = result[0] / sum(result)
         print(rate)
         self.assertTrue(0.75 <= rate <= 0.79)
 
     def test_performance(self):
-        cards = model.Card.parse_cards('As Ah Ad 8s Ac 7d')
+        cards = model.Card.parse_cards_line('As Ah Ad 8s Ac 7d')
         start_time = time.time()
         simulation.HybridMonteCarloSimulator(6, config.sim_cycles).simulate(*cards)
         elapsed_time = time.time() - start_time
@@ -91,7 +91,7 @@ class TestHybridMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.assertTrue(elapsed_time < 10)
 
     def test_sample_opponets(self):
-        cards = model.Card.parse_cards('As Ac 7d 8s Jc 6d Ad')
+        cards = model.Card.parse_cards_line('As Ac 7d 8s Jc 6d Ad')
         result = self.simulator._sample_opponents(5000, tuple(cards))
         rate = result[0] / sum(result)
         print(result)
@@ -105,17 +105,17 @@ class TestLookUpSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.simulator = simulation.LookUpSimulator(5)
 
     def test_not_suited(self):
-        cards = model.Card.parse_cards('As 6c')
+        cards = model.Card.parse_cards_line('As 6c')
         result = self.simulator.simulate(*cards)
         self.assertEqual(19.21, result[0])
 
     def test_suited(self):
-        cards = model.Card.parse_cards('Ac 6c')
+        cards = model.Card.parse_cards_line('Ac 6c')
         result = self.simulator.simulate(*cards)
         self.assertEqual(23.33, result[0])
 
     def test_pair(self):
-        cards = model.Card.parse_cards('Ac Ad')
+        cards = model.Card.parse_cards_line('Ac Ad')
         result = self.simulator.simulate(*cards)
         self.assertEqual(55.78, result[0])
 
@@ -131,33 +131,33 @@ class TestSimulatorManager(testtools.TestCase):
         return super().tearDown()
 
     def test_preflop(self):
-        cards = model.Card.parse_cards('Ac 6c')
+        cards = model.Card.parse_cards_line('Ac 6c')
         simulator = self.manager.find_simulator(*cards)
         self.assertIsInstance(simulator, simulation.LookUpSimulator)
 
     def test_flop(self):
-        cards = model.Card.parse_cards('As 6c Ad 8s Ac')
+        cards = model.Card.parse_cards_line('As 6c Ad 8s Ac')
         simulator = self.manager.find_simulator(*cards)
         self.assertIsInstance(simulator, simulation.HybridMonteCarloSimulator)
 
     def test_turn(self):
-        cards = model.Card.parse_cards('As 6c Ad 8s Ac 4d')
+        cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d')
         simulator = self.manager.find_simulator(*cards)
         self.assertIsInstance(simulator, simulation.BruteForceSimulator)
 
     def test_river(self):
-        cards = model.Card.parse_cards('As 6c Ad 8s Ac 4d 5h')
+        cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d 5h')
         simulator = self.manager.find_simulator(*cards)
         self.assertIsInstance(simulator, simulation.BruteForceSimulator)
 
     def test_river_five_players(self):
-        cards = model.Card.parse_cards('As 6c Ad 8s Ac 4d 5h')
+        cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d 5h')
         config.player_num = 5
         simulator = self.manager.find_simulator(*cards)
         self.assertIsInstance(simulator, simulation.HybridMonteCarloSimulator)
 
     def test_turn_seven_players(self):
-        cards = model.Card.parse_cards('As 6c Ad 8s Ac 4d')
+        cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d')
         config.player_num = 7
         simulator = self.manager.find_simulator(*cards)
         self.assertIsInstance(simulator, simulation.HybridMonteCarloSimulator)

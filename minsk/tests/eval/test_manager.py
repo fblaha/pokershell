@@ -29,6 +29,6 @@ class TestEvaluatorManager(testtools.TestCase, common.TestUtilsMixin):
         self._test_hand('2h 2c 5h Jh Jc', model.Hand.TWO_PAIR)
 
     def _test_hand(self, cards_str, expected_hand):
-        cards = model.Card.parse_cards(cards_str)
+        cards = model.Card.parse_cards_line(cards_str)
         best_hand = self.manager.find_best_hand(*cards)
         self.assertEqual(expected_hand, best_hand[0])
