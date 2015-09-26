@@ -19,7 +19,7 @@ class MinskShell(cmd.Cmd):
         simulator = simulation.BruteForceSimulator()
         self.simulate(cards, simulator)
 
-    def do_eval(self, cards):
+    def do_e(self, cards):
         """evaluate hand"""
         cards = model.Card.parse_cards(cards)
         manager = simulation.SimulatorManager()

@@ -23,20 +23,20 @@ class TestShell(testtools.TestCase):
 
     def test_monte_carlo_eval(self):
         with common.test_config(10000, 5):
-            self.shell.do_eval('As 6s 5d')
+            self.shell.do_e('As 6s 5d')
 
     def test_look_up(self):
         with common.test_config(10000, 5):
             self.shell.do_lu('As 6s')
 
     def test_eval(self):
-        self.shell.do_eval('As 6c Ad 8s Ac 6d 7d')
+        self.shell.do_e('As 6c Ad 8s Ac 6d 7d')
 
     def test_eval_pre_flop(self):
-        self.shell.do_eval('As 6c')
+        self.shell.do_e('As 6c')
 
     def test_eval_no_simulator(self):
-        self.shell.do_eval('As 6c 8h')
+        self.shell.do_e('As 6c 8h')
 
     def test_sim_cycles(self):
         with common.test_config(10000, 5):
