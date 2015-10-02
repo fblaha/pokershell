@@ -40,7 +40,8 @@ class MinskShell(cmd.Cmd):
         """evaluate hand - monte carlo"""
         cards, player_num = self._parse_line(cards)
         with config.with_config(_player_num=player_num):
-            simulator = simulation.MonteCarloSimulator(config.player_num, config.sim_cycles)
+            simulator = simulation.MonteCarloSimulator(
+                config.player_num, config.sim_cycles)
             self.simulate(cards, simulator)
 
     def do_lu(self, cards):
