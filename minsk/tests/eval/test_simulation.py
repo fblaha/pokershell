@@ -84,6 +84,7 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         print('Elapsed time : %f' % elapsed_time)
         self.assertTrue(elapsed_time < 10)
 
+
 class TestLookUpSimulator(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
@@ -123,7 +124,7 @@ class TestSimulatorManager(testtools.TestCase):
     def test_flop(self):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac')
         simulator = self.manager.find_simulator(*cards)
-        self.assertIsInstance(simulator, simulation.HybridMonteCarloSimulator)
+        self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
 
     def test_turn(self):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d')
@@ -139,10 +140,10 @@ class TestSimulatorManager(testtools.TestCase):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d 5h')
         config.player_num = 5
         simulator = self.manager.find_simulator(*cards)
-        self.assertIsInstance(simulator, simulation.HybridMonteCarloSimulator)
+        self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
 
     def test_turn_seven_players(self):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d')
         config.player_num = 7
         simulator = self.manager.find_simulator(*cards)
-        self.assertIsInstance(simulator, simulation.HybridMonteCarloSimulator)
+        self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
