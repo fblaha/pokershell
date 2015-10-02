@@ -1,7 +1,7 @@
 import contextlib
 
 player_num = 2
-sim_cycles = 100000
+sim_cycles = 40000
 
 
 @contextlib.contextmanager

@@ -36,14 +36,6 @@ class MinskShell(cmd.Cmd):
             tokens = tokens[:-1]
         return model.Card.parse_cards(tokens), player_num
 
-    def do_hmc(self, cards):
-        """evaluate hand - hybrid monte carlo"""
-        cards, player_num = self._parse_line(cards)
-        with config.with_config(_player_num=player_num):
-            simulator = simulation.HybridMonteCarloSimulator(
-                config.player_num, config.sim_cycles)
-            self.simulate(cards, simulator)
-
     def do_mc(self, cards):
         """evaluate hand - monte carlo"""
         cards, player_num = self._parse_line(cards)

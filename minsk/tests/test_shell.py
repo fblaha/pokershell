@@ -18,10 +18,6 @@ class TestShell(testtools.TestCase):
     def test_brute_force(self):
         self.shell.do_bf('As 6c Ad 8s Ac 6d 7d')
 
-    def test_hybrid_monte_carlo(self):
-        with config.with_config(10000, 5):
-            self.shell.do_hmc('As 6c Ad 8s Ac 6d 7d')
-
     def test_monte_carlo(self):
         with config.with_config(10000, 5):
             self.shell.do_mc('As 6s')

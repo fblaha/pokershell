@@ -22,10 +22,33 @@ class AbstractSimulator(metaclass=abc.ABCMeta):
         pass
 
 
-class CombinatoricSimulator(AbstractSimulator, metaclass=abc.ABCMeta):
+class ParallelSimulatorMixin:
+    @staticmethod
+    def _simulate_parallel(sim_fc, data):
+        partial_results = multiprocessing.Pool().map(sim_fc, data)
+        return tuple(sum(x) for x in zip(*partial_results))
+
+    @classmethod
+    def _simulate_cards_parallel(cls, sim_cycles, fc, cards):
+        parallel_count = multiprocessing.cpu_count() * 2
+        start_data = (cards,) * parallel_count
+        cycles = sim_cycles // parallel_count
+        fc = functools.partial(fc, cycles)
+        return cls._simulate_parallel(fc, start_data)
+
+
+class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
+    priority = 0
+    name = 'Brute Force'
+    cards_num = {6, 7}
+    players_num = {2}
+
     def __init__(self):
         super().__init__()
         self._manager = manager.EvaluatorManager()
+
+    def _process(self, parallel_exec_num, cards, generated):
+        return self._simulate_river(parallel_exec_num, cards + generated)
 
     def simulate(self, *cards):
         unknown_count = 7 - len(cards)
@@ -38,37 +61,6 @@ class CombinatoricSimulator(AbstractSimulator, metaclass=abc.ABCMeta):
             return self._simulate_parallel(fc, combinations)
         else:
             return self._simulate_river(0, cards)
-
-    @staticmethod
-    def _simulate_parallel(sim_fc, data):
-        partial_results = multiprocessing.Pool().map(sim_fc, data)
-        return tuple(sum(x) for x in zip(*partial_results))
-
-    def _process(self, parallel_exec_num, cards, generated):
-        return self._simulate_river(parallel_exec_num, cards + generated)
-
-    @abc.abstractmethod
-    def _simulate_river(self, generated_num, cards):
-        pass
-
-    def _eval_showdown(self, my_hand, common, others_cards):
-        result = 1
-        for hand in zip(others_cards[::2], others_cards[1::2]):
-            opponent_cards = hand + common
-            opponent_best = self._manager.find_best_hand(*opponent_cards)
-            if my_hand < opponent_best:
-                return -1
-                break
-            elif my_hand == opponent_best:
-                result = 0
-        return result
-
-
-class BruteForceSimulator(CombinatoricSimulator):
-    priority = 0
-    name = 'Brute Force'
-    cards_num = {6, 7}
-    players_num = {2}
 
     def _simulate_river(self, _, cards):
         common = cards[2:]
@@ -95,24 +87,17 @@ class BruteForceSimulator(CombinatoricSimulator):
         return cls()
 
 
-class HybridMonteCarloSimulator(CombinatoricSimulator):
-    name = 'Hybrid Monte Carlo'
-    cards_num = {5, 6, 7}
+class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
+    name = 'Monte Carlo'
+    cards_num = set(range(2, 8))
     players_num = set(range(2, 11))
 
     def __init__(self, player_num, sim_cycles):
         super().__init__()
+        self._manager = manager.EvaluatorManager()
         self._player_num = player_num
         self._sim_cycles = sim_cycles
         self._avg_eval_count = self._get_avg_eval_count(player_num - 1)
-
-    def _simulate_river(self, parallel_exec_num, cards):
-        if parallel_exec_num:
-            cycles = self._sim_cycles // parallel_exec_num
-            return self._sample_opponents(cycles, cards)
-        else:
-            return self._simulate_cards_parallel(self._sim_cycles,
-                                                 self._sample_opponents, cards)
 
     @staticmethod
     def _get_avg_eval_count(opponents_count):
@@ -122,45 +107,6 @@ class HybridMonteCarloSimulator(CombinatoricSimulator):
             sum += i * prob
         sum += opponents_count * prob
         return sum
-
-    @classmethod
-    def _simulate_cards_parallel(cls, sim_cycles, fc, cards):
-        parallel_count = multiprocessing.cpu_count() * 2
-        start_data = (cards,) * parallel_count
-        cycles = sim_cycles // parallel_count
-        fc = functools.partial(fc, cycles)
-        return cls._simulate_parallel(fc, start_data)
-
-    def _sample_opponents(self, sim_cycles, cards):
-        common = cards[2:]
-        deck_cards = model.Deck(*cards).cards
-        my_hand = self._manager.find_best_hand(*cards)
-        win, tie, lose = 0, 0, 0
-        others_count = self._player_num - 1
-        sampled_count = others_count * 2
-        for _ in range(int(sim_cycles / self._avg_eval_count)):
-            others_cards = random.sample(deck_cards, sampled_count)
-            result = self._eval_showdown(my_hand, common, others_cards)
-            if result == -1:
-                lose += 1
-            elif result == 0:
-                tie += 1
-            else:
-                win += 1
-        return win, tie, lose
-
-    @classmethod
-    def from_config(cls):
-        return cls(config.player_num, config.sim_cycles)
-
-
-class MonteCarloSimulator(HybridMonteCarloSimulator):
-    name = 'Monte Carlo'
-    cards_num = set(range(2, 8))
-    players_num = set(range(2, 11))
-
-    def __init__(self, player_num, sim_cycles):
-        super().__init__(player_num, sim_cycles)
 
     def simulate(self, *cards):
         return self._simulate_cards_parallel(self._sim_cycles, self._sample, cards)
@@ -186,6 +132,22 @@ class MonteCarloSimulator(HybridMonteCarloSimulator):
             else:
                 win += 1
         return win, tie, lose
+
+    def _eval_showdown(self, my_hand, common, others_cards):
+        result = 1
+        for hand in zip(others_cards[::2], others_cards[1::2]):
+            opponent_cards = hand + common
+            opponent_best = self._manager.find_best_hand(*opponent_cards)
+            if my_hand < opponent_best:
+                return -1
+                break
+            elif my_hand == opponent_best:
+                result = 0
+        return result
+
+    @classmethod
+    def from_config(cls):
+        return cls(config.player_num, config.sim_cycles)
 
 
 class LookUpSimulator(AbstractSimulator):
@@ -242,7 +204,6 @@ class LookUpSimulator(AbstractSimulator):
 
 class SimulatorManager:
     simulators = (LookUpSimulator,
-                  HybridMonteCarloSimulator,
                   BruteForceSimulator,
                   MonteCarloSimulator)
 

@@ -52,12 +52,6 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         print(result)
         self.assertTrue(result[1] < result[0] < result[2])
 
-
-class TestHybridMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
-    def setUp(self):
-        super().setUp()
-        self.simulator = simulation.HybridMonteCarloSimulator(5, 10000)
-
     def test_avg_cmp_count(self):
         self.assertEqual(1, self.simulator._get_avg_eval_count(1))
         self.assertEqual(1.5, self.simulator._get_avg_eval_count(2))
@@ -65,9 +59,9 @@ class TestHybridMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
 
     def test_avg_cmp_count_assigment(self):
         self.assertEqual(1,
-                         simulation.HybridMonteCarloSimulator(2, 10000)._avg_eval_count)
+                         simulation.MonteCarloSimulator(2, 10000)._avg_eval_count)
         self.assertEqual(1.5,
-                         simulation.HybridMonteCarloSimulator(3, 10000)._avg_eval_count)
+                         simulation.MonteCarloSimulator(3, 10000)._avg_eval_count)
 
     def test_river_full_house(self):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 6d 9d')
@@ -85,19 +79,10 @@ class TestHybridMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
     def test_performance(self):
         cards = model.Card.parse_cards_line('As Ah Ad 8s Ac 7d')
         start_time = time.time()
-        simulation.HybridMonteCarloSimulator(6, config.sim_cycles).simulate(*cards)
+        simulation.MonteCarloSimulator(6, config.sim_cycles).simulate(*cards)
         elapsed_time = time.time() - start_time
         print('Elapsed time : %f' % elapsed_time)
         self.assertTrue(elapsed_time < 10)
-
-    def test_sample_opponets(self):
-        cards = model.Card.parse_cards_line('As Ac 7d 8s Jc 6d Ad')
-        result = self.simulator._sample_opponents(5000, tuple(cards))
-        rate = result[0] / sum(result)
-        print(result)
-        print(rate)
-        self.assertTrue(rate > 0.5)
-
 
 class TestLookUpSimulator(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
