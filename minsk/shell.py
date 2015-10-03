@@ -109,7 +109,7 @@ class MinskShell(cmd.Cmd):
             row.append(cards[6])
         evaluator_manager = manager.EvaluatorManager()
         if len(cards) >= 5:
-            result = evaluator_manager.find_best_hand(*cards)
+            result = evaluator_manager.find_best_hand(cards)
             columns.append('Hand')
             row.append(result.hand.name)
 

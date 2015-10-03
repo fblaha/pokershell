@@ -63,7 +63,7 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.assertEqual(1.5,
                          simulation.MonteCarloSimulator(3, 10000)._avg_eval_count)
 
-    def test_river_full_hyuhouse(self):
+    def test_river_full_house(self):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 6d 9d')
         result = self.simulator.simulate(*cards)
         print(result)

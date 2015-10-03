@@ -44,7 +44,7 @@ class EvaluatorManager:
         (model.Hand.HIGH_CARD, evaluators.HighCardEvaluator()),
     ])
 
-    def find_best_hand(self, *cards):
+    def find_best_hand(self, cards, min_hand=None):
         ctx = context.EvalContext(*cards)
         for hand, evaluator in self._EVALUATORS.items():
             if evaluator.required_rank_counts < ctx.rank_counts \
@@ -52,3 +52,5 @@ class EvaluatorManager:
                 result = evaluator.find(ctx)
                 if result:
                     return EvalResult(hand, result)
+            if hand == min_hand:
+                return

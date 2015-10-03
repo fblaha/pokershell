@@ -66,17 +66,19 @@ class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
         common = cards[2:]
         deck = model.Deck(*cards)
         deck_cards = deck.cards
-        best_hand = self._manager.find_best_hand(*cards)
+        best_hand = self._manager.find_best_hand(cards)
         win, tie, lose = 0, 0, 0
         for opponent in model.Card.all_combinations(deck_cards, 2):
             opponent_cards = opponent + common
-            opponent_best = self._manager.find_best_hand(*opponent_cards)
-            if best_hand > opponent_best:
+            opponent_best = self._manager.find_best_hand(opponent_cards,
+                                                         min_hand=best_hand.hand)
+            if not opponent_best or best_hand > opponent_best:
                 win += 1
             elif best_hand < opponent_best:
                 lose += 1
             elif best_hand == opponent_best:
                 tie += 1
+
         return win, tie, lose
 
     @classmethod
@@ -119,7 +121,7 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
             sampled_cards = tuple(random.sample(deck_cards, sampled_count))
             sampled_common = sampled_cards[:sampled_common_count]
             my_cards = cards + sampled_common
-            my_hand = self._manager.find_best_hand(*my_cards)
+            my_hand = self._manager.find_best_hand(my_cards)
             others_cards = sampled_cards[sampled_common_count:]
             result = self._eval_showdown(my_hand, common + sampled_common, others_cards)
             if result == -1:
@@ -134,12 +136,14 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
         result = 1
         for hand in zip(others_cards[::2], others_cards[1::2]):
             opponent_cards = hand + common
-            opponent_best = self._manager.find_best_hand(*opponent_cards)
-            if my_hand < opponent_best:
-                return -1
-                break
-            elif my_hand == opponent_best:
-                result = 0
+            opponent_best = self._manager.find_best_hand(opponent_cards,
+                                                         min_hand=my_hand.hand)
+            if opponent_best:
+                if my_hand < opponent_best:
+                    return -1
+                    break
+                elif my_hand == opponent_best:
+                    result = 0
         return result
 
     @classmethod
