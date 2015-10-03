@@ -91,7 +91,8 @@ class TestFlushEvaluator(testtools.TestCase, common.TestUtilsMixin):
 
     def test_find5(self):
         result = self.evaluator.find(self.create_context('Js 9c 5c Jh 2c 3c tc'))
-        self.assertEqual((model.Rank.TEN, model.Rank.NINE, model.Rank.FIVE), result()[0:3])
+        self.assertEqual((model.Rank.TEN, model.Rank.NINE, model.Rank.FIVE),
+                         result()[0:3])
 
     def test_find_none(self):
         result = self.evaluator.find(self.create_context('Js 9s 5c Jh 2c 3h tc'))

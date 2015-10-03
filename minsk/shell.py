@@ -114,7 +114,7 @@ class MinskShell(cmd.Cmd):
             row.append(result.hand.name)
 
             columns.append('Ranks')
-            row.append(' '.join(map(repr, result.get_ranks())))
+            row.append(' '.join(map(repr, result.complement_ranks)))
 
         input_table = prettytable.PrettyTable(columns)
         input_table.add_row(row)
