@@ -52,5 +52,5 @@ class EvaluatorManager:
                 result = evaluator.find(ctx)
                 if result:
                     return EvalResult(hand, result)
-            if hand == min_hand:
+            if min_hand and hand == min_hand:
                 return
