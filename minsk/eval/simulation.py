@@ -71,9 +71,6 @@ class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
         for opponent in model.Card.all_combinations(deck_cards, 2):
             opponent_cards = opponent + common
             opponent_best = self._manager.find_best_hand(*opponent_cards)
-            if len(best_hand) != len(opponent_best):
-                raise ValueError('Hands are not comparable: {0} {1}'.
-                                 format(best_hand, opponent_best))
             if best_hand > opponent_best:
                 win += 1
             elif best_hand < opponent_best:

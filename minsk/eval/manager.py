@@ -1,8 +1,34 @@
 import collections
+import functools
 
 import minsk.eval.context as context
 import minsk.eval.evaluators as evaluators
 import minsk.model as model
+
+
+@functools.total_ordering
+class EvalResult:
+    def __init__(self, hand, ranks_lazy):
+        super().__init__()
+        self._complement_ranks = None
+        self.hand = hand
+        self._ranks_lazy = ranks_lazy
+
+    def __eq__(self, other):
+        return self.hand == other.hand and \
+               self.complement_ranks == other.complement_ranks
+
+    def __lt__(self, other):
+        if self.hand == other.hand:
+            return self.complement_ranks < other.complement_ranks
+        else:
+            return self.hand < other.hand
+
+    @property
+    def complement_ranks(self):
+        if not self._complement_ranks:
+            self._complement_ranks = self._ranks_lazy()
+        return self._complement_ranks
 
 
 class EvaluatorManager:
@@ -25,4 +51,4 @@ class EvaluatorManager:
                     and ctx.max_suit_count >= evaluator.required_suit_count:
                 result = evaluator.find(ctx)
                 if result:
-                    return hand, result
+                    return EvalResult(hand, result)

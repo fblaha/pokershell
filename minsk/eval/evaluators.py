@@ -6,10 +6,13 @@ class KindEvaluator(eval.AbstractEvaluator):
     def find(self, context):
         ranks = context.get_ranks(self.count)
         if ranks:
-            complement_count = 5 - self.count
-            result = context.get_complement_ranks(complement_count, ranks[0])
-            result.insert(0, ranks[0])
-            return tuple(result)
+            def get_ranks():
+                complement_count = 5 - self.count
+                result = context.get_complement_ranks(complement_count, ranks[0])
+                result.insert(0, ranks[0])
+                return tuple(result)
+
+            return get_ranks
 
 
 class FourEvaluator(KindEvaluator):
@@ -29,7 +32,7 @@ class OnePairEvaluator(KindEvaluator):
 
 class HighCardEvaluator(eval.AbstractEvaluator):
     def find(self, context):
-        return tuple(context.get_complement_ranks(5))
+        return lambda: tuple(context.get_complement_ranks(5))
 
 
 class FullHouseEvaluator(eval.AbstractEvaluator):
@@ -44,7 +47,7 @@ class FullHouseEvaluator(eval.AbstractEvaluator):
             ranks2 += context.get_ranks(2, check_better=False)
             ranks2.sort(reverse=True)
             if ranks2:
-                return ranks3[0], ranks2[0]
+                return lambda: (ranks3[0], ranks2[0])
 
 
 class TwoPairsEvaluator(eval.AbstractEvaluator):
@@ -53,8 +56,10 @@ class TwoPairsEvaluator(eval.AbstractEvaluator):
     def find(self, context):
         ranks2 = context.get_ranks(2)
         if len(ranks2) >= 2:
-            complement = context.get_complement_ranks(1, ranks2[0], ranks2[1])
-            return ranks2[0], ranks2[1], complement[0]
+            def get_ranks():
+                complement = context.get_complement_ranks(1, ranks2[0], ranks2[1])
+                return ranks2[0], ranks2[1], complement[0]
+            return get_ranks
 
 
 class FlushEvaluator(eval.AbstractEvaluator):
@@ -66,9 +71,11 @@ class FlushEvaluator(eval.AbstractEvaluator):
         if sorted_sets:
             biggest = sorted_sets[0]
             if len(biggest) >= 5:
-                card_rank = lambda card: card.rank
-                sorted_cards = sorted(biggest, key=card_rank, reverse=True)[0:5]
-                return tuple(card.rank for card in sorted_cards)
+                def get_ranks():
+                    card_rank = lambda card: card.rank
+                    sorted_cards = sorted(biggest, key=card_rank, reverse=True)[0:5]
+                    return tuple(card.rank for card in sorted_cards)
+                return get_ranks
 
 
 class StraightEvaluator(eval.AbstractEvaluator):
@@ -84,19 +91,15 @@ class StraightEvaluator(eval.AbstractEvaluator):
         for rank_ord in rank_nums:
             lower = rank_ord - 4
             if all(r in rank_nums for r in range(lower, rank_ord + 1)):
-                return model.Rank.from_ord(rank_ord),
+                return lambda: (model.Rank.from_ord(rank_ord),)
 
 
 class StraightFlushEvaluator(StraightEvaluator):
     required_suit_count = 5
 
     def find(self, context):
-        collected_ranks = []
         for suit_set in context.suit_dict.values():
             if len(suit_set) >= 5:
                 result = self._find_straight(suit_set)
                 if result:
-                    collected_ranks += result
-        if collected_ranks:
-            collected_ranks.sort(reverse=True)
-            return collected_ranks[0],
+                    return result

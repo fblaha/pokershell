@@ -5,6 +5,21 @@ import minsk.tests.eval.common as common
 import minsk.model as model
 
 
+class TestEvalResult(testtools.TestCase):
+    def test_cmp_hand(self):
+        flush = manager.EvalResult(model.Hand.FLUSH, lambda: (model.Rank.ACE,))
+        high_card = manager.EvalResult(model.Hand.HIGH_CARD, lambda: (model.Rank.ACE,))
+        self.assertTrue(flush > high_card)
+        self.assertFalse(flush < high_card)
+
+    def test_cmp_ranks(self):
+        high1 = manager.EvalResult(model.Hand.HIGH_CARD, lambda: (model.Rank.ACE,))
+        high2 = manager.EvalResult(model.Hand.HIGH_CARD, lambda: (model.Rank.ACE,))
+        self.assertTrue(high1 == high2)
+        self.assertFalse(high1 < high2)
+        self.assertFalse(high1 > high2)
+
+
 class TestEvaluatorManager(testtools.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
@@ -31,4 +46,4 @@ class TestEvaluatorManager(testtools.TestCase, common.TestUtilsMixin):
     def _test_hand(self, cards_str, expected_hand):
         cards = model.Card.parse_cards_line(cards_str)
         best_hand = self.manager.find_best_hand(*cards)
-        self.assertEqual(expected_hand, best_hand[0])
+        self.assertEqual(expected_hand, best_hand.hand)

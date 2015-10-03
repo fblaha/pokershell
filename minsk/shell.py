@@ -109,12 +109,12 @@ class MinskShell(cmd.Cmd):
             row.append(cards[6])
         evaluator_manager = manager.EvaluatorManager()
         if len(cards) >= 5:
-            hand = evaluator_manager.find_best_hand(*cards)
+            result = evaluator_manager.find_best_hand(*cards)
             columns.append('Hand')
-            row.append(hand[0].name)
+            row.append(result.hand.name)
 
             columns.append('Ranks')
-            row.append(' '.join(map(repr, hand[1])))
+            row.append(' '.join(map(repr, result.get_ranks())))
 
         input_table = prettytable.PrettyTable(columns)
         input_table.add_row(row)
