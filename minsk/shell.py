@@ -1,6 +1,7 @@
 import cmd
 import time
 import re
+import collections
 
 import prettytable
 
@@ -9,6 +10,8 @@ import minsk.eval.simulation as simulation
 import minsk.model as model
 import minsk.config as config
 
+ParsedLine = collections.namedtuple('ParsedLine', 'cards player_num pot pot_eq')
+
 
 class MinskShell(cmd.Cmd):
     """Minsk shell"""
@@ -16,49 +19,56 @@ class MinskShell(cmd.Cmd):
 
     def do_bf(self, cards):
         """evaluate hand - brute force"""
-        cards, _ = self._parse_line(cards)
+        parsed = self._parse_line(cards)
         simulator = simulation.BruteForceSimulator()
-        self.simulate(cards, simulator)
+        self.simulate(parsed, simulator)
 
     def do_e(self, cards):
         """evaluate hand"""
-        cards, player_num = self._parse_line(cards)
+        parsed = self._parse_line(cards)
         manager = simulation.SimulatorManager()
-        with config.with_config(_player_num=player_num):
-            simulator = manager.find_simulator(*cards)
-            self.simulate(cards, simulator)
+        with config.with_config(_player_num=parsed.player_num):
+            simulator = manager.find_simulator(*parsed.cards)
+            self.simulate(parsed, simulator)
 
-    def _parse_line(self, cards):
-        tokens = cards.split()
+    def _parse_line(self, line):
+        tokens = line.split()
         player_num = config.player_num
-        if re.fullmatch('\d', tokens[-1]):
-            player_num = int(tokens[-1])
-            tokens = tokens[:-1]
-        return model.Card.parse_cards(tokens), player_num
+        cards = [token for token in tokens if not re.fullmatch('\d+', token)]
+        params = [token for token in tokens if re.fullmatch('\d+', token)]
+        pot_eq, pot = None, None
+        if params:
+            player_num = int(params[0])
+            if len(params) >= 2:
+                pot = float(params[1])
+                if len(params) >= 3:
+                    call_amount = float(params[2])
+                    pot_eq = call_amount / pot
+        return ParsedLine(model.Card.parse_cards(cards), player_num, pot, pot_eq)
 
     def do_mc(self, cards):
         """evaluate hand - monte carlo"""
-        cards, player_num = self._parse_line(cards)
-        with config.with_config(_player_num=player_num):
+        parsed = self._parse_line(cards)
+        with config.with_config(_player_num=parsed.player_num):
             simulator = simulation.MonteCarloSimulator(
                 config.player_num, config.sim_cycles)
-            self.simulate(cards, simulator)
+            self.simulate(parsed, simulator)
 
     def do_lu(self, cards):
         """evaluate hand - loop up"""
-        cards, player_num = self._parse_line(cards)
-        with config.with_config(_player_num=player_num):
+        parsed = self._parse_line(cards)
+        with config.with_config(_player_num=parsed.player_num):
             simulator = simulation.LookUpSimulator(config.player_num)
-            self.simulate(cards, simulator)
+            self.simulate(parsed, simulator)
 
-    def simulate(self, cards, simulator):
+    def simulate(self, parsed_line, simulator):
         self.print_configuration(simulator)
-        self.print_input(cards)
+        self.print_input(parsed_line)
         if not simulator:
             print('\nNo simulator found!\n')
             return
         start = time.time()
-        result = simulator.simulate(*cards)
+        result = simulator.simulate(*parsed_line.cards)
         self.print_output(result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
@@ -94,7 +104,8 @@ class MinskShell(cmd.Cmd):
             result_table.add_row(result_pct)
         print(result_table)
 
-    def print_input(self, cards):
+    def print_input(self, parsed_line):
+        cards = parsed_line.cards
         print('\nInput :')
         columns = ['Hole']
         row = [' '.join(map(repr, cards[0:2]))]
@@ -115,6 +126,14 @@ class MinskShell(cmd.Cmd):
 
             columns.append('Ranks')
             row.append(' '.join(map(repr, result.complement_ranks)))
+
+        if parsed_line.pot:
+            columns.append('Pot')
+            row.append(parsed_line.pot)
+
+        if parsed_line.pot:
+            columns.append('Pot Equity')
+            row.append(str(round(parsed_line.pot_eq * 100, 2)) + '%')
 
         input_table = prettytable.PrettyTable(columns)
         input_table.add_row(row)
