@@ -5,6 +5,7 @@ import collections
 
 import prettytable
 
+import minsk.eval.bet as bet
 import minsk.eval.manager as manager
 import minsk.eval.simulation as simulation
 import minsk.model as model
@@ -105,7 +106,8 @@ class MinskShell(cmd.Cmd):
         print(pct_table)
         if parsed_line.pot:
             bet_table = prettytable.PrettyTable(['Max Bet'])
-            max_bet = parsed_line.pot * (raw_pct[0] + raw_pct[1]) / 100
+            win_chance = raw_pct[0] / 100
+            max_bet = bet.BetAdviser.get_max_bet(win_chance, parsed_line.pot)
             bet_table.add_row([str(round(max_bet))])
             print(bet_table)
 
