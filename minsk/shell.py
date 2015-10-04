@@ -36,6 +36,8 @@ class MinskShell(cmd.Cmd):
         player_num = config.player_num
         cards = [token for token in tokens if not re.fullmatch('\d+', token)]
         params = [token for token in tokens if re.fullmatch('\d+', token)]
+        joined = ''.join(cards)
+        cards = zip(joined[::2], joined[1::2])
         pot_eq, pot = None, None
         if params:
             player_num = int(params[0])

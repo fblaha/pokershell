@@ -19,6 +19,12 @@ class TestShell(testtools.TestCase):
         self.assertEqual(100, parsed.pot)
         self.assertEqual(0.1, parsed.pot_eq)
 
+    def test_parse_line_cards(self):
+        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d')
+        self.assertEqual(7, len(parsed.cards))
+        parsed = self.shell._parse_line('As6c Ad8sAc 6d 7d')
+        self.assertEqual(7, len(parsed.cards))
+
     def test_brute_force(self):
         self.shell.do_bf('As 6c Ad 8s Ac 6d 7d')
 
