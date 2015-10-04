@@ -23,7 +23,7 @@ class TestShell(testtools.TestCase):
         self.shell.do_bf('As 6c Ad 8s Ac 6d 7d')
 
     def test_pot_equity(self):
-        self.shell.do_e('As 6c Ad 8s Ac 6d 7d 2 110 79')
+        self.shell.do_e('As 6c 8c 8s qc 6d 7d 5 110 79')
 
     def test_monte_carlo(self):
         with config.with_config(10000, 5):

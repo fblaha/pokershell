@@ -69,7 +69,7 @@ class MinskShell(cmd.Cmd):
             return
         start = time.time()
         result = simulator.simulate(*parsed_line.cards)
-        self.print_output(result)
+        self.print_output(parsed_line, result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
@@ -90,19 +90,25 @@ class MinskShell(cmd.Cmd):
             t.add_row(['simulator', simulator.name])
         print(t)
 
-    def print_output(self, result):
+    def print_output(self, parsed_line, result):
         print('\nOutput :')
-        result_table = prettytable.PrettyTable(['Win', 'Tie', 'Loss'])
+        pct_table = prettytable.PrettyTable(['Win', 'Tie', 'Loss'])
 
         if isinstance(result[0], int):
             total = sum(result)
-            result_pct = list(map(lambda x: str(round(x / total * 100, 2)) + '%', result))
-            result_table.add_row(result_pct)
-            result_table.add_row(result)
+            raw_pct = list(map(lambda x: x / total * 100, result))
+            pct_table.add_row(result)
         else:
-            result_pct = list(map(lambda x: str(round(x, 2)) + '%', result))
-            result_table.add_row(result_pct)
-        print(result_table)
+            raw_pct = result
+
+        result_pct = list(map(lambda x: str(round(x, 2)) + '%', raw_pct))
+        pct_table.add_row(result_pct)
+        print(pct_table)
+        if parsed_line.pot:
+            bet_table = prettytable.PrettyTable(['Max Bet'])
+            max_bet = parsed_line.pot * (raw_pct[0] + raw_pct[1]) / 100
+            bet_table.add_row([str(round(max_bet))])
+            print(bet_table)
 
     def print_input(self, parsed_line):
         cards = parsed_line.cards
