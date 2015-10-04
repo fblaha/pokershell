@@ -10,7 +10,7 @@ import minsk.eval.simulation as simulation
 import minsk.model as model
 import minsk.config as config
 
-ParsedLine = collections.namedtuple('ParsedLine', 'cards player_num pot pot_eq')
+ParsedLine = collections.namedtuple('ParsedLine', 'cards player_num pot')
 
 
 class MinskShell(cmd.Cmd):
@@ -38,15 +38,12 @@ class MinskShell(cmd.Cmd):
         params = [token for token in tokens if re.fullmatch('\d+', token)]
         joined = ''.join(cards)
         cards = zip(joined[::2], joined[1::2])
-        pot_eq, pot = None, None
+        pot = None
         if params:
             player_num = int(params[0])
             if len(params) >= 2:
                 pot = float(params[1])
-                if len(params) >= 3:
-                    call_amount = float(params[2])
-                    pot_eq = call_amount / pot
-        return ParsedLine(model.Card.parse_cards(cards), player_num, pot, pot_eq)
+        return ParsedLine(model.Card.parse_cards(cards), player_num, pot)
 
     def do_mc(self, cards):
         """evaluate hand - monte carlo"""
@@ -138,10 +135,6 @@ class MinskShell(cmd.Cmd):
         if parsed_line.pot:
             columns.append('Pot')
             row.append(parsed_line.pot)
-
-        if parsed_line.pot:
-            columns.append('Pot Equity')
-            row.append(str(round(parsed_line.pot_eq * 100, 2)) + '%')
 
         input_table = prettytable.PrettyTable(columns)
         input_table.add_row(row)
