@@ -15,8 +15,7 @@ class EvalResult:
         self._ranks_lazy = ranks_lazy
 
     def __eq__(self, other):
-        return self.hand == other.hand \
-               and self.complement_ranks == other.complement_ranks
+        return self.hand == other.hand and self.complement_ranks == other.complement_ranks
 
     def __lt__(self, other):
         if self.hand == other.hand:
