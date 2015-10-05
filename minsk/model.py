@@ -2,6 +2,7 @@ import enum
 import functools
 import random
 import itertools
+import os
 
 import minsk.utils
 
@@ -14,7 +15,10 @@ class Suit(enum.Enum):
     SPADES = '♠', 's', 'spades'
 
     def __repr__(self):
-        return self.value[0]
+        if 'nt' == os.name:
+            return self.value[1]
+        else:
+            return self.value[0]
 
 
 @functools.total_ordering
