@@ -107,7 +107,8 @@ class MinskShell(cmd.Cmd):
         if parsed_line.pot:
             bet_table = prettytable.PrettyTable(['Max Bet'])
             win_chance = raw_pct[0] / 100
-            max_bet = bet.BetAdviser.get_max_bet(win_chance, parsed_line.pot)
+            max_bet = bet.BetAdviser.get_max_bet(win_chance, parsed_line.pot,
+                                                 len(parsed_line.cards))
             bet_table.add_row([str(round(max_bet))])
             print(bet_table)
 
