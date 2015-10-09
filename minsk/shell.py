@@ -13,6 +13,8 @@ import minsk.config as config
 
 ParsedLine = collections.namedtuple('ParsedLine', 'cards player_num pot')
 
+NUM_RE = '\d+(\.\d+)?'
+
 
 class MinskShell(cmd.Cmd):
     """Minsk shell"""
@@ -35,8 +37,8 @@ class MinskShell(cmd.Cmd):
     def _parse_line(self, line):
         tokens = line.split()
         player_num = config.player_num
-        cards = [token for token in tokens if not re.fullmatch('\d+', token)]
-        params = [token for token in tokens if re.fullmatch('\d+', token)]
+        cards = [token for token in tokens if not re.fullmatch(NUM_RE, token)]
+        params = [token for token in tokens if re.fullmatch(NUM_RE, token)]
         joined = ''.join(cards)
         cards = zip(joined[::2], joined[1::2])
         pot = None
@@ -109,7 +111,7 @@ class MinskShell(cmd.Cmd):
             win_chance = raw_pct[0] / 100
             max_bet = bet.BetAdviser.get_max_bet(win_chance, parsed_line.pot,
                                                  len(parsed_line.cards))
-            bet_table.add_row([str(round(max_bet))])
+            bet_table.add_row([str(round(max_bet, 2))])
             print(bet_table)
 
     def print_input(self, parsed_line):

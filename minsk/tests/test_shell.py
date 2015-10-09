@@ -14,9 +14,14 @@ class TestShell(testtools.TestCase):
         self.assertEqual(2, parsed.player_num)
         parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d 7')
         self.assertEqual(7, parsed.player_num)
-        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d 7 100 10')
+        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d 7 100')
         self.assertEqual(7, parsed.player_num)
         self.assertEqual(100, parsed.pot)
+
+    def test_parse_line_float(self):
+        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d 7 0.24')
+        self.assertEqual(7, parsed.player_num)
+        self.assertEqual(0.24, parsed.pot)
 
     def test_parse_line_cards(self):
         parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d')
@@ -28,7 +33,7 @@ class TestShell(testtools.TestCase):
         self.shell.do_bf('As 6c Ad 8s Ac 6d 7d')
 
     def test_pot_equity(self):
-        self.shell.do_e('As 6c 8c 8s qc 6d 7d 5 110')
+        self.shell.do_e('As 6c 8c 8s qc 6d 7d 5 0.89')
 
     def test_monte_carlo(self):
         with config.with_config(10000, 5):
