@@ -1,4 +1,7 @@
-class GameState:
+import minsk.utils as utils
+
+
+class GameState(utils.CommonEqualityMixin):
     def __init__(self, cards, player_num, pot):
         super().__init__()
         self._cards = cards
@@ -6,6 +9,8 @@ class GameState:
         self._pot = pot
 
     def is_successor(self, other):
+        if self == other:
+            return False
         my_cards = ''.join(map(repr, self._cards))
         other_cards = ''.join(map(repr, other._cards))
         return my_cards.startswith(other_cards) and \

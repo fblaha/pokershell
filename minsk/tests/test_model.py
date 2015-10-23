@@ -39,20 +39,6 @@ class TestCard(testtools.TestCase):
         loaded = pickle.loads(pickle.dumps(orig))
         self.assertEqual(orig, loaded)
 
-    def test_cmp_rank(self):
-        c1 = model.Card.parse('js')
-        c2 = model.Card.parse('Qs')
-        self.assertTrue(c1 < c2)
-        self.assertFalse(c1 > c2)
-        self.assertTrue(c1 <= c2)
-        self.assertTrue(c1 >= c1)
-
-    def test_cmp_suit(self):
-        c1 = model.Card.parse('qc')
-        c2 = model.Card.parse('Qs')
-        self.assertTrue(c1 < c2)
-        self.assertFalse(c1 > c2)
-
     def test_hole_hand_combinations(self):
         all_cards = model.Card.all_cards()
         count = len(list(model.Card.all_combinations(all_cards, 2)))

@@ -4,7 +4,7 @@ import random
 import itertools
 import os
 
-import minsk.utils
+import minsk.utils as utils
 
 
 @enum.unique
@@ -66,12 +66,7 @@ class Hand(enum.IntEnum):
     STRAIGHT_FLUSH = 9
 
 
-_SUIT_ORD = {suit: i for i, suit in enumerate(Suit)}
-_RANK_ORD = {rank: i for i, rank in enumerate(Rank)}
-
-
-@functools.total_ordering
-class Card(metaclass=minsk.utils.MementoMetaclass):
+class Card(utils.CommonEqualityMixin, metaclass=utils.MementoMetaclass):
     def __init__(self, rank, suit):
         self._rank = rank
         self._suit = suit
@@ -85,16 +80,10 @@ class Card(metaclass=minsk.utils.MementoMetaclass):
         return self._rank
 
     def __key(self):
-        return _RANK_ORD[self._rank], _SUIT_ORD[self._suit]
-
-    def __eq__(self, y):
-        return isinstance(y, self.__class__) and self.__key() == y.__key()
+        return self._rank, self._suit
 
     def __hash__(self):
         return hash(self.__key())
-
-    def __lt__(self, other):
-        return self.__key() < other.__key()
 
     def __repr__(self):
         return repr(self._rank) + repr(self._suit)
