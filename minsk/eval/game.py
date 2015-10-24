@@ -13,9 +13,9 @@ class GameState(utils.CommonEqualityMixin):
             return False
         my_cards = ''.join(map(repr, self._cards))
         other_cards = ''.join(map(repr, other._cards))
-        return my_cards.startswith(other_cards) and \
-               self._pot >= other._pot and \
-               self._player_num <= other._player_num
+        return all((my_cards.startswith(other_cards),
+                    self._pot >= other._pot,
+                    self._player_num <= other._player_num,))
 
 
 class GameStack:
