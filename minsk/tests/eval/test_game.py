@@ -32,6 +32,16 @@ class TestGameState(testtools.TestCase):
         river2 = state(parse('2d 2c 4h 5d 8h 9d jc'), 2, 200)
         self.assertFalse(river1.is_successor(river2))
 
+    def test_street(self):
+        pre_flop = state(parse('2d 2c'), 5, 100)
+        flop = state(parse('2d 2c 4h 5d 8h'), 2, 200)
+        turn = state(parse('2d 2c 4h 5d 8h 9d'), 2, 200)
+        river = state(parse('2d 2c 4h 5d 8h 9d jc'), 2, 200)
+        self.assertEqual(game.Street.PRE_FLOP, pre_flop.street)
+        self.assertEqual(game.Street.FLOP, flop.street)
+        self.assertEqual(game.Street.TURN, turn.street)
+        self.assertEqual(game.Street.RIVER, river.street)
+
 
 class TestGameStack(testtools.TestCase):
     def test_stack(self):

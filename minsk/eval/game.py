@@ -1,4 +1,14 @@
+import enum
+
 import minsk.utils as utils
+
+
+@enum.unique
+class Street(enum.IntEnum):
+    PRE_FLOP = 2
+    FLOP = 5
+    TURN = 6
+    RIVER = 7
 
 
 class GameState(utils.CommonEqualityMixin):
@@ -16,6 +26,10 @@ class GameState(utils.CommonEqualityMixin):
         return all((my_cards.startswith(other_cards),
                     self._pot >= other._pot,
                     self._player_num <= other._player_num,))
+
+    @property
+    def street(self):
+        return Street(len(self._cards))
 
 
 class GameStack:
