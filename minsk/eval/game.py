@@ -50,9 +50,10 @@ class GameStack:
         self._stack = []
 
     def add_state(self, state):
-        if self._stack and not state.is_successor(self._stack[-1]):
-            self._stack = []
-        self._stack.append(state)
+        if state.player_num and state.pot:
+            if self._stack and not state.is_successor(self._stack[-1]):
+                self._stack = []
+            self._stack.append(state)
 
     @property
     def stack(self):
