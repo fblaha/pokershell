@@ -28,6 +28,18 @@ class GameState(utils.CommonEqualityMixin):
                     self._player_num <= other._player_num,))
 
     @property
+    def cards(self):
+        return self._cards
+
+    @property
+    def player_num(self):
+        return self._player_num
+
+    @property
+    def pot(self):
+        return self._pot
+
+    @property
     def street(self):
         return Street(len(self._cards))
 

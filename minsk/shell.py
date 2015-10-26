@@ -1,17 +1,15 @@
 import cmd
 import time
 import re
-import collections
 
 import prettytable
 
 import minsk.eval.bet as bet
 import minsk.eval.manager as manager
 import minsk.eval.simulation as simulation
+import minsk.eval.game as game
 import minsk.model as model
 import minsk.config as config
-
-ParsedLine = collections.namedtuple('ParsedLine', 'cards player_num pot')
 
 NUM_RE = '\d+(\.\d+)?'
 
@@ -19,6 +17,11 @@ NUM_RE = '\d+(\.\d+)?'
 class MinskShell(cmd.Cmd):
     """Minsk shell"""
     prompt = '(minsk) '
+
+    def __init__(self):
+        super().__init__()
+        self._sim_manager = simulation.SimulatorManager()
+        self._game_stack = game.GameStack()
 
     def do_bf(self, cards):
         """evaluate hand - brute force"""
@@ -29,9 +32,8 @@ class MinskShell(cmd.Cmd):
     def do_e(self, cards):
         """evaluate hand"""
         parsed = self._parse_line(cards)
-        manager = simulation.SimulatorManager()
         with config.with_config(_player_num=parsed.player_num):
-            simulator = manager.find_simulator(*parsed.cards)
+            simulator = self._sim_manager.find_simulator(*parsed.cards)
             self.simulate(parsed, simulator)
 
     def _parse_line(self, line):
@@ -46,7 +48,7 @@ class MinskShell(cmd.Cmd):
             player_num = int(params[0])
             if len(params) >= 2:
                 pot = float(params[1])
-        return ParsedLine(model.Card.parse_cards(cards), player_num, pot)
+        return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
     def do_mc(self, cards):
         """evaluate hand - monte carlo"""
@@ -66,6 +68,9 @@ class MinskShell(cmd.Cmd):
     def simulate(self, parsed_line, simulator):
         self.print_configuration(simulator)
         self.print_input(parsed_line)
+
+        self._game_stack.add_state(parsed_line)
+
         if not simulator:
             print('\nNo simulator found!\n')
             return
