@@ -29,7 +29,7 @@ class TestShell(testtools.TestCase):
         self.assertEqual(7, parsed.player_num)
         self.assertEqual(0.24, parsed.pot)
 
-    def test_parse_line_chunks_eq(self):
+    def test_parse_line_empty_chunks(self):
         line = 'As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24'
         self.assertEqual(self.parse(line), self.parse(line + ';'))
         self.assertEqual(self.parse(line), self.parse(line + ' ;'))
