@@ -8,30 +8,38 @@ class TestShell(testtools.TestCase):
     def setUp(self):
         super().setUp()
         self.shell = shell.MinskShell()
+        self.parse = self.shell._parse_line
 
     def test_parse_line(self):
-        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d')
+        parsed = self.parse('As 6c Ad 8s Ac 6d 7d')
         self.assertEqual(2, parsed.player_num)
-        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d 7')
+        parsed = self.parse('As 6c Ad 8s Ac 6d 7d 7')
         self.assertEqual(7, parsed.player_num)
-        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d 7 100')
+        parsed = self.parse('As 6c Ad 8s Ac 6d 7d 7 100')
         self.assertEqual(7, parsed.player_num)
         self.assertEqual(100, parsed.pot)
 
     def test_parse_line_float(self):
-        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d 7 0.24')
+        parsed = self.parse('As 6c Ad 8s Ac 6d 7d 7 0.24')
         self.assertEqual(7, parsed.player_num)
         self.assertEqual(0.24, parsed.pot)
 
     def test_parse_line_chunks(self):
-        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24; ')
+        parsed = self.parse('As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24; ')
         self.assertEqual(7, parsed.player_num)
         self.assertEqual(0.24, parsed.pot)
 
+    def test_parse_line_chunks_eq(self):
+        line = 'As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24'
+        self.assertEqual(self.parse(line), self.parse(line + ';'))
+        self.assertEqual(self.parse(line), self.parse(line + ' ;'))
+        self.assertEqual(self.parse(line), self.parse(line + '; '))
+        self.assertEqual(self.parse(line), self.parse(line + '; ;; '))
+
     def test_parse_line_cards(self):
-        parsed = self.shell._parse_line('As 6c Ad 8s Ac 6d 7d')
+        parsed = self.parse('As 6c Ad 8s Ac 6d 7d')
         self.assertEqual(7, len(parsed.cards))
-        parsed = self.shell._parse_line('As6c Ad8sAc 6d 7d')
+        parsed = self.parse('As6c Ad8sAc 6d 7d')
         self.assertEqual(7, len(parsed.cards))
 
     def test_brute_force(self):
