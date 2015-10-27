@@ -38,10 +38,12 @@ class MinskShell(cmd.Cmd):
             self.simulate(parsed, simulator)
 
     def _parse_line(self, line):
-        tokens = line.split()
+        last_chunk = line.split(';')[-1]
+        line = line.replace(';', '')
         player_num = config.player_num
-        cards = [token for token in tokens if re.fullmatch(CARD_RE, token, re.IGNORECASE)]
-        params = [token for token in tokens if re.fullmatch(NUM_RE, token)]
+        cards = [token for token in line.split()
+                 if re.fullmatch(CARD_RE, token, re.IGNORECASE)]
+        params = [token for token in last_chunk.split() if re.fullmatch(NUM_RE, token)]
         joined = ''.join(cards)
         cards = zip(joined[::2], joined[1::2])
         pot = None
