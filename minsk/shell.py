@@ -12,6 +12,7 @@ import minsk.model as model
 import minsk.config as config
 
 NUM_RE = '\d+(\.\d+)?'
+CARD_RE = '([2-9tjqka][hscd])+'
 
 
 class MinskShell(cmd.Cmd):
@@ -39,7 +40,7 @@ class MinskShell(cmd.Cmd):
     def _parse_line(self, line):
         tokens = line.split()
         player_num = config.player_num
-        cards = [token for token in tokens if not re.fullmatch(NUM_RE, token)]
+        cards = [token for token in tokens if re.fullmatch(CARD_RE, token, re.IGNORECASE)]
         params = [token for token in tokens if re.fullmatch(NUM_RE, token)]
         joined = ''.join(cards)
         cards = zip(joined[::2], joined[1::2])
