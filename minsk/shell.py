@@ -38,7 +38,7 @@ class MinskShell(cmd.Cmd):
             self.simulate(parsed, simulator)
 
     def _parse_line(self, line):
-        last_chunk = line.split(';')[-1]
+        last_chunk = [token for token in line.split(';') if token.strip()][-1]
         line = line.replace(';', '')
         player_num = config.player_num
         cards = [token for token in line.split()
