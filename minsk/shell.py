@@ -121,6 +121,14 @@ class MinskShell(cmd.Cmd):
             bet_table.add_row([str(round(max_bet, 2))])
             print(bet_table)
 
+        dangerous_hands = sim_result.get_dangerous_hands(3)
+        if dangerous_hands:
+            danger_table = prettytable.PrettyTable(['Dangerous Hand', 'Lose Rate'])
+            for hand, count in dangerous_hands:
+                pct = count * 100 / sim_result.lose
+                danger_table.add_row([hand.name, str(round(pct, 2)) + '%'])
+            print(danger_table)
+
     def print_input(self, parsed_line):
         cards = parsed_line.cards
         print('\nInput :')

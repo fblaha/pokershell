@@ -145,3 +145,15 @@ class TestSimulatorManager(testtools.TestCase):
         config.player_num = 7
         simulator = self.manager.find_simulator(*cards)
         self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
+
+
+class TestSimulationResult(testtools.TestCase):
+    def test_beaten_by(self):
+        beaten_by = [0, 0, 5824, 2736, 324, 849, 1478, 135, 6]
+        result = simulation.SimulationResult(35000, 1600, 1100, beaten_by)
+        dangerous_hands = result.get_dangerous_hands(3)
+        self.assertEqual(3, len(dangerous_hands))
+        self.assertEqual(dangerous_hands[0][0], model.Hand.TWO_PAIR)
+        self.assertEqual(dangerous_hands[0][1], 5824)
+        self.assertEqual(dangerous_hands[2][0], model.Hand.FULL_HOUSE)
+        self.assertEqual(dangerous_hands[2][1], 1478)

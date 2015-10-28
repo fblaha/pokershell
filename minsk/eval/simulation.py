@@ -21,6 +21,12 @@ class SimulationResult:
     def total(self):
         return self.win + self.tie + self.lose
 
+    def get_dangerous_hands(self, n):
+        if self.beaten_by:
+            counts = [(hand, self.beaten_by[hand]) for hand in model.Hand]
+            counts.sort(key=lambda x: x[1], reverse=True)
+            return [cnt for cnt in counts[:n] if cnt[1]]
+
     def __repr__(self):
         return repr(self.__dict__)
 

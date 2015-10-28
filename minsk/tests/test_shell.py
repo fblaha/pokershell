@@ -63,6 +63,9 @@ class TestShell(testtools.TestCase):
     def test_eval(self):
         self.shell.do_e('As 6c Ad 8s Ac 6d 7d')
 
+    def test_eval_unbeatable(self):
+        self.shell.do_e('ad kd jd qd td 5 100; 4 500 3c 4d')
+
     def test_eval_pre_flop(self):
         self.shell.do_e('As 6c')
 
