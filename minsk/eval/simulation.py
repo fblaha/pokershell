@@ -2,11 +2,27 @@ import functools
 import multiprocessing
 import abc
 import os
+
 import random
 
 import minsk.config as config
 import minsk.model as model
 import minsk.eval.manager as manager
+
+
+class SimulationResult:
+    def __init__(self, win, tie, lose, beaten_by):
+        self.win = win
+        self.tie = tie
+        self.lose = lose
+        self.beaten_by = beaten_by
+
+    @property
+    def total(self):
+        return self.win + self.tie + self.lose
+
+    def __repr__(self):
+        return repr(self.__dict__)
 
 
 class AbstractSimulator(metaclass=abc.ABCMeta):
@@ -26,7 +42,15 @@ class ParallelSimulatorMixin:
     @staticmethod
     def _simulate_parallel(sim_fc, data):
         partial_results = multiprocessing.Pool().map(sim_fc, data)
-        return tuple(sum(x) for x in zip(*partial_results))
+        win, tie, lose = 0, 0, 0
+        beaten_by = [0] * len(model.Hand)
+        for result in partial_results:
+            win += result.win
+            tie += result.tie
+            lose += result.lose
+            for i, cnt in enumerate(result.beaten_by):
+                beaten_by[i] += cnt
+        return SimulationResult(win, tie, lose, beaten_by)
 
     @classmethod
     def _simulate_cards_parallel(cls, sim_cycles, fc, cards):
@@ -67,6 +91,7 @@ class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
         deck = model.Deck(*cards)
         deck_cards = deck.cards
         best_hand = self._manager.find_best_hand(cards)
+        beaten_by = [0] * len(model.Hand)
         win, tie, lose = 0, 0, 0
         for opponent in model.Card.all_combinations(deck_cards, 2):
             opponent_cards = opponent + common
@@ -75,11 +100,12 @@ class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
             if not opponent_best or best_hand > opponent_best:
                 win += 1
             elif best_hand < opponent_best:
+                beaten_by[opponent_best.hand] += 1
                 lose += 1
             elif best_hand == opponent_best:
                 tie += 1
 
-        return win, tie, lose
+        return SimulationResult(win, tie, lose, beaten_by)
 
     @classmethod
     def from_config(cls):
@@ -117,33 +143,37 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
         win, tie, lose = 0, 0, 0
         others_count = self._player_num - 1
         sampled_count = sampled_common_count + others_count * 2
+        beaten_by = [0] * len(model.Hand)
         for _ in range(int(sim_cycles / (self._avg_eval_count + 1))):
             sampled_cards = tuple(random.sample(deck_cards, sampled_count))
             sampled_common = sampled_cards[:sampled_common_count]
             my_cards = cards + sampled_common
             my_hand = self._manager.find_best_hand(my_cards)
             others_cards = sampled_cards[sampled_common_count:]
-            result = self._eval_showdown(my_hand, common + sampled_common, others_cards)
+            result, hand = self._eval_showdown(my_hand,
+                                               common + sampled_common,
+                                               others_cards)
             if result == -1:
+                beaten_by[hand] += 1
                 lose += 1
             elif result == 0:
                 tie += 1
             else:
                 win += 1
-        return win, tie, lose
+        return SimulationResult(win, tie, lose, beaten_by)
 
     def _eval_showdown(self, my_hand, common, others_cards):
-        result = 1
+        result = 1, my_hand.hand
         for hand in zip(others_cards[::2], others_cards[1::2]):
             opponent_cards = hand + common
             opponent_best = self._manager.find_best_hand(opponent_cards,
                                                          min_hand=my_hand.hand)
             if opponent_best:
                 if my_hand < opponent_best:
-                    return -1
+                    return -1, opponent_best.hand
                     break
                 elif my_hand == opponent_best:
-                    result = 0
+                    result = 0, my_hand.hand
         return result
 
     @classmethod
@@ -176,7 +206,7 @@ class LookUpSimulator(AbstractSimulator):
             win = float(line_split[2])
             tie = float(line_split[3])
             lose = 100 - win - tie
-            code_dict[code] = (win, tie, lose)
+            code_dict[code] = SimulationResult(win, tie, lose, None)
         self._sim_data[player_num] = code_dict
 
     def simulate(self, c1, c2):

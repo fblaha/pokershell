@@ -55,15 +55,15 @@ class Rank(enum.Enum):
 
 @enum.unique
 class Hand(enum.IntEnum):
-    HIGH_CARD = 1
-    ONE_PAIR = 2
-    TWO_PAIR = 3
-    THREE_OF_KIND = 4
-    STRAIGHT = 5
-    FLUSH = 6
-    FULL_HOUSE = 7
-    FOUR_OF_KIND = 8
-    STRAIGHT_FLUSH = 9
+    HIGH_CARD = 0
+    ONE_PAIR = 1
+    TWO_PAIR = 2
+    THREE_OF_KIND = 3
+    STRAIGHT = 4
+    FLUSH = 5
+    FULL_HOUSE = 6
+    FOUR_OF_KIND = 7
+    STRAIGHT_FLUSH = 8
 
 
 class Card(utils.CommonEqualityMixin, metaclass=utils.MementoMetaclass):

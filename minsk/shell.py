@@ -100,16 +100,16 @@ class MinskShell(cmd.Cmd):
             t.add_row(['simulator', simulator.name])
         print(t)
 
-    def print_output(self, parsed_line, result):
+    def print_output(self, parsed_line, sim_result):
         print('\nOutput :')
+        counts = (sim_result.win, sim_result.tie, sim_result.lose)
         pct_table = prettytable.PrettyTable(['Win', 'Tie', 'Loss'])
 
-        if isinstance(result[0], int):
-            total = sum(result)
-            raw_pct = list(map(lambda x: x / total * 100, result))
-            pct_table.add_row(result)
+        if isinstance(counts[0], int):
+            raw_pct = list(map(lambda x: x / sim_result.total * 100, counts))
+            pct_table.add_row(counts)
         else:
-            raw_pct = result
+            raw_pct = counts
 
         result_pct = list(map(lambda x: str(round(x, 2)) + '%', raw_pct))
         pct_table.add_row(result_pct)
