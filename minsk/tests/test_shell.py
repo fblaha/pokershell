@@ -4,11 +4,10 @@ import minsk.shell as shell
 import minsk.config as config
 
 
-class TestShell(testtools.TestCase):
+class TestLineParser(testtools.TestCase):
     def setUp(self):
         super().setUp()
-        self.shell = shell.MinskShell()
-        self.parse = self.shell._parse_line
+        self.parse = shell.LineParser.parse_line
 
     def test_parse_line(self):
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d')
@@ -41,6 +40,12 @@ class TestShell(testtools.TestCase):
         self.assertEqual(7, len(parsed.cards))
         parsed = self.parse('As6c Ad8sAc 6d 7d')
         self.assertEqual(7, len(parsed.cards))
+
+
+class TestShell(testtools.TestCase):
+    def setUp(self):
+        super().setUp()
+        self.shell = shell.MinskShell()
 
     def test_brute_force(self):
         self.shell.do_bf('As 6c Ad 8s Ac 6d 7d')

@@ -72,7 +72,7 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         result = self.simulator.simulate(*cards)
         rate = result.win / result.total
         print(rate)
-        self.assertTrue(0.75 <= rate <= 0.79)
+        self.assertTrue(0.75 <= rate <= 0.8)
 
     def test_performance(self):
         cards = model.Card.parse_cards_line('As Ah Ad 8s Ac 7d')

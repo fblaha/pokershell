@@ -15,6 +15,25 @@ NUM_RE = '\d+(\.\d+)?'
 CARD_RE = '([2-9tjqka][hscd])+'
 
 
+class LineParser:
+    @staticmethod
+    def parse_line(line):
+        last_chunk = [token for token in line.split(';') if token.strip()][-1]
+        line = line.replace(';', ' ')
+        player_num = config.player_num
+        cards = [token for token in line.split()
+                 if re.fullmatch(CARD_RE, token, re.IGNORECASE)]
+        params = [token for token in last_chunk.split() if re.fullmatch(NUM_RE, token)]
+        joined = ''.join(cards)
+        cards = zip(joined[::2], joined[1::2])
+        pot = None
+        if params:
+            player_num = int(params[0])
+            if len(params) >= 2:
+                pot = float(params[1])
+        return game.GameState(model.Card.parse_cards(cards), player_num, pot)
+
+
 class MinskShell(cmd.Cmd):
     """Minsk shell"""
     prompt = '(minsk) '
@@ -23,6 +42,7 @@ class MinskShell(cmd.Cmd):
         super().__init__()
         self._sim_manager = simulation.SimulatorManager()
         self._game_stack = game.GameStack()
+        self._parse_line = LineParser.parse_line
 
     def do_bf(self, cards):
         """evaluate hand - brute force"""
@@ -36,22 +56,6 @@ class MinskShell(cmd.Cmd):
         with config.with_config(_player_num=parsed.player_num):
             simulator = self._sim_manager.find_simulator(*parsed.cards)
             self.simulate(parsed, simulator)
-
-    def _parse_line(self, line):
-        last_chunk = [token for token in line.split(';') if token.strip()][-1]
-        line = line.replace(';', '')
-        player_num = config.player_num
-        cards = [token for token in line.split()
-                 if re.fullmatch(CARD_RE, token, re.IGNORECASE)]
-        params = [token for token in last_chunk.split() if re.fullmatch(NUM_RE, token)]
-        joined = ''.join(cards)
-        cards = zip(joined[::2], joined[1::2])
-        pot = None
-        if params:
-            player_num = int(params[0])
-            if len(params) >= 2:
-                pot = float(params[1])
-        return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
     def do_mc(self, cards):
         """evaluate hand - monte carlo"""
