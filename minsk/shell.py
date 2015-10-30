@@ -51,7 +51,7 @@ class MinskShell(cmd.Cmd):
         self._game_stack = game.GameStack()
 
     def _parse_line(self, line):
-        if LineParser.validate_line(line):
+        if not LineParser.validate_line(line):
             print("Invalid syntax '%s'" % line)
         try:
             return LineParser.parse_line(line)
