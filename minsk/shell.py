@@ -51,12 +51,13 @@ class MinskShell(cmd.Cmd):
         self._game_stack = game.GameStack()
 
     def _parse_line(self, line):
-        if not LineParser.validate_line(line):
+        if LineParser.validate_line(line):
+            try:
+                return LineParser.parse_line(line)
+            except ValueError as e:
+                print(str(e))
+        else:
             print("Invalid syntax '%s'" % line)
-        try:
-            return LineParser.parse_line(line)
-        except ValueError as e:
-            print(str(e))
 
     def do_brute_force(self, cards):
         """evaluate hand - brute force"""
