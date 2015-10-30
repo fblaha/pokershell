@@ -33,6 +33,13 @@ class LineParser:
                 pot = float(params[1])
         return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
+    @staticmethod
+    def validate_line(line):
+        line = line.replace(';', ' ')
+        return all(re.fullmatch(NUM_RE, token) or
+                   re.fullmatch(CARD_RE, token, re.IGNORECASE)
+                   for token in line.split())
+
 
 class MinskShell(cmd.Cmd):
     """Minsk shell"""
@@ -42,35 +49,52 @@ class MinskShell(cmd.Cmd):
         super().__init__()
         self._sim_manager = simulation.SimulatorManager()
         self._game_stack = game.GameStack()
-        self._parse_line = LineParser.parse_line
 
-    def do_bf(self, cards):
+    def _parse_line(self, line):
+        if LineParser.validate_line(line):
+            print("Invalid syntax '%s'" % line)
+        try:
+            return LineParser.parse_line(line)
+        except ValueError as e:
+            print(str(e))
+
+    def do_brute_force(self, cards):
         """evaluate hand - brute force"""
         parsed = self._parse_line(cards)
-        simulator = simulation.BruteForceSimulator()
-        self.simulate(parsed, simulator)
+        if parsed:
+            simulator = simulation.BruteForceSimulator()
+            self.simulate(parsed, simulator)
 
-    def do_e(self, cards):
+    def do_eval(self, cards):
         """evaluate hand"""
         parsed = self._parse_line(cards)
-        with config.with_config(_player_num=parsed.player_num):
-            simulator = self._sim_manager.find_simulator(*parsed.cards)
-            self.simulate(parsed, simulator)
+        if parsed:
+            with config.with_config(_player_num=parsed.player_num):
+                simulator = self._sim_manager.find_simulator(*parsed.cards)
+                self.simulate(parsed, simulator)
 
-    def do_mc(self, cards):
+    def default(self, line):
+        if LineParser.validate_line(line):
+            self.do_eval(line)
+        else:
+            super().default(line)
+
+    def do_monte_carlo(self, cards):
         """evaluate hand - monte carlo"""
         parsed = self._parse_line(cards)
-        with config.with_config(_player_num=parsed.player_num):
-            simulator = simulation.MonteCarloSimulator(
-                config.player_num, config.sim_cycles)
-            self.simulate(parsed, simulator)
+        if parsed:
+            with config.with_config(_player_num=parsed.player_num):
+                simulator = simulation.MonteCarloSimulator(
+                    config.player_num, config.sim_cycles)
+                self.simulate(parsed, simulator)
 
-    def do_lu(self, cards):
+    def do_look_up(self, cards):
         """evaluate hand - loop up"""
         parsed = self._parse_line(cards)
-        with config.with_config(_player_num=parsed.player_num):
-            simulator = simulation.LookUpSimulator(config.player_num)
-            self.simulate(parsed, simulator)
+        if parsed:
+            with config.with_config(_player_num=parsed.player_num):
+                simulator = simulation.LookUpSimulator(config.player_num)
+                self.simulate(parsed, simulator)
 
     def simulate(self, parsed_line, simulator):
         self.print_configuration(simulator)

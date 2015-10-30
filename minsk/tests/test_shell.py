@@ -8,6 +8,7 @@ class TestLineParser(testtools.TestCase):
     def setUp(self):
         super().setUp()
         self.parse = shell.LineParser.parse_line
+        self.validate = shell.LineParser.validate_line
 
     def test_parse_line(self):
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d')
@@ -41,6 +42,14 @@ class TestLineParser(testtools.TestCase):
         parsed = self.parse('As6c Ad8sAc 6d 7d')
         self.assertEqual(7, len(parsed.cards))
 
+    def test_validate(self):
+        self.assertTrue(self.validate('As6c Ad8sAc 6d 7d'))
+        self.assertTrue(self.validate('As6c Ad8sAc 3 3.0'))
+        self.assertTrue(self.validate('As6c; Ad 8s Ac 3 3.0'))
+
+    def test_validate_negative(self):
+        self.assertFalse(self.validate('As 6cX'))
+
 
 class TestShell(testtools.TestCase):
     def setUp(self):
@@ -48,34 +57,37 @@ class TestShell(testtools.TestCase):
         self.shell = shell.MinskShell()
 
     def test_brute_force(self):
-        self.shell.do_bf('As 6c Ad 8s Ac 6d 7d')
+        self.shell.do_brute_force('As 6c Ad 8s Ac 6d 7d')
 
     def test_pot_equity(self):
-        self.shell.do_e('As 6c 8c 8s qc 6d 7d 5 0.89')
+        self.shell.do_eval('As 6c 8c 8s qc 6d 7d 5 0.89')
 
     def test_monte_carlo(self):
         with config.with_config(10000, 5):
-            self.shell.do_mc('As 6s')
+            self.shell.do_monte_carlo('As 6s')
 
     def test_monte_carlo_eval(self):
         with config.with_config(10000, 5):
-            self.shell.do_e('As 6s 5d')
+            self.shell.do_eval('As 6s 5d')
 
     def test_look_up(self):
         with config.with_config(10000, 5):
-            self.shell.do_lu('As 6s')
+            self.shell.do_look_up('As 6s')
 
     def test_eval(self):
-        self.shell.do_e('As 6c Ad 8s Ac 6d 7d')
+        self.shell.do_eval('As 6c Ad 8s Ac 6d 7d')
+
+    def test_eval_dupl(self):
+        self.shell.do_eval('As 6c Ad As Ac 6d 7d')
 
     def test_eval_unbeatable(self):
-        self.shell.do_e('ad kd jd qd td 5 100; 4 500 3c 4d')
+        self.shell.do_eval('ad kd jd qd td 5 100; 4 500 3c 4d')
 
     def test_eval_pre_flop(self):
-        self.shell.do_e('As 6c')
+        self.shell.do_eval('As 6c')
 
     def test_eval_no_simulator(self):
-        self.shell.do_e('As 6c 8h')
+        self.shell.do_eval('As 6c 8h')
 
     def test_sim_cycles(self):
         with config.with_config(10000, 5):

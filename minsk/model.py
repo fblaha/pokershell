@@ -118,7 +118,7 @@ class Card(utils.CommonEqualityMixin, metaclass=utils.MementoMetaclass):
     def parse_cards(cls, tokens):
         cards = tuple(cls.parse(card) for card in tokens)
         if len(cards) != len(set(cards)):
-            raise ValueError('Duplicate cards: {0}'.format(tokens))
+            raise ValueError('Duplicate cards: {0}'.format(cards))
         return cards
 
 
