@@ -58,8 +58,3 @@ class GameStack:
     @property
     def stack(self):
         return self._stack
-
-    @property
-    def current(self):
-        if self._stack:
-            return self._stack[-1]
