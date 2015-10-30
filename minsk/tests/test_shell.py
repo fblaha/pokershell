@@ -11,34 +11,34 @@ class TestLineParser(testtools.TestCase):
 
     def test_parse_line(self):
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d')
-        self.assertEqual(2, parsed.player_num)
+        self.assertEqual(2, parsed.current.player_num)
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d 7')
         self.assertEqual(7, parsed.player_num)
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d 7 100')
-        self.assertEqual(7, parsed.player_num)
-        self.assertEqual(100, parsed.pot)
+        self.assertEqual(7, parsed.current.player_num)
+        self.assertEqual(100, parsed.current.pot)
 
     def test_parse_line_float(self):
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d 7 0.24')
-        self.assertEqual(7, parsed.player_num)
-        self.assertEqual(0.24, parsed.pot)
+        self.assertEqual(7, parsed.current.player_num)
+        self.assertEqual(0.24, parsed.current.pot)
 
     def test_parse_line_chunks(self):
         parsed = self.parse('As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24; ')
-        self.assertEqual(7, parsed.player_num)
-        self.assertEqual(0.24, parsed.pot)
+        self.assertEqual(7, parsed.current.player_num)
+        self.assertEqual(0.24, parsed.current.pot)
 
     def test_parse_line_empty_chunks(self):
         line = 'As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24'
-        self.assertEqual(self.parse(line), self.parse(line + ';'))
-        self.assertEqual(self.parse(line), self.parse(line + ' ;'))
-        self.assertEqual(self.parse(line), self.parse(line + '; '))
-        self.assertEqual(self.parse(line), self.parse(line + '; ;; '))
+        self.assertEqual(self.parse(line).current, self.parse(line + ';').current)
+        self.assertEqual(self.parse(line).current, self.parse(line + ' ;').current)
+        self.assertEqual(self.parse(line).current, self.parse(line + '; ').current)
+        self.assertEqual(self.parse(line).current, self.parse(line + '; ;; ').current)
 
     def test_parse_line_cards(self):
-        parsed = self.parse('As 6c Ad 8s Ac 6d 7d')
+        parsed = self.parse('As 6c Ad 8s Ac 6d 7d').current
         self.assertEqual(7, len(parsed.cards))
-        parsed = self.parse('As6c Ad8sAc 6d 7d')
+        parsed = self.parse('As6c Ad8sAc 6d 7d').current
         self.assertEqual(7, len(parsed.cards))
 
 
