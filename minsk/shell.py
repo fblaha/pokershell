@@ -201,10 +201,5 @@ class MinskShell(cmd.Cmd):
     def do_EOF(self, line):
         return True
 
-
-def main():
-    MinskShell().cmdloop()
-
-
 if __name__ == '__main__':
-    main()
+    MinskShell().cmdloop()
