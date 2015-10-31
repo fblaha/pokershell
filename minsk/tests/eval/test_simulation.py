@@ -66,13 +66,25 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         result = self.simulator.simulate(*cards)
         print(result)
         self.assertTrue(result.win / result.total > 0.9)
+        wining_hands = result.get_wining_hands(100)
+        self.assertEquals(1, len(wining_hands))
+        self.assertEquals(model.Hand.FULL_HOUSE, wining_hands[0][0])
+        self.assertEquals(result.win, wining_hands[0][1])
 
     def test_calculator_comparison(self):
         cards = model.Card.parse_cards_line('4h 4d 8c 4c Qd')
         result = self.simulator.simulate(*cards)
         rate = result.win / result.total
         print(rate)
+        print(result)
         self.assertTrue(0.75 <= rate <= 0.8)
+
+    def test_hand_stats(self):
+        cards = model.Card.parse_cards_line('4h 4d 8c 4c Qd')
+        result = self.simulator.simulate(*cards)
+        print(result)
+        self.assertEquals(result.win, sum(result.win_by))
+        self.assertEquals(result.lose, sum(result.beaten_by))
 
     def test_performance(self):
         cards = model.Card.parse_cards_line('As Ah Ad 8s Ac 7d')
@@ -150,8 +162,8 @@ class TestSimulatorManager(testtools.TestCase):
 class TestSimulationResult(testtools.TestCase):
     def test_beaten_by(self):
         beaten_by = [0, 0, 5824, 2736, 324, 849, 1478, 135, 6]
-        result = simulation.SimulationResult(35000, 1600, 1100, beaten_by)
-        dangerous_hands = result.get_dangerous_hands(3)
+        result = simulation.SimulationResult(35000, 1600, 1100, None, beaten_by)
+        dangerous_hands = result.get_beating_hands(3)
         self.assertEqual(3, len(dangerous_hands))
         self.assertEqual(dangerous_hands[0][0], model.Hand.TWO_PAIR)
         self.assertEqual(dangerous_hands[0][1], 5824)

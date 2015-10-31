@@ -159,11 +159,17 @@ class MinskShell(cmd.Cmd):
             bet_table.add_row([str(round(max_bet, 2))])
             print(bet_table)
 
-        dangerous_hands = sim_result.get_dangerous_hands(3)
-        if dangerous_hands:
-            danger_table = prettytable.PrettyTable(['Dangerous Hand', 'Lose Rate'])
-            for hand, count in dangerous_hands:
-                pct = count * 100 / sim_result.lose
+        wining_hands = sim_result.get_wining_hands(3)
+        beating_hands = sim_result.get_beating_hands(3)
+        self._print_hand_stats(wining_hands, 'Wining Hand')
+        self._print_hand_stats(beating_hands, 'Beating Hand')
+
+    def _print_hand_stats(self, hand_stats, label):
+        if hand_stats:
+            danger_table = prettytable.PrettyTable([label, 'Frequency'])
+            total = sum(count for _, count in hand_stats)
+            for hand, count in hand_stats:
+                pct = count * 100 / total
                 danger_table.add_row([hand.name, str(round(pct, 2)) + '%'])
             print(danger_table)
 
@@ -201,5 +207,10 @@ class MinskShell(cmd.Cmd):
     def do_EOF(self, line):
         return True
 
-if __name__ == '__main__':
+
+def main():
     MinskShell().cmdloop()
+
+
+if __name__ == '__main__':
+    main()
