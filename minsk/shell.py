@@ -38,8 +38,8 @@ class LineParser:
         chunks = [token.strip() for token in line.split(';') if token.strip()]
         history = []
         for i in range(1, len(chunks) + 1):
-            subline = '; '.join(chunks[:i])
-            history.append(cls.parse_state(subline))
+            history_line = '; '.join(chunks[:i])
+            history.append(cls.parse_state(history_line))
         return history
 
     @staticmethod
