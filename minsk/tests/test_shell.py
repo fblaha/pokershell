@@ -50,10 +50,11 @@ class TestLineParser(testtools.TestCase):
     def test_validate_negative(self):
         self.assertFalse(self.validate('As 6cX'))
 
-    def test_parse_stack(self):
-        parsed = shell.LineParser.parse_stack('As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24; ')
-        self.assertEqual(2, len(parsed.stack))
-        self.assertEqual(0.24, parsed.current.pot)
+    def test_parse_history(self):
+        history = shell.LineParser.parse_history('As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24; ')
+        self.assertEqual(2, len(history))
+        self.assertEqual(0.24, history[-1].pot)
+        self.assertEqual(7, history[-1].player_num)
 
 
 class TestShell(testtools.TestCase):

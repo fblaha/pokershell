@@ -43,6 +43,10 @@ class GameState(utils.CommonEqualityMixin, utils.CommonReprMixin):
     def street(self):
         return Street(len(self._cards))
 
+    @property
+    def complete(self):
+        return bool(self._pot and self._player_num)
+
 
 class GameStack(utils.CommonReprMixin):
     def __init__(self):
@@ -50,7 +54,7 @@ class GameStack(utils.CommonReprMixin):
         self._stack = []
 
     def add_state(self, state):
-        if state.player_num and state.pot:
+        if state.complete:
             if self._stack and not state.is_successor(self._stack[-1]):
                 self._stack = []
             self._stack.append(state)

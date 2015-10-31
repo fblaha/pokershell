@@ -34,13 +34,13 @@ class LineParser:
         return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
     @classmethod
-    def parse_stack(cls, line):
+    def parse_history(cls, line):
         chunks = [token.strip() for token in line.split(';') if token.strip()]
-        stack = game.GameStack()
+        history = []
         for i in range(1, len(chunks) + 1):
             subline = '; '.join(chunks[:i])
-            stack.add_state(cls.parse_state(subline))
-        return stack
+            history.append(cls.parse_state(subline))
+        return history
 
     @staticmethod
     def validate_line(line):
