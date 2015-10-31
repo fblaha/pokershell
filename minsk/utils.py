@@ -13,3 +13,8 @@ class CommonEqualityMixin(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+
+class CommonReprMixin(object):
+    def __repr__(self):
+        return repr(self.__dict__)

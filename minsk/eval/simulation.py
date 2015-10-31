@@ -2,15 +2,15 @@ import functools
 import multiprocessing
 import abc
 import os
-
 import random
 
 import minsk.config as config
 import minsk.model as model
 import minsk.eval.manager as manager
+import minsk.utils as utils
 
 
-class SimulationResult:
+class SimulationResult(utils.CommonReprMixin):
     def __init__(self, win, tie, lose, beaten_by):
         self.win = win
         self.tie = tie
@@ -26,9 +26,6 @@ class SimulationResult:
             counts = [(hand, self.beaten_by[hand]) for hand in model.Hand]
             counts.sort(key=lambda x: x[1], reverse=True)
             return [cnt for cnt in counts[:n] if cnt[1]]
-
-    def __repr__(self):
-        return repr(self.__dict__)
 
 
 class AbstractSimulator(metaclass=abc.ABCMeta):

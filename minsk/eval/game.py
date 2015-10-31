@@ -11,7 +11,7 @@ class Street(enum.IntEnum):
     RIVER = 7
 
 
-class GameState(utils.CommonEqualityMixin):
+class GameState(utils.CommonEqualityMixin, utils.CommonReprMixin):
     def __init__(self, cards, player_num, pot):
         super().__init__()
         self._cards = cards
@@ -44,7 +44,7 @@ class GameState(utils.CommonEqualityMixin):
         return Street(len(self._cards))
 
 
-class GameStack:
+class GameStack(utils.CommonReprMixin):
     def __init__(self):
         super().__init__()
         self._stack = []

@@ -17,7 +17,7 @@ CARD_RE = '([2-9tjqka][hscd])+'
 
 class LineParser:
     @staticmethod
-    def parse_line(line):
+    def parse_state(line):
         last_chunk = [token for token in line.split(';') if token.strip()][-1]
         line = line.replace(';', ' ')
         player_num = config.player_num
@@ -32,6 +32,15 @@ class LineParser:
             if len(params) >= 2:
                 pot = float(params[1])
         return game.GameState(model.Card.parse_cards(cards), player_num, pot)
+
+    @classmethod
+    def parse_stack(cls, line):
+        chunks = [token.strip() for token in line.split(';') if token.strip()]
+        stack = game.GameStack()
+        for i in range(1, len(chunks) + 1):
+            subline = '; '.join(chunks[:i])
+            stack.add_state(cls.parse_state(subline))
+        return stack
 
     @staticmethod
     def validate_line(line):
@@ -53,7 +62,7 @@ class MinskShell(cmd.Cmd):
     def _parse_line(self, line):
         if LineParser.validate_line(line):
             try:
-                return LineParser.parse_line(line)
+                return LineParser.parse_state(line)
             except ValueError as e:
                 print(str(e))
         else:
