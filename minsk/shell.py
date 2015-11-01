@@ -11,35 +11,36 @@ import minsk.eval.game as game
 import minsk.model as model
 import minsk.config as config
 
-NUM_RE = '\d+(\.\d+)?'
+NUM_RE = '\d+(\.(\d+)?)?'
 CARD_RE = '([2-9tjqka][hscd])+'
 
 
 class LineParser:
     @staticmethod
-    def parse_state(line):
-        last_chunk = [token for token in line.split(';') if token.strip()][-1]
-        line = line.replace(';', ' ')
-        player_num = config.player_num
-        cards = [token for token in line.split()
+    def parse_state(line, default_player_num=None):
+        tokens = line.split()
+        cards = [token for token in tokens
                  if re.fullmatch(CARD_RE, token, re.IGNORECASE)]
-        params = [token for token in last_chunk.split() if re.fullmatch(NUM_RE, token)]
+        params = [token for token in tokens if re.fullmatch(NUM_RE, token)]
         joined = ''.join(cards)
         cards = zip(joined[::2], joined[1::2])
         pot = None
-        if params:
-            player_num = int(params[0])
-            if len(params) >= 2:
-                pot = float(params[1])
+        player_num = default_player_num
+        for param in params:
+            if '.' in param:
+                pot = float(param)
+            else:
+                player_num = int(param)
         return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
     @classmethod
-    def parse_history(cls, line):
+    def parse_history(cls, line, default_player_num=None):
         chunks = [token.strip() for token in line.split(';') if token.strip()]
         history = []
         for i in range(1, len(chunks) + 1):
-            history_line = '; '.join(chunks[:i])
-            history.append(cls.parse_state(history_line))
+            history_line = ' '.join(chunks[:i])
+            state = cls.parse_state(history_line, default_player_num)
+            history.append(state)
         return history
 
     @staticmethod
@@ -62,7 +63,7 @@ class MinskShell(cmd.Cmd):
     def _parse_line(self, line):
         if LineParser.validate_line(line):
             try:
-                return LineParser.parse_state(line)
+                return LineParser.parse_history(line, config.player_num)[-1]
             except ValueError as e:
                 print(str(e))
         else:

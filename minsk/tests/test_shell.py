@@ -8,14 +8,15 @@ class TestLineParser(testtools.TestCase):
     def setUp(self):
         super().setUp()
         self.parse = shell.LineParser.parse_state
+        self.history = shell.LineParser.parse_history
         self.validate = shell.LineParser.validate_line
 
     def test_parse_state(self):
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d')
-        self.assertEqual(2, parsed.player_num)
+        self.assertIsNone(parsed.player_num)
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d 7')
         self.assertEqual(7, parsed.player_num)
-        parsed = self.parse('As 6c Ad 8s Ac 6d 7d 7 100')
+        parsed = self.parse('As 6c Ad 8s Ac 6d 7d 7 100.')
         self.assertEqual(7, parsed.player_num)
         self.assertEqual(100, parsed.pot)
 
@@ -25,16 +26,9 @@ class TestLineParser(testtools.TestCase):
         self.assertEqual(0.24, parsed.pot)
 
     def test_parse_state_chunks(self):
-        parsed = self.parse('As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24; ')
+        parsed = self.parse('As 6c Ad 8s Ac 6d 8 0.14 7d 7 0.24 ')
         self.assertEqual(7, parsed.player_num)
         self.assertEqual(0.24, parsed.pot)
-
-    def test_parse_state_empty_chunks(self):
-        line = 'As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24'
-        self.assertEqual(self.parse(line), self.parse(line + ';'))
-        self.assertEqual(self.parse(line), self.parse(line + ' ;'))
-        self.assertEqual(self.parse(line), self.parse(line + '; '))
-        self.assertEqual(self.parse(line), self.parse(line + '; ;; '))
 
     def test_parse_state_cards(self):
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d')
@@ -55,6 +49,20 @@ class TestLineParser(testtools.TestCase):
         self.assertEqual(2, len(history))
         self.assertEqual(0.24, history[-1].pot)
         self.assertEqual(7, history[-1].player_num)
+
+    def test_parse_history_state(self):
+        history = shell.LineParser.parse_history('2c2d 5d5h6d 3 0.5; 5s ')
+        self.assertEqual(2, len(history))
+        self.assertEqual(0.5, history[-1].pot)
+        self.assertEqual(3, history[-1].player_num)
+
+    def test_parse_history_empty_chunks(self):
+        line = 'As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24'
+        canonical = self.history(line)
+        self.assertEqual(canonical, self.history(line + ';'))
+        self.assertEqual(canonical, self.history(line + ' ;'))
+        self.assertEqual(canonical, self.history(line + '; '))
+        self.assertEqual(canonical, self.history(line + '; ;; '))
 
 
 class TestShell(testtools.TestCase):
