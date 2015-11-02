@@ -96,7 +96,7 @@ class MinskShell(cmd.Cmd):
         if parsed:
             with config.with_config(_player_num=parsed.player_num):
                 simulator = simulation.MonteCarloSimulator(
-                    config.player_num, config.sim_cycles)
+                    config.player_num, config.sim_cycle)
                 self.simulate(parsed, simulator)
 
     def do_look_up(self, cards):
@@ -126,14 +126,14 @@ class MinskShell(cmd.Cmd):
         """set player number"""
         config.player_num = int(player_num)
 
-    def do_sim_cycles(self, sim_cycles):
+    def do_sim_cycle(self, sim_cycle):
         """set simulation cycles number"""
-        config.sim_cycles = int(sim_cycles)
+        config.sim_cycle = float(sim_cycle)
 
     def print_configuration(self, simulator):
         print('\nConfiguration :')
         t = prettytable.PrettyTable(['key', 'value'])
-        for name in ('player_num', 'sim_cycles'):
+        for name in ('player_num', 'sim_cycle'):
             t.add_row([name, getattr(config, name)])
         if simulator:
             t.add_row(['simulator', simulator.name])

@@ -3,6 +3,7 @@ import multiprocessing
 import abc
 import os
 import random
+import time
 
 import minsk.config as config
 import minsk.model as model
@@ -69,11 +70,10 @@ class ParallelSimulatorMixin:
             add_lst[i] += cnt
 
     @classmethod
-    def _simulate_cards_parallel(cls, sim_cycles, fc, cards):
+    def _simulate_cards_parallel(cls, sim_cycle, fc, cards):
         parallel_count = multiprocessing.cpu_count() * 2
         start_data = (cards,) * parallel_count
-        cycles = sim_cycles // parallel_count
-        fc = functools.partial(fc, cycles)
+        fc = functools.partial(fc, sim_cycle)
         return cls._simulate_parallel(fc, start_data)
 
 
@@ -133,26 +133,19 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
     cards_num = set(range(2, 8))
     players_num = set(range(2, 11))
 
-    def __init__(self, player_num, sim_cycles):
+    def __init__(self, player_num, sim_cycle):
         super().__init__()
         self._manager = manager.EvaluatorManager()
         self._player_num = player_num
-        self._sim_cycles = sim_cycles
-        self._avg_eval_count = self._get_avg_eval_count(player_num - 1)
-
-    @staticmethod
-    def _get_avg_eval_count(opponents_count):
-        prob, sum = 1.0, 0.0
-        for i in range(1, opponents_count):
-            prob /= 2
-            sum += i * prob
-        sum += opponents_count * prob
-        return sum
+        if sim_cycle > 30:
+            raise ValueError('Too long simulation %f seconds' % sim_cycle)
+        self._sim_cycle = sim_cycle
 
     def simulate(self, *cards):
-        return self._simulate_cards_parallel(self._sim_cycles, self._sample, cards)
+        return self._simulate_cards_parallel(self._sim_cycle, self._sample, cards)
 
-    def _sample(self, sim_cycles, cards):
+    def _sample(self, sim_cycle, cards):
+        start = time.time()
         common = cards[2:]
         sampled_common_count = 5 - len(common)
         deck_cards = model.Deck(*cards).cards
@@ -160,7 +153,7 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
         others_count = self._player_num - 1
         sampled_count = sampled_common_count + others_count * 2
         win_by, beaten_by = [0] * len(model.Hand), [0] * len(model.Hand)
-        for _ in range(int(sim_cycles / (self._avg_eval_count + 1))):
+        while time.time() - start < sim_cycle:
             sampled_cards = tuple(random.sample(deck_cards, sampled_count))
             sampled_common = sampled_cards[:sampled_common_count]
             my_cards = cards + sampled_common
@@ -188,14 +181,13 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
             if opponent_best:
                 if my_hand < opponent_best:
                     return -1, opponent_best.hand
-                    break
                 elif my_hand == opponent_best:
                     result = 0, my_hand.hand
         return result
 
     @classmethod
     def from_config(cls):
-        return cls(config.player_num, config.sim_cycles)
+        return cls(config.player_num, config.sim_cycle)
 
 
 class LookUpSimulator(AbstractSimulator):

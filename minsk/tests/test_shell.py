@@ -77,15 +77,15 @@ class TestShell(testtools.TestCase):
         self.shell.do_eval('As 6c 8c 8s qc 6d 7d 5 0.89')
 
     def test_monte_carlo(self):
-        with config.with_config(10000, 5):
+        with config.with_config(1, 5):
             self.shell.do_monte_carlo('As 6s')
 
     def test_monte_carlo_eval(self):
-        with config.with_config(10000, 5):
+        with config.with_config(1, 5):
             self.shell.do_eval('As 6s 5d')
 
     def test_look_up(self):
-        with config.with_config(10000, 5):
+        with config.with_config(1, 5):
             self.shell.do_look_up('As 6s')
 
     def test_eval(self):
@@ -103,12 +103,12 @@ class TestShell(testtools.TestCase):
     def test_eval_no_simulator(self):
         self.shell.do_eval('As 6c 8h')
 
-    def test_sim_cycles(self):
-        with config.with_config(10000, 5):
-            self.shell.do_sim_cycles('30000')
-            self.assertEqual(30000, config.sim_cycles)
+    def test_sim_cycle(self):
+        with config.with_config(1, 5):
+            self.shell.do_sim_cycle('3')
+            self.assertEqual(3, config.sim_cycle)
 
     def test_player_num(self):
-        with config.with_config(10000, 5):
+        with config.with_config(1, 5):
             self.shell.do_player_num('7')
             self.assertEqual(7, config.player_num)
