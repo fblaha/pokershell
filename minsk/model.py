@@ -14,7 +14,7 @@ class Suit(enum.Enum):
     SPADES = '♠', 's', 'spades'
 
     def __repr__(self):
-        return self.value[0]
+        return self.value[1]
 
 
 @functools.total_ordering
