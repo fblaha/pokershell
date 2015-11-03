@@ -2,9 +2,10 @@ import enum
 import functools
 import random
 import itertools
-import os
 
 import minsk.utils as utils
+
+enable_unicode = False
 
 
 @enum.unique
@@ -15,10 +16,10 @@ class Suit(enum.Enum):
     SPADES = '♠', 's', 'spades'
 
     def __repr__(self):
-        if 'nt' == os.name:
-            return self.value[1]
-        else:
+        if enable_unicode:
             return self.value[0]
+        else:
+            return self.value[1]
 
 
 @functools.total_ordering
