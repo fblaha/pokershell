@@ -11,8 +11,8 @@ class TestBetAdviser(testtools.TestCase):
     def test_equity(self):
         self._test_func(self.adviser.get_equity)
 
-    def test_max_bet(self):
-        self._test_func(self.adviser.get_max_bet)
+    def test_max_call(self):
+        self._test_func(self.adviser.get_max_call)
 
     def _test_func(self, func):
         self.assertTrue(func(0.3, 100) < 100)

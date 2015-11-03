@@ -1,6 +1,6 @@
 class BetAdviser:
     @staticmethod
-    def get_max_bet(hand_strength, pot):
+    def get_max_call(hand_strength, pot):
         try:
             return hand_strength * pot / (1 - hand_strength)
         except ZeroDivisionError:

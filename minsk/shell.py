@@ -1,7 +1,6 @@
 import argparse
 import cmd
 import time
-
 import re
 
 import prettytable
@@ -158,9 +157,9 @@ class MinskShell(cmd.Cmd):
         if parsed_line.pot:
             win_chance = raw_pct[0] / 100
             equity = bet.BetAdviser.get_equity(win_chance, parsed_line.pot)
-            max_bet = bet.BetAdviser.get_max_bet(win_chance, parsed_line.pot)
-            bet_table = prettytable.PrettyTable(['Equity', 'Max Bet'])
-            bet_table.add_row([str(round(equity, 2)), str(round(max_bet, 2))])
+            max_call = bet.BetAdviser.get_max_call(win_chance, parsed_line.pot)
+            bet_table = prettytable.PrettyTable(['Equity', 'Max Call'])
+            bet_table.add_row([str(round(equity, 2)), str(round(max_call, 2))])
             print(bet_table)
 
         wining_hands = sim_result.get_wining_hands(3)
