@@ -204,8 +204,8 @@ class LookUpSimulator(AbstractSimulator):
         if player_num in self._sim_data:
             return
         code_dict = {}
-        dir = os.path.dirname(__file__)
-        data_file = os.path.join(dir, 'preflop', str(self._player_num) + '.txt')
+        directory = os.path.dirname(__file__)
+        data_file = os.path.join(directory, 'preflop', str(self._player_num) + '.txt')
         with open(data_file) as f:
             content = f.readlines()
         for line in content:

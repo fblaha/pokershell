@@ -40,10 +40,10 @@ class EvalContext:
                 reverse=True)
         return self._sorted_ranks
 
-    def get_complement_ranks(self, count, *exluded_ranks):
+    def get_complement_ranks(self, count, *excluded_ranks):
         result = []
         for rank in self.sorted_ranks:
-            if rank not in exluded_ranks:
+            if rank not in excluded_ranks:
                 result.append(rank)
                 if len(result) == count:
                     return result

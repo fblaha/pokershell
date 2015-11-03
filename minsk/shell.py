@@ -205,7 +205,7 @@ class MinskShell(cmd.Cmd):
         input_table.add_row(row)
         print(input_table)
 
-    def do_EOF(self, line):
+    def do_EOF(self, _):
         return True
 
 
