@@ -71,8 +71,7 @@ class ParallelSimulatorMixin:
 
     @classmethod
     def _simulate_cards_parallel(cls, sim_cycle, fc, cards):
-        parallel_count = multiprocessing.cpu_count() * 2
-        start_data = (cards,) * parallel_count
+        start_data = (cards,) * multiprocessing.cpu_count()
         fc = functools.partial(fc, sim_cycle)
         return cls._simulate_parallel(fc, start_data)
 
