@@ -213,7 +213,7 @@ class MinskShell(cmd.Cmd):
 
 def main():
     parser = argparse.ArgumentParser(description='Minsk Shell')
-    parser.add_argument('--unicode', action='store_true', default=False)
+    parser.add_argument('-u', '--unicode', action='store_true', default=False)
     args = parser.parse_args()
     if args.unicode:
         model.enable_unicode = True
