@@ -16,7 +16,7 @@ class TestConfig(testtools.TestCase):
         orig_player_num = config.player_num
         with config.with_config(9999, 20):
             self._check_values(20, 9999)
-            with config.with_config(_player_num=21):
+            with config.with_config(player_num_=21):
                 self._check_values(21, 9999)
         self._check_values(orig_player_num, orig_sim_cycle)
 
@@ -27,8 +27,8 @@ class TestConfig(testtools.TestCase):
     def test_with_config_default(self):
         orig_sim_cycle = config.sim_cycle
         orig_player_num = config.player_num
-        with config.with_config(_sim_cycle=9999):
+        with config.with_config(sim_cycle_=9999):
             self._check_values(orig_player_num, 9999)
-        with config.with_config(_player_num=100):
+        with config.with_config(player_num_=100):
             self._check_values(100, orig_sim_cycle)
         self._check_values(orig_player_num, orig_sim_cycle)

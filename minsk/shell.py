@@ -81,7 +81,7 @@ class MinskShell(cmd.Cmd):
         """evaluate hand"""
         state = self._parse_line(cards)
         if state:
-            with config.with_config(_player_num=state.player_num):
+            with config.with_config(player_num_=state.player_num):
                 simulator = self._sim_manager.find_simulator(*state.cards)
                 self.simulate(state, simulator)
 
@@ -95,7 +95,7 @@ class MinskShell(cmd.Cmd):
         """evaluate hand - monte carlo"""
         state = self._parse_line(cards)
         if state:
-            with config.with_config(_player_num=state.player_num):
+            with config.with_config(player_num_=state.player_num):
                 simulator = simulation.MonteCarloSimulator(
                     config.player_num, config.sim_cycle)
                 self.simulate(state, simulator)
@@ -104,7 +104,7 @@ class MinskShell(cmd.Cmd):
         """evaluate hand - loop up"""
         state = self._parse_line(cards)
         if state:
-            with config.with_config(_player_num=state.player_num):
+            with config.with_config(player_num_=state.player_num):
                 simulator = simulation.LookUpSimulator(config.player_num)
                 self.simulate(state, simulator)
 
