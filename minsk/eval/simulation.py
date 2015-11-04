@@ -86,22 +86,21 @@ class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
         super().__init__()
         self._manager = manager.EvaluatorManager()
 
-    def _process(self, parallel_exec_num, cards, generated):
-        return self._simulate_river(parallel_exec_num, cards + generated)
+    def _process(self, cards, generated):
+        return self._simulate_river(cards + generated)
 
     def simulate(self, *cards):
         unknown_count = 7 - len(cards)
         deck = model.Deck(*cards)
         deck_cards = deck.cards
         if unknown_count:
-            parallel_exec_num = len(deck_cards) ** unknown_count
-            fc = functools.partial(self._process, parallel_exec_num, cards)
+            fc = functools.partial(self._process, cards)
             combinations = model.Card.all_combinations(deck_cards, unknown_count)
             return self._simulate_parallel(fc, combinations)
         else:
-            return self._simulate_river(0, cards)
+            return self._simulate_river(cards)
 
-    def _simulate_river(self, _, cards):
+    def _simulate_river(self, cards):
         common = cards[2:]
         deck = model.Deck(*cards)
         deck_cards = deck.cards
