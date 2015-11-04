@@ -72,18 +72,18 @@ class MinskShell(cmd.Cmd):
 
     def do_brute_force(self, cards):
         """evaluate hand - brute force"""
-        parsed = self._parse_line(cards)
-        if parsed:
+        state = self._parse_line(cards)
+        if state:
             simulator = simulation.BruteForceSimulator()
-            self.simulate(parsed, simulator)
+            self.simulate(state, simulator)
 
     def do_eval(self, cards):
         """evaluate hand"""
-        parsed = self._parse_line(cards)
-        if parsed:
-            with config.with_config(_player_num=parsed.player_num):
-                simulator = self._sim_manager.find_simulator(*parsed.cards)
-                self.simulate(parsed, simulator)
+        state = self._parse_line(cards)
+        if state:
+            with config.with_config(_player_num=state.player_num):
+                simulator = self._sim_manager.find_simulator(*state.cards)
+                self.simulate(state, simulator)
 
     def default(self, line):
         if LineParser.validate_line(line):
@@ -93,33 +93,33 @@ class MinskShell(cmd.Cmd):
 
     def do_monte_carlo(self, cards):
         """evaluate hand - monte carlo"""
-        parsed = self._parse_line(cards)
-        if parsed:
-            with config.with_config(_player_num=parsed.player_num):
+        state = self._parse_line(cards)
+        if state:
+            with config.with_config(_player_num=state.player_num):
                 simulator = simulation.MonteCarloSimulator(
                     config.player_num, config.sim_cycle)
-                self.simulate(parsed, simulator)
+                self.simulate(state, simulator)
 
     def do_look_up(self, cards):
         """evaluate hand - loop up"""
-        parsed = self._parse_line(cards)
-        if parsed:
-            with config.with_config(_player_num=parsed.player_num):
+        state = self._parse_line(cards)
+        if state:
+            with config.with_config(_player_num=state.player_num):
                 simulator = simulation.LookUpSimulator(config.player_num)
-                self.simulate(parsed, simulator)
+                self.simulate(state, simulator)
 
-    def simulate(self, parsed_line, simulator):
+    def simulate(self, state, simulator):
         self.print_configuration(simulator)
-        self.print_input(parsed_line)
+        self.print_input(state)
 
-        self._game_stack.add_state(parsed_line)
+        self._game_stack.add_state(state)
 
         if not simulator:
             print('\nNo simulator found!\n')
             return
         start = time.time()
-        result = simulator.simulate(*parsed_line.cards)
-        self.print_output(parsed_line, result)
+        result = simulator.simulate(*state.cards)
+        self.print_output(state, result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
@@ -140,7 +140,7 @@ class MinskShell(cmd.Cmd):
             t.add_row(['simulator', simulator.name])
         print(t)
 
-    def print_output(self, parsed_line, sim_result):
+    def print_output(self, state, sim_result):
         print('\nOutput :')
         counts = (sim_result.win, sim_result.tie, sim_result.lose)
         pct_table = prettytable.PrettyTable(['Win', 'Tie', 'Loss'])
@@ -154,10 +154,10 @@ class MinskShell(cmd.Cmd):
         result_pct = list(map(lambda x: str(round(x, 2)) + '%', raw_pct))
         pct_table.add_row(result_pct)
         print(pct_table)
-        if parsed_line.pot:
+        if state.pot:
             win_chance = raw_pct[0] / 100
-            equity = bet.BetAdviser.get_equity(win_chance, parsed_line.pot)
-            max_call = bet.BetAdviser.get_max_call(win_chance, parsed_line.pot)
+            equity = bet.BetAdviser.get_equity(win_chance, state.pot)
+            max_call = bet.BetAdviser.get_max_call(win_chance, state.pot)
             bet_table = prettytable.PrettyTable(['Equity', 'Max Call'])
             bet_table.add_row([str(round(equity, 2)), str(round(max_call, 2))])
             print(bet_table)
@@ -176,8 +176,8 @@ class MinskShell(cmd.Cmd):
                 danger_table.add_row([hand.name, str(round(pct, 2)) + '%'])
             print(danger_table)
 
-    def print_input(self, parsed_line):
-        cards = parsed_line.cards
+    def print_input(self, state):
+        cards = state.cards
         print('\nInput :')
         columns = ['Hole']
         row = [' '.join(map(repr, cards[0:2]))]
@@ -199,9 +199,9 @@ class MinskShell(cmd.Cmd):
             columns.append('Ranks')
             row.append(' '.join(map(repr, result.complement_ranks)))
 
-        if parsed_line.pot:
+        if state.pot:
             columns.append('Pot')
-            row.append(parsed_line.pot)
+            row.append(state.pot)
 
         input_table = prettytable.PrettyTable(columns)
         input_table.add_row(row)
