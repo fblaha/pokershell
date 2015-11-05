@@ -32,6 +32,7 @@ class LineParser:
                 pot = float(param)
             else:
                 player_num = int(param)
+                assert 2 <= player_num <= 10
         return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
     @classmethod
@@ -81,9 +82,9 @@ class MinskShell(cmd.Cmd):
         """evaluate hand"""
         state = self._parse_line(cards)
         if state:
-            with config.with_config(player_num_=state.player_num):
-                simulator = self._sim_manager.find_simulator(*state.cards)
-                self.simulate(state, simulator)
+            simulator = self._sim_manager.find_simulator(
+                state.player_num or config.player_num, *state.cards)
+            self.simulate(state, simulator)
 
     def default(self, line):
         if LineParser.validate_line(line):
@@ -95,21 +96,19 @@ class MinskShell(cmd.Cmd):
         """evaluate hand - monte carlo"""
         state = self._parse_line(cards)
         if state:
-            with config.with_config(player_num_=state.player_num):
-                simulator = simulation.MonteCarloSimulator(
-                    config.player_num, config.sim_cycle)
-                self.simulate(state, simulator)
+            simulator = simulation.MonteCarloSimulator(
+                config.sim_cycle)
+            self.simulate(state, simulator)
 
     def do_look_up(self, cards):
         """evaluate hand - loop up"""
         state = self._parse_line(cards)
         if state:
-            with config.with_config(player_num_=state.player_num):
-                simulator = simulation.LookUpSimulator(config.player_num)
-                self.simulate(state, simulator)
+            simulator = simulation.LookUpSimulator()
+            self.simulate(state, simulator)
 
     def simulate(self, state, simulator):
-        self.print_configuration(simulator)
+        self.print_configuration(state, simulator)
         self.print_input(state)
 
         self._game_stack.add_state(state)
@@ -118,7 +117,7 @@ class MinskShell(cmd.Cmd):
             print('\nNo simulator found!\n')
             return
         start = time.time()
-        result = simulator.simulate(*state.cards)
+        result = simulator.simulate(state.player_num or config.player_num, *state.cards)
         self.print_output(state, result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
@@ -131,11 +130,11 @@ class MinskShell(cmd.Cmd):
         """set simulation cycles number"""
         config.sim_cycle = float(sim_cycle)
 
-    def print_configuration(self, simulator):
+    def print_configuration(self, state, simulator):
         print('\nConfiguration :')
         t = prettytable.PrettyTable(['key', 'value'])
-        for name in ('player_num', 'sim_cycle'):
-            t.add_row([name, getattr(config, name)])
+        t.add_row(['sim_cycle', config.sim_cycle])
+        t.add_row(['player_num', state.player_num or config.player_num])
         if simulator:
             t.add_row(['simulator', simulator.name])
         print(t)

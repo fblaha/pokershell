@@ -14,6 +14,8 @@ class Street(enum.IntEnum):
 class GameState(utils.CommonEqualityMixin, utils.CommonReprMixin):
     def __init__(self, cards, player_num, pot):
         super().__init__()
+        if player_num and not 2 <= player_num <= 10:
+            raise ValueError('Illegal player number %d' % player_num)
         self._cards = cards
         self._player_num = player_num
         self._pot = pot

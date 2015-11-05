@@ -41,7 +41,7 @@ class AbstractSimulator(metaclass=abc.ABCMeta):
     priority = 100
 
     @abc.abstractmethod
-    def simulate(self, *cards):
+    def simulate(self, player_num, *cards):
         pass
 
     @classmethod
@@ -69,12 +69,6 @@ class ParallelSimulatorMixin:
         for i, cnt in enumerate(target_lst):
             add_lst[i] += cnt
 
-    @classmethod
-    def _simulate_cards_parallel(cls, sim_cycle, fc, cards):
-        start_data = (cards,) * multiprocessing.cpu_count()
-        fc = functools.partial(fc, sim_cycle)
-        return cls._simulate_parallel(fc, start_data)
-
 
 class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
     priority = 0
@@ -89,7 +83,10 @@ class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
     def _process(self, cards, generated):
         return self._simulate_river(cards + generated)
 
-    def simulate(self, *cards):
+    def simulate(self, player_num, *cards):
+        assert isinstance(player_num, int)
+        if player_num != 2:
+            raise ValueError('Only 2 players are supported')
         unknown_count = 7 - len(cards)
         deck = model.Deck(*cards)
         deck_cards = deck.cards
@@ -131,24 +128,26 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
     cards_num = set(range(2, 8))
     players_num = set(range(2, 11))
 
-    def __init__(self, player_num, sim_cycle):
+    def __init__(self, sim_cycle):
         super().__init__()
         self._manager = manager.EvaluatorManager()
-        self._player_num = player_num
-        if sim_cycle > 30:
+        if sim_cycle > 120:
             raise ValueError('Too long simulation %f seconds' % sim_cycle)
         self._sim_cycle = sim_cycle
 
-    def simulate(self, *cards):
-        return self._simulate_cards_parallel(self._sim_cycle, self._sample, cards)
+    def simulate(self, player_num, *cards):
+        assert isinstance(player_num, int)
+        start_data = (cards,) * multiprocessing.cpu_count()
+        fc = functools.partial(self._sample, player_num, self._sim_cycle)
+        return self._simulate_parallel(fc, start_data)
 
-    def _sample(self, sim_cycle, cards):
+    def _sample(self, player_num, sim_cycle, cards):
         start = time.time()
         common = cards[2:]
         sampled_common_count = 5 - len(common)
         deck_cards = model.Deck(*cards).cards
         win, tie, lose = 0, 0, 0
-        others_count = self._player_num - 1
+        others_count = player_num - 1
         sampled_count = sampled_common_count + others_count * 2
         win_by, beaten_by = [0] * len(model.Hand), [0] * len(model.Hand)
         while time.time() - start < sim_cycle:
@@ -185,7 +184,7 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
 
     @classmethod
     def from_config(cls):
-        return cls(config.player_num, config.sim_cycle)
+        return cls(config.sim_cycle)
 
 
 class LookUpSimulator(AbstractSimulator):
@@ -194,9 +193,8 @@ class LookUpSimulator(AbstractSimulator):
     cards_num = {2}
     players_num = set(range(2, 11))
 
-    def __init__(self, player_num):
+    def __init__(self):
         super().__init__()
-        self._player_num = player_num
         self._sim_data = {}
 
     def _init_data(self, player_num):
@@ -204,7 +202,7 @@ class LookUpSimulator(AbstractSimulator):
             return
         code_dict = {}
         directory = os.path.dirname(__file__)
-        data_file = os.path.join(directory, 'preflop', str(self._player_num) + '.txt')
+        data_file = os.path.join(directory, 'preflop', str(player_num) + '.txt')
         with open(data_file) as f:
             content = f.readlines()
         for line in content:
@@ -216,10 +214,11 @@ class LookUpSimulator(AbstractSimulator):
             code_dict[code] = SimulationResult(win, tie, lose, None, None)
         self._sim_data[player_num] = code_dict
 
-    def simulate(self, c1, c2):
-        self._init_data(self._player_num)
+    def simulate(self, player_num, c1, c2):
+        assert isinstance(player_num, int)
+        self._init_data(player_num)
         code = self._get_hole_code(c1, c2)
-        return self._sim_data[self._player_num][code]
+        return self._sim_data[player_num][code]
 
     def _get_hole_code(self, c1, c2):
         ranks = sorted([c1.rank, c2.rank])
@@ -237,7 +236,7 @@ class LookUpSimulator(AbstractSimulator):
 
     @classmethod
     def from_config(cls):
-        return cls(config.player_num)
+        return cls()
 
 
 class SimulatorManager:
@@ -245,10 +244,11 @@ class SimulatorManager:
                   BruteForceSimulator,
                   MonteCarloSimulator)
 
-    def find_simulator(self, *cards):
+    def find_simulator(self, player_num, *cards):
+        assert isinstance(player_num, int)
         available = []
         for simulator in self.simulators:
-            if config.player_num in simulator.players_num \
+            if player_num in simulator.players_num \
                     and len(cards) in simulator.cards_num:
                 available.append(simulator)
         if available:
