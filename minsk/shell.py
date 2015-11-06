@@ -1,7 +1,9 @@
 import argparse
 import cmd
+import enum
 import time
 import re
+import collections
 
 import prettytable
 
@@ -11,6 +13,19 @@ import minsk.eval.simulation as simulation
 import minsk.eval.game as game
 import minsk.model as model
 import minsk.config as config
+
+
+@enum.unique
+class InputTableColumn(enum.Enum):
+    HOLE = 'Hole'
+    FLOP = 'Flop'
+    TURN = 'Turn'
+    RIVER = 'River'
+    PLAYER_NUM = 'Player Num'
+    HAND = 'Hand'
+    RANKS = 'Ranks'
+    POT = 'Pot'
+
 
 NUM_RE = '\d+(\.(\d+)?)?'
 CARD_RE = '([2-9tjqka][hscd])+'
@@ -189,40 +204,51 @@ class MinskShell(cmd.Cmd):
             rows[i][offset + 1] = '%.2f%%' % pct
 
     def _print_input(self, stack):
-        current = stack.current
-        cards = current.cards
         print('\nInput :')
-        columns = ['Hole']
-        row = [' '.join(map(repr, cards[0:2]))]
-        if len(cards) >= 5:
-            columns.append('Flop')
-            row.append(' '.join(map(repr, cards[2:5])))
-        if len(cards) >= 6:
-            columns.append('Turn')
-            row.append(cards[5])
-        if len(cards) == 7:
-            columns.append('River')
-            row.append(cards[6])
+        table = self._build_input_table(stack)
+        header, columns = [], []
+        for col_name in InputTableColumn:
+            col_data = table[col_name]
+            if col_data:
+                header.append(col_name.value)
+                columns.append(col_data[::-1])
 
-        columns.append('Player Num')
-        row.append(current.player_num or config.player_num)
-
-        evaluator_manager = manager.EvaluatorManager()
-        if len(cards) >= 5:
-            result = evaluator_manager.find_best_hand(cards)
-            columns.append('Hand')
-            row.append(result.hand.name)
-
-            columns.append('Ranks')
-            row.append(' '.join(map(repr, result.complement_ranks)))
-
-        if current.pot:
-            columns.append('Pot')
-            row.append(current.pot)
-
-        input_table = prettytable.PrettyTable(columns)
-        input_table.add_row(row)
+        input_table = prettytable.PrettyTable(header)
+        for row in zip(*columns):
+            input_table.add_row(row)
         print(input_table)
+
+    def _build_input_table(self, stack):
+        table = collections.defaultdict(list)
+        states = stack.history[::-1]
+        for state in states:
+            cards = state.cards
+            table[InputTableColumn.HOLE].append(' '.join(map(repr, cards[0:2])))
+            if len(cards) >= 5:
+                table[InputTableColumn.FLOP].append(' '.join(map(repr, cards[2:5])))
+            if len(cards) >= 6:
+                table[InputTableColumn.TURN].append(cards[5])
+            if len(cards) == 7:
+                table[InputTableColumn.RIVER].append(cards[6])
+
+            table[InputTableColumn.PLAYER_NUM].append(state.player_num or config.player_num)
+
+            if len(cards) >= 5:
+                evaluator_manager = manager.EvaluatorManager()
+                result = evaluator_manager.find_best_hand(cards)
+                table[InputTableColumn.HAND].append(result.hand.name)
+
+                table[InputTableColumn.RANKS].append(result.complement_ranks)
+
+            if state.pot:
+                table[InputTableColumn.POT].append(state.pot)
+        row_num = max(len(col) for col in table.values())
+        for col in table.values():
+            if col:
+                missing = row_num - len(col)
+                if missing:
+                    col.extend(['-'] * missing)
+        return table
 
     def do_EOF(self, _):
         return True

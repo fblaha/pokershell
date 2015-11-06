@@ -86,6 +86,9 @@ class TestShell(testtools.TestCase):
     def test_pot_equity(self):
         self.shell.do_eval('As 6c 8c 8s qc 6d 7d 5 0.89')
 
+    def test_stack(self):
+        self.shell.do_eval('As 6c 6 0.2; 8c 8s qc 3 0.4; 6d 0.8;  7d 2 2.5')
+
     def test_monte_carlo(self):
         self.shell.do_monte_carlo('As 6s')
 
