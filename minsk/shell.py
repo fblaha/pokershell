@@ -108,8 +108,8 @@ class MinskShell(cmd.Cmd):
             self.simulate(state, simulator)
 
     def simulate(self, state, simulator):
-        self.print_configuration(state, simulator)
-        self.print_input(state)
+        self._print_configuration(state, simulator)
+        self._print_input(state)
 
         self._game_stack.add_state(state)
 
@@ -118,7 +118,7 @@ class MinskShell(cmd.Cmd):
             return
         start = time.time()
         result = simulator.simulate(state.player_num or config.player_num, *state.cards)
-        self.print_output(state, result)
+        self._print_output(state, result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
@@ -130,7 +130,7 @@ class MinskShell(cmd.Cmd):
         """set simulation cycles number"""
         config.sim_cycle = float(sim_cycle)
 
-    def print_configuration(self, state, simulator):
+    def _print_configuration(self, state, simulator):
         print('\nConfiguration :')
         t = prettytable.PrettyTable(['key', 'value'])
         t.add_row(['sim_cycle', config.sim_cycle])
@@ -139,7 +139,7 @@ class MinskShell(cmd.Cmd):
             t.add_row(['simulator', simulator.name])
         print(t)
 
-    def print_output(self, state, sim_result):
+    def _print_output(self, state, sim_result):
         print('\nOutput :')
         counts = (sim_result.win, sim_result.tie, sim_result.lose)
         header = ['Win', 'Tie', 'Loss']
@@ -163,21 +163,29 @@ class MinskShell(cmd.Cmd):
         out_table.add_row(row)
         print(out_table)
 
+        self._print_hand_stats(sim_result)
+
+    def _print_hand_stats(self, sim_result):
         wining_hands = sim_result.get_wining_hands(3)
         beating_hands = sim_result.get_beating_hands(3)
-        self._print_hand_stats(wining_hands, 'Wining Hand')
-        self._print_hand_stats(beating_hands, 'Beating Hand')
+        row_num = max(len(wining_hands), len(beating_hands))
+        if row_num:
+            rows = [[''] * 4 for _ in range(row_num)]
+            self._fill_table(rows, wining_hands)
+            self._fill_table(rows, beating_hands, 2)
+            stats_table = prettytable.PrettyTable(['Wining Hand', 'Win Freq', 'Beating Hand', 'Beat Freq'])
+            for row in rows:
+                stats_table.add_row(row)
+            print(stats_table)
 
-    def _print_hand_stats(self, hand_stats, label):
-        if hand_stats:
-            danger_table = prettytable.PrettyTable([label, 'Frequency'])
-            total = sum(count for _, count in hand_stats)
-            for hand, count in hand_stats:
-                pct = count * 100 / total
-                danger_table.add_row([hand.name, str(round(pct, 2)) + '%'])
-            print(danger_table)
+    def _fill_table(self, rows, hands, offset=0):
+        total = sum(count for _, count in hands)
+        for i, (hand, count) in enumerate(hands):
+            pct = count * 100 / total
+            rows[i][offset] = hand.name
+            rows[i][offset + 1] = '%.2f%%' % pct
 
-    def print_input(self, state):
+    def _print_input(self, state):
         cards = state.cards
         print('\nInput :')
         columns = ['Hole']

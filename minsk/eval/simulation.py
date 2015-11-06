@@ -35,6 +35,8 @@ class SimulationResult(utils.CommonReprMixin):
             counts = [(hand, lst[hand]) for hand in model.Hand]
             counts.sort(key=lambda x: x[1], reverse=True)
             return [cnt for cnt in counts[:n] if cnt[1]]
+        else:
+            return []
 
 
 class AbstractSimulator(metaclass=abc.ABCMeta):
