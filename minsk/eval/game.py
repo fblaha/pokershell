@@ -54,8 +54,10 @@ class GameStack(utils.CommonReprMixin):
     def __init__(self):
         super().__init__()
         self._stack = []
+        self._history = []
 
     def add_state(self, state):
+        self._history.append(state)
         if state.complete:
             if self._stack and not state.is_successor(self._stack[-1]):
                 self._stack = []
@@ -66,6 +68,12 @@ class GameStack(utils.CommonReprMixin):
         return self._stack
 
     @property
+    def history(self):
+        return self._history
+
+    @property
     def current(self):
         if self._stack:
             return self._stack[-1]
+        elif self._history:
+            return self._history[-1]

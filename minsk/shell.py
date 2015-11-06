@@ -36,14 +36,17 @@ class LineParser:
         return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
     @classmethod
-    def parse_history(cls, line, default_player_num=None):
+    def parse_stack(cls, line, default_player_num=None):
         chunks = [token.strip() for token in line.split(';') if token.strip()]
         history = []
         for i in range(1, len(chunks) + 1):
             history_line = ' '.join(chunks[:i])
             state = cls.parse_state(history_line, default_player_num)
             history.append(state)
-        return history
+        game_stack = game.GameStack()
+        for state in history:
+            game_stack.add_state(state)
+        return game_stack if game_stack.current else None
 
     @staticmethod
     def validate_line(line):
@@ -60,12 +63,11 @@ class MinskShell(cmd.Cmd):
     def __init__(self):
         super().__init__()
         self._sim_manager = simulation.SimulatorManager()
-        self._game_stack = game.GameStack()
 
-    def _parse_line(self, line):
+    def _parse_stack(self, line):
         if LineParser.validate_line(line):
             try:
-                return LineParser.parse_history(line, config.player_num)[-1]
+                return LineParser.parse_stack(line, config.player_num)
             except ValueError as e:
                 print(str(e))
         else:
@@ -73,18 +75,18 @@ class MinskShell(cmd.Cmd):
 
     def do_brute_force(self, cards):
         """evaluate hand - brute force"""
-        state = self._parse_line(cards)
-        if state:
+        stack = self._parse_stack(cards)
+        if stack:
             simulator = simulation.BruteForceSimulator()
-            self.simulate(state, simulator)
+            self.simulate(stack, simulator)
 
     def do_eval(self, cards):
         """evaluate hand"""
-        state = self._parse_line(cards)
-        if state:
+        stack = self._parse_stack(cards)
+        if stack:
             simulator = self._sim_manager.find_simulator(
-                state.player_num or config.player_num, *state.cards)
-            self.simulate(state, simulator)
+                stack.current.player_num or config.player_num, *stack.current.cards)
+            self.simulate(stack, simulator)
 
     def default(self, line):
         if LineParser.validate_line(line):
@@ -94,31 +96,31 @@ class MinskShell(cmd.Cmd):
 
     def do_monte_carlo(self, cards):
         """evaluate hand - monte carlo"""
-        state = self._parse_line(cards)
-        if state:
+        stack = self._parse_stack(cards)
+        if stack:
             simulator = simulation.MonteCarloSimulator(
                 config.sim_cycle)
-            self.simulate(state, simulator)
+            self.simulate(stack, simulator)
 
     def do_look_up(self, cards):
         """evaluate hand - loop up"""
-        state = self._parse_line(cards)
-        if state:
+        stack = self._parse_stack(cards)
+        if stack:
             simulator = simulation.LookUpSimulator()
-            self.simulate(state, simulator)
+            self.simulate(stack, simulator)
 
-    def simulate(self, state, simulator):
+    def simulate(self, stack, simulator):
         self._print_configuration(simulator)
-        self._print_input(state)
-
-        self._game_stack.add_state(state)
+        current = stack.current
+        self._print_input(stack)
 
         if not simulator:
             print('\nNo simulator found!\n')
             return
         start = time.time()
-        result = simulator.simulate(state.player_num or config.player_num, *state.cards)
-        self._print_output(state, result)
+        player_num = current.player_num or config.player_num
+        result = simulator.simulate(player_num, *current.cards)
+        self._print_output(current, result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
@@ -172,7 +174,8 @@ class MinskShell(cmd.Cmd):
             rows = [['-'] * 4 for _ in range(row_num)]
             self._fill_table(rows, wining_hands)
             self._fill_table(rows, beating_hands, 2)
-            stats_table = prettytable.PrettyTable(['Wining Hand', 'Win Freq', 'Beating Hand', 'Beat Freq'])
+            header = ['Wining Hand', 'Win Freq', 'Beating Hand', 'Beat Freq']
+            stats_table = prettytable.PrettyTable(header)
             for row in rows:
                 stats_table.add_row(row)
             print(stats_table)
@@ -184,8 +187,9 @@ class MinskShell(cmd.Cmd):
             rows[i][offset] = hand.name
             rows[i][offset + 1] = '%.2f%%' % pct
 
-    def _print_input(self, state):
-        cards = state.cards
+    def _print_input(self, stack):
+        current = stack.current
+        cards = current.cards
         print('\nInput :')
         columns = ['Hole']
         row = [' '.join(map(repr, cards[0:2]))]
@@ -200,7 +204,7 @@ class MinskShell(cmd.Cmd):
             row.append(cards[6])
 
         columns.append('Player Num')
-        row.append(state.player_num or config.player_num)
+        row.append(current.player_num or config.player_num)
 
         evaluator_manager = manager.EvaluatorManager()
         if len(cards) >= 5:
@@ -211,9 +215,9 @@ class MinskShell(cmd.Cmd):
             columns.append('Ranks')
             row.append(' '.join(map(repr, result.complement_ranks)))
 
-        if state.pot:
+        if current.pot:
             columns.append('Pot')
-            row.append(state.pot)
+            row.append(current.pot)
 
         input_table = prettytable.PrettyTable(columns)
         input_table.add_row(row)
