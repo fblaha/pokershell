@@ -108,7 +108,7 @@ class MinskShell(cmd.Cmd):
             self.simulate(state, simulator)
 
     def simulate(self, state, simulator):
-        self._print_configuration(state, simulator)
+        self._print_configuration(simulator)
         self._print_input(state)
 
         self._game_stack.add_state(state)
@@ -130,11 +130,10 @@ class MinskShell(cmd.Cmd):
         """set simulation cycles number"""
         config.sim_cycle = float(sim_cycle)
 
-    def _print_configuration(self, state, simulator):
+    def _print_configuration(self, simulator):
         print('\nConfiguration :')
         t = prettytable.PrettyTable(['key', 'value'])
         t.add_row(['sim_cycle', config.sim_cycle])
-        t.add_row(['player_num', state.player_num or config.player_num])
         if simulator:
             t.add_row(['simulator', simulator.name])
         print(t)
@@ -199,6 +198,10 @@ class MinskShell(cmd.Cmd):
         if len(cards) == 7:
             columns.append('River')
             row.append(cards[6])
+
+        columns.append('Player Num')
+        row.append(state.player_num or config.player_num)
+
         evaluator_manager = manager.EvaluatorManager()
         if len(cards) >= 5:
             result = evaluator_manager.find_best_hand(cards)
