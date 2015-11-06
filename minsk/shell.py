@@ -43,10 +43,11 @@ class LineParser:
             history_line = ' '.join(chunks[:i])
             state = cls.parse_state(history_line, default_player_num)
             history.append(state)
-        game_stack = game.GameStack()
-        for state in history:
-            game_stack.add_state(state)
-        return game_stack if game_stack.current else None
+        if history:
+            game_stack = game.GameStack()
+            for state in history:
+                game_stack.add_state(state)
+            return game_stack
 
     @staticmethod
     def validate_line(line):
