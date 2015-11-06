@@ -147,7 +147,7 @@ class MinskShell(cmd.Cmd):
         header = ['Win', 'Tie', 'Loss']
 
         if isinstance(counts[0], int):
-            pct = list(map(lambda x: x / sim_result.total * 100, counts))
+            pct = [count / sim_result.total * 100 for count in counts]
             row = ['%.2f%% (%d)' % (val, count) for val, count in zip(pct, counts)]
         else:
             pct = counts
