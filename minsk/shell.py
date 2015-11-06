@@ -142,24 +142,26 @@ class MinskShell(cmd.Cmd):
     def print_output(self, state, sim_result):
         print('\nOutput :')
         counts = (sim_result.win, sim_result.tie, sim_result.lose)
-        pct_table = prettytable.PrettyTable(['Win', 'Tie', 'Loss'])
+        header = ['Win', 'Tie', 'Loss']
 
         if isinstance(counts[0], int):
-            raw_pct = list(map(lambda x: x / sim_result.total * 100, counts))
-            pct_table.add_row(counts)
+            pct = list(map(lambda x: x / sim_result.total * 100, counts))
+            row = ['%.2f%% (%d)' % (val, count) for val, count in zip(pct, counts)]
         else:
-            raw_pct = counts
+            pct = counts
+            row = ['%.2f%%' % val for val in pct]
 
-        result_pct = list(map(lambda x: str(round(x, 2)) + '%', raw_pct))
-        pct_table.add_row(result_pct)
-        print(pct_table)
         if state.pot:
-            win_chance = raw_pct[0] / 100
+            win_chance = pct[0] / 100
             equity = bet.BetAdviser.get_equity(win_chance, state.pot)
             max_call = bet.BetAdviser.get_max_call(win_chance, state.pot)
-            bet_table = prettytable.PrettyTable(['Equity', 'Max Call'])
-            bet_table.add_row([str(round(equity, 2)), str(round(max_call, 2))])
-            print(bet_table)
+
+            header.extend(['Equity', 'Max Call'])
+            row.extend([str(round(equity, 2)), str(round(max_call, 2))])
+
+        out_table = prettytable.PrettyTable(header)
+        out_table.add_row(row)
+        print(out_table)
 
         wining_hands = sim_result.get_wining_hands(3)
         beating_hands = sim_result.get_beating_hands(3)
