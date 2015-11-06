@@ -170,7 +170,7 @@ class MinskShell(cmd.Cmd):
         beating_hands = sim_result.get_beating_hands(3)
         row_num = max(len(wining_hands), len(beating_hands))
         if row_num:
-            rows = [[''] * 4 for _ in range(row_num)]
+            rows = [['-'] * 4 for _ in range(row_num)]
             self._fill_table(rows, wining_hands)
             self._fill_table(rows, beating_hands, 2)
             stats_table = prettytable.PrettyTable(['Wining Hand', 'Win Freq', 'Beating Hand', 'Beat Freq'])
