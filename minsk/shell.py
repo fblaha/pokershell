@@ -230,8 +230,8 @@ class MinskShell(cmd.Cmd):
             if len(cards) == 7:
                 table[InputTableColumn.RIVER].append(cards[6])
 
-            player_num = state.player_num or config.player_num
-            table[InputTableColumn.PLAYER_NUM].append(player_num)
+            if state.player_num:
+                table[InputTableColumn.PLAYER_NUM].append(state.player_num)
 
             if len(cards) >= 5:
                 evaluator_manager = manager.EvaluatorManager()
