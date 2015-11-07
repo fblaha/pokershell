@@ -19,6 +19,7 @@ class GameState(utils.CommonEqualityMixin, utils.CommonReprMixin):
         self._cards = cards
         self._player_num = player_num
         self._pot = pot
+        self._previous = None
 
     def is_successor(self, other):
         if self == other:
@@ -44,6 +45,16 @@ class GameState(utils.CommonEqualityMixin, utils.CommonReprMixin):
     @property
     def street(self):
         return Street(len(self._cards))
+
+    @property
+    def previous(self):
+        return self._previous
+
+    @previous.setter
+    def previous(self, previous):
+        if previous and not self.is_successor(previous):
+            raise ValueError('State %s is not successor of %s' % (self, previous))
+        self._previous = previous
 
 
 class GameStack(utils.CommonReprMixin):

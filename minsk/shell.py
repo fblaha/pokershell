@@ -56,6 +56,8 @@ class LineParser:
         for i in range(1, len(chunks) + 1):
             history_line = ' '.join(chunks[:i])
             state = cls.parse_state(history_line)
+            if history:
+                state.previous = history[-1]
             history.append(state)
         if history:
             game_stack = game.GameStack()
