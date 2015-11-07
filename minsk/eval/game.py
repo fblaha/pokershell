@@ -26,7 +26,7 @@ class GameState(utils.CommonEqualityMixin, utils.CommonReprMixin):
         my_cards = ''.join(map(repr, self._cards))
         other_cards = ''.join(map(repr, other._cards))
         return all((my_cards.startswith(other_cards),
-                    self.pot >= other.pot,
+                    other.pot is None or self.pot >= other.pot,
                     self.player_num <= other.player_num,))
 
     @property
@@ -45,27 +45,16 @@ class GameState(utils.CommonEqualityMixin, utils.CommonReprMixin):
     def street(self):
         return Street(len(self._cards))
 
-    @property
-    def complete(self):
-        return bool(self._pot and self._player_num)
-
 
 class GameStack(utils.CommonReprMixin):
     def __init__(self):
         super().__init__()
-        self._stack = []
         self._history = []
 
     def add_state(self, state):
+        if self._history and not state.is_successor(self._history[-1]):
+            raise ValueError('Not subsequent game states')
         self._history.append(state)
-        if state.complete:
-            if self._stack and not state.is_successor(self._stack[-1]):
-                self._stack = []
-            self._stack.append(state)
-
-    @property
-    def stack(self):
-        return self._stack
 
     @property
     def history(self):
@@ -73,7 +62,5 @@ class GameStack(utils.CommonReprMixin):
 
     @property
     def current(self):
-        if self._stack:
-            return self._stack[-1]
-        elif self._history:
+        if self._history:
             return self._history[-1]
