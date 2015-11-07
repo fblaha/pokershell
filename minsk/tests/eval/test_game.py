@@ -1,4 +1,4 @@
-import testtools
+import unittest
 
 import minsk.eval.game as game
 import minsk.model as model
@@ -8,7 +8,7 @@ parse = model.Card.parse_cards_line
 state = game.GameState
 
 
-class TestGameState(testtools.TestCase):
+class TestGameState(unittest.TestCase):
     def test_successor_cards(self):
         pre_flop = state(parse('2d 2c'), 5, 100)
         flop = state(parse('2d 2c 4h 5d 8h'), 2, 200)
@@ -42,15 +42,13 @@ class TestGameState(testtools.TestCase):
         self.assertEqual(game.Street.TURN, turn.street)
         self.assertEqual(game.Street.RIVER, river.street)
 
-
-class TestGameStack(testtools.TestCase):
-    def test_stack(self):
-        stack = game.GameStack()
-        stack.add_state(state(parse('2d 2c'), 5, 100))
-        self.assertEqual(1, len(stack.history))
-        flop = parse('2d 2c 4h 5d 8h')
-        stack.add_state(state(flop, 2, 200))
-        self.assertEqual(2, len(stack.history))
-        self.assertRaises(ValueError, stack.add_state, state(parse('3d 4c'), 5, 100))
-        self.assertRaises(ValueError, stack.add_state, state(flop, 2, 100))
-        self.assertRaises(ValueError, stack.add_state, state(flop, 5, 500))
+    def test_previous(self):
+        pre_flop = state(parse('2d 2c'), 5, 100)
+        flop_cards = parse('2d 2c 4h 5d 8h')
+        flop = state(flop_cards, 2, 200)
+        flop.previous = pre_flop
+        self.assertEqual(2, len(flop.history))
+        with self.assertRaises(ValueError):
+            flop.previous = state(parse('3d 4c'), 5, 100)
+            flop.previous = state(flop_cards, 2, 100)
+            flop.previous = state(flop_cards, 5, 500)

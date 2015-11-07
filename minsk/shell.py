@@ -50,20 +50,16 @@ class LineParser:
         return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
     @classmethod
-    def parse_stack(cls, line):
+    def parse_history(cls, line):
         chunks = [token.strip() for token in line.split(';') if token.strip()]
-        history = []
+        last_state = None
         for i in range(1, len(chunks) + 1):
             history_line = ' '.join(chunks[:i])
             state = cls.parse_state(history_line)
-            if history:
-                state.previous = history[-1]
-            history.append(state)
-        if history:
-            game_stack = game.GameStack()
-            for state in history:
-                game_stack.add_state(state)
-            return game_stack
+            if last_state:
+                state.previous = last_state
+            last_state = state
+        return last_state
 
     @staticmethod
     def validate_line(line):
@@ -81,10 +77,10 @@ class MinskShell(cmd.Cmd):
         super().__init__()
         self._sim_manager = simulation.SimulatorManager()
 
-    def _parse_stack(self, line):
+    def _parse_history(self, line):
         if LineParser.validate_line(line):
             try:
-                return LineParser.parse_stack(line)
+                return LineParser.parse_history(line)
             except ValueError as e:
                 print(str(e))
         else:
@@ -92,18 +88,18 @@ class MinskShell(cmd.Cmd):
 
     def do_brute_force(self, cards):
         """evaluate hand - brute force"""
-        stack = self._parse_stack(cards)
-        if stack:
+        state = self._parse_history(cards)
+        if state:
             simulator = simulation.BruteForceSimulator()
-            self.simulate(stack, simulator)
+            self.simulate(state, simulator)
 
     def do_eval(self, cards):
         """evaluate hand"""
-        stack = self._parse_stack(cards)
-        if stack:
+        state = self._parse_history(cards)
+        if state:
             simulator = self._sim_manager.find_simulator(
-                stack.current.player_num or config.player_num, *stack.current.cards)
-            self.simulate(stack, simulator)
+                state.player_num or config.player_num, *state.cards)
+            self.simulate(state, simulator)
 
     def default(self, line):
         if LineParser.validate_line(line):
@@ -113,31 +109,30 @@ class MinskShell(cmd.Cmd):
 
     def do_monte_carlo(self, cards):
         """evaluate hand - monte carlo"""
-        stack = self._parse_stack(cards)
-        if stack:
+        state = self._parse_history(cards)
+        if state:
             simulator = simulation.MonteCarloSimulator(
                 config.sim_cycle)
-            self.simulate(stack, simulator)
+            self.simulate(state, simulator)
 
     def do_look_up(self, cards):
         """evaluate hand - loop up"""
-        stack = self._parse_stack(cards)
-        if stack:
+        state = self._parse_history(cards)
+        if state:
             simulator = simulation.LookUpSimulator()
-            self.simulate(stack, simulator)
+            self.simulate(state, simulator)
 
-    def simulate(self, stack, simulator):
+    def simulate(self, state, simulator):
         self._print_configuration(simulator)
-        current = stack.current
-        self._print_input(stack)
+        self._print_input(state)
 
         if not simulator:
             print('\nNo simulator found!\n')
             return
         start = time.time()
-        player_num = current.player_num or config.player_num
-        result = simulator.simulate(player_num, *current.cards)
-        self._print_output(current, result)
+        player_num = state.player_num or config.player_num
+        result = simulator.simulate(player_num, *state.cards)
+        self._print_output(state, result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
@@ -204,9 +199,9 @@ class MinskShell(cmd.Cmd):
             rows[i][offset] = hand.name
             rows[i][offset + 1] = '%.2f%%' % pct
 
-    def _print_input(self, stack):
+    def _print_input(self, state):
         print('\nInput :')
-        table = self._build_input_table(stack)
+        table = self._build_input_table(state)
         header, columns = [], []
         for col_name in InputTableColumn:
             col_data = table[col_name]
@@ -219,10 +214,9 @@ class MinskShell(cmd.Cmd):
             input_table.add_row(row)
         print(input_table)
 
-    def _build_input_table(self, stack):
+    def _build_input_table(self, state):
         table = collections.defaultdict(list)
-        states = stack.history[::-1]
-        for state in states:
+        for state in state.history:
             cards = state.cards
             table[InputTableColumn.HOLE].append(' '.join(map(repr, cards[0:2])))
             if len(cards) >= 5:

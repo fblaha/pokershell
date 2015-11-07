@@ -1,10 +1,10 @@
-import testtools
+import unittest
 
 import minsk.shell as shell
 import minsk.config as config
 
 
-class TestLineParser(testtools.TestCase):
+class TestLineParser(unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.parse = shell.LineParser.parse_state
@@ -12,7 +12,7 @@ class TestLineParser(testtools.TestCase):
 
     @staticmethod
     def history(line):
-        return shell.LineParser.parse_stack(line).history
+        return shell.LineParser.parse_history(line).history
 
     def test_parse_state(self):
         parsed = self.parse('As 6c Ad 8s Ac 6d 7d')
@@ -50,8 +50,8 @@ class TestLineParser(testtools.TestCase):
     def test_parse_history(self):
         history = self.history('As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24; ')
         self.assertEqual(2, len(history))
-        self.assertEqual(0.24, history[-1].pot)
-        self.assertEqual(7, history[-1].player_num)
+        self.assertEqual(0.24, history[0].pot)
+        self.assertEqual(7, history[0].player_num)
 
     def test_parse_history_state(self):
         history = self.history('2c2d 5d5h6d 3 0.5; 5s ')
@@ -68,7 +68,7 @@ class TestLineParser(testtools.TestCase):
         self.assertEqual(canonical, self.history(line + '; ;; '))
 
 
-class TestShell(testtools.TestCase):
+class TestShell(unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.shell = shell.MinskShell()
