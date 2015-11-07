@@ -238,6 +238,7 @@ class MinskShell(cmd.Cmd):
 
             if state.pot:
                 table[InputTableColumn.POT].append(state.pot)
+
         row_num = max(len(col) for col in table.values())
         for col in table.values():
             if col:
