@@ -43,6 +43,16 @@ class GameState(utils.CommonEqualityMixin, utils.CommonReprMixin):
         return self._pot
 
     @property
+    def pot_growth(self):
+        if self.pot and self.previous and self.previous.pot:
+            return self.pot / self.previous.pot
+
+    @property
+    def fold_num(self):
+        if self.player_num and self.previous and self.previous.player_num:
+            return self.previous.player_num - self.player_num
+
+    @property
     def street(self):
         return Street(len(self._cards))
 

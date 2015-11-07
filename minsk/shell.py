@@ -21,9 +21,11 @@ class InputTableColumn(enum.Enum):
     TURN = 'Turn'
     RIVER = 'River'
     PLAYER_NUM = 'Player Num'
+    FOLD_NUM = 'Fold Num'
     HAND = 'Hand'
     RANKS = 'Ranks'
     POT = 'Pot'
+    POT_GROWTH = 'Pot Growth'
 
 
 class MinskShell(cmd.Cmd):
@@ -184,7 +186,11 @@ class MinskShell(cmd.Cmd):
                 table[InputTableColumn.RIVER].append(cards[6])
 
             if state.player_num:
-                table[InputTableColumn.PLAYER_NUM].append(state.player_num)
+                if state.fold_num:
+                    value = '%d(-%d)' % (state.player_num, state.fold_num)
+                else:
+                    value = '%d' % state.player_num
+                table[InputTableColumn.PLAYER_NUM].append(value)
 
             if len(cards) >= 5:
                 evaluator_manager = manager.EvaluatorManager()
@@ -195,6 +201,9 @@ class MinskShell(cmd.Cmd):
 
             if state.pot:
                 table[InputTableColumn.POT].append(state.pot)
+                if state.pot_growth:
+                    table[InputTableColumn.POT_GROWTH].append('%.0f%%' % (state.pot_growth * 100))
+
 
         row_num = max(len(col) for col in table.values())
         for col in table.values():
