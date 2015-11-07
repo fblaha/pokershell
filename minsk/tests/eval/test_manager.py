@@ -1,11 +1,11 @@
-import testtools
+import unittest
 
 import minsk.eval.manager as manager
 import minsk.tests.eval.common as common
 import minsk.model as model
 
 
-class TestEvalResult(testtools.TestCase):
+class TestEvalResult(unittest.TestCase):
     def test_cmp_hand(self):
         flush = manager.EvalResult(model.Hand.FLUSH, lambda: (model.Rank.ACE,))
         high_card = manager.EvalResult(model.Hand.HIGH_CARD, lambda: (model.Rank.ACE,))
@@ -20,7 +20,7 @@ class TestEvalResult(testtools.TestCase):
         self.assertFalse(high1 > high2)
 
 
-class TestEvaluatorManager(testtools.TestCase, common.TestUtilsMixin):
+class TestEvaluatorManager(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.manager = manager.EvaluatorManager()

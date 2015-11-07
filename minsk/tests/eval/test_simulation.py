@@ -1,6 +1,5 @@
 import time
-
-import testtools
+import unittest
 
 import minsk.config as config
 import minsk.eval.simulation as simulation
@@ -8,7 +7,7 @@ import minsk.model as model
 import minsk.tests.eval.common as common
 
 
-class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
+class TestBruteForceSimulator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.simulator = simulation.BruteForceSimulator()
@@ -35,7 +34,7 @@ class TestBruteForceSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.assertTrue(result.win / result.total < 0.2)
 
 
-class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
+class TestMonteCarloSimulator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.simulator = simulation.MonteCarloSimulator(0.5)
@@ -86,7 +85,7 @@ class TestMonteCarloSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.assertTrue(elapsed_time < 10)
 
 
-class TestLookUpSimulator(testtools.TestCase, common.TestUtilsMixin):
+class TestLookUpSimulator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.simulator = simulation.LookUpSimulator()
@@ -107,7 +106,7 @@ class TestLookUpSimulator(testtools.TestCase, common.TestUtilsMixin):
         self.assertEqual(55.78, result.win)
 
 
-class TestSimulatorManager(testtools.TestCase):
+class TestSimulatorManager(unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.manager = simulation.SimulatorManager()
@@ -143,7 +142,7 @@ class TestSimulatorManager(testtools.TestCase):
         self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
 
 
-class TestSimulationResult(testtools.TestCase):
+class TestSimulationResult(unittest.TestCase):
     def test_beaten_by(self):
         beaten_by = [0, 0, 5824, 2736, 324, 849, 1478, 135, 6]
         result = simulation.SimulationResult(35000, 1600, 1100, None, beaten_by)

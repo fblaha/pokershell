@@ -1,11 +1,11 @@
-import testtools
+import unittest
 
 import minsk.model as model
 import minsk.eval.evaluators as evaluators
 import minsk.tests.eval.common as common
 
 
-class TestFourEvaluator(testtools.TestCase, common.TestUtilsMixin):
+class TestFourEvaluator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.evaluator = evaluators.FourEvaluator()
@@ -19,7 +19,7 @@ class TestFourEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.assertEqual((model.Rank.JACK, model.Rank.FOUR), result())
 
 
-class TestThreeEvaluator(testtools.TestCase, common.TestUtilsMixin):
+class TestThreeEvaluator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.evaluator = evaluators.ThreeEvaluator()
@@ -29,7 +29,7 @@ class TestThreeEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.assertEqual((model.Rank.JACK, model.Rank.FIVE, model.Rank.DEUCE), result())
 
 
-class TestOnePairEvaluator(testtools.TestCase, common.TestUtilsMixin):
+class TestOnePairEvaluator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.evaluator = evaluators.OnePairEvaluator()
@@ -44,7 +44,7 @@ class TestOnePairEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.assertRaises(ValueError, self.evaluator.find, context)
 
 
-class TestHighCardEvaluator(testtools.TestCase, common.TestUtilsMixin):
+class TestHighCardEvaluator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.evaluator = evaluators.HighCardEvaluator()
@@ -55,7 +55,7 @@ class TestHighCardEvaluator(testtools.TestCase, common.TestUtilsMixin):
                           model.Rank.SEVEN, model.Rank.FIVE, model.Rank.DEUCE), result())
 
 
-class TestFullHouseEvaluator(testtools.TestCase, common.TestUtilsMixin):
+class TestFullHouseEvaluator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.evaluator = evaluators.FullHouseEvaluator()
@@ -69,7 +69,7 @@ class TestFullHouseEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.assertEqual((model.Rank.JACK, model.Rank.DEUCE), result())
 
 
-class TestTwoPairsEvaluator(testtools.TestCase, common.TestUtilsMixin):
+class TestTwoPairsEvaluator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.evaluator = evaluators.TwoPairsEvaluator()
@@ -79,7 +79,7 @@ class TestTwoPairsEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.assertEqual((model.Rank.JACK, model.Rank.DEUCE, model.Rank.FIVE), result())
 
 
-class TestFlushEvaluator(testtools.TestCase, common.TestUtilsMixin):
+class TestFlushEvaluator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.evaluator = evaluators.FlushEvaluator()
@@ -99,7 +99,7 @@ class TestFlushEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.assertIsNone(result)
 
 
-class TestStraightEvaluator(testtools.TestCase, common.TestUtilsMixin):
+class TestStraightEvaluator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.evaluator = evaluators.StraightEvaluator()
@@ -121,7 +121,7 @@ class TestStraightEvaluator(testtools.TestCase, common.TestUtilsMixin):
         self.assertEqual((model.Rank.ACE,), result())
 
 
-class TestStraightFlushEvaluator(testtools.TestCase, common.TestUtilsMixin):
+class TestStraightFlushEvaluator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.evaluator = evaluators.StraightFlushEvaluator()

@@ -1,9 +1,9 @@
-import testtools
+import unittest
 
 import minsk.eval.bet as bet
 
 
-class TestBetAdviser(testtools.TestCase):
+class TestBetAdviser(unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.adviser = bet.BetAdviser()

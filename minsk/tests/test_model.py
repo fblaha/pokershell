@@ -1,11 +1,10 @@
 import pickle
-
-import testtools
+import unittest
 
 import minsk.model as model
 
 
-class TestRank(testtools.TestCase):
+class TestRank(unittest.TestCase):
     def test_rank_cmp(self):
         self.assertTrue(model.Rank.ACE >= model.Rank.FOUR)
         self.assertTrue(model.Rank.ACE == model.Rank.ACE)
@@ -13,7 +12,7 @@ class TestRank(testtools.TestCase):
         self.assertTrue(model.Rank.EIGHT != model.Rank.ACE)
 
 
-class TestCard(testtools.TestCase):
+class TestCard(unittest.TestCase):
     def test_parse(self):
         self.assertIn(repr(model.Card.parse('js')), ['J♠', 'Js'])
         self.assertIn(repr(model.Card.parse('Jc')), ['J♣', 'Jc'])
@@ -45,7 +44,7 @@ class TestCard(testtools.TestCase):
         self.assertEqual(1326, count)
 
 
-class TestDeck(testtools.TestCase):
+class TestDeck(unittest.TestCase):
     def test_shuffle(self):
         deck = model.Deck()
         deck.shuffle()

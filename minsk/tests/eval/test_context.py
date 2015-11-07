@@ -1,10 +1,10 @@
-import testtools
+import unittest
 
 import minsk.model as model
 import minsk.tests.eval.common as common
 
 
-class TestEvalContext(testtools.TestCase, common.TestUtilsMixin):
+class TestEvalContext(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
         self.ctx = self.create_context('2h 2c 2d 5h Jh Jc')
