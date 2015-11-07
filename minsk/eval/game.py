@@ -27,7 +27,7 @@ class GameState(utils.CommonEqualityMixin, utils.CommonReprMixin):
         other_cards = ''.join(map(repr, other._cards))
         return all((my_cards.startswith(other_cards),
                     other.pot is None or self.pot >= other.pot,
-                    self.player_num <= other.player_num,))
+                    other.player_num is None or self.player_num <= other.player_num,))
 
     @property
     def cards(self):
@@ -53,7 +53,8 @@ class GameStack(utils.CommonReprMixin):
 
     def add_state(self, state):
         if self._history and not state.is_successor(self._history[-1]):
-            raise ValueError('State %s is not successor of %s' % (state, self._history[-1]))
+            args = (state, self._history[-1])
+            raise ValueError('State %s is not successor of %s' % args)
         self._history.append(state)
 
     @property

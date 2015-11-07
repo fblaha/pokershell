@@ -33,15 +33,14 @@ CARD_RE = '([2-9tjqka][hscd])+'
 
 class LineParser:
     @staticmethod
-    def parse_state(line, default_player_num=None):
+    def parse_state(line):
         tokens = line.split()
         cards = [token for token in tokens
                  if re.fullmatch(CARD_RE, token, re.IGNORECASE)]
         params = [token for token in tokens if re.fullmatch(NUM_RE, token)]
         joined = ''.join(cards)
         cards = zip(joined[::2], joined[1::2])
-        pot = None
-        player_num = default_player_num
+        pot, player_num = None, None
         for param in params:
             if '.' in param:
                 pot = float(param)
@@ -51,12 +50,12 @@ class LineParser:
         return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
     @classmethod
-    def parse_stack(cls, line, default_player_num=None):
+    def parse_stack(cls, line):
         chunks = [token.strip() for token in line.split(';') if token.strip()]
         history = []
         for i in range(1, len(chunks) + 1):
             history_line = ' '.join(chunks[:i])
-            state = cls.parse_state(history_line, default_player_num)
+            state = cls.parse_state(history_line)
             history.append(state)
         if history:
             game_stack = game.GameStack()
@@ -83,7 +82,7 @@ class MinskShell(cmd.Cmd):
     def _parse_stack(self, line):
         if LineParser.validate_line(line):
             try:
-                return LineParser.parse_stack(line, config.player_num)
+                return LineParser.parse_stack(line)
             except ValueError as e:
                 print(str(e))
         else:
