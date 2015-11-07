@@ -53,7 +53,7 @@ class GameStack(utils.CommonReprMixin):
 
     def add_state(self, state):
         if self._history and not state.is_successor(self._history[-1]):
-            raise ValueError('Not subsequent game states')
+            raise ValueError('State %s is not successor of %s' % (state, self._history[-1]))
         self._history.append(state)
 
     @property
