@@ -82,8 +82,10 @@ class MinskShell(cmd.Cmd):
             self.simulate(state, simulator)
 
     def simulate(self, state, simulator):
+        print('\nConfiguration :')
         self._print_configuration(simulator)
-        self._print_input(state)
+        print('\nGame :')
+        self._print_game(state)
 
         if not simulator:
             print('\nNo simulator found!\n')
@@ -91,7 +93,8 @@ class MinskShell(cmd.Cmd):
         start = time.time()
         player_num = state.player_num or config.player_num
         result = simulator.simulate(player_num, *state.cards)
-        self._print_output(state, result)
+        print('\nSimulation :')
+        self._print_simulation(state, result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
@@ -104,15 +107,13 @@ class MinskShell(cmd.Cmd):
         config.sim_cycle = float(sim_cycle)
 
     def _print_configuration(self, simulator):
-        print('\nConfiguration :')
         t = prettytable.PrettyTable(['key', 'value'])
         t.add_row(['sim_cycle', config.sim_cycle])
         if simulator:
             t.add_row(['simulator', simulator.name])
         print(t)
 
-    def _print_output(self, state, sim_result):
-        print('\nOutput :')
+    def _print_simulation(self, state, sim_result):
         counts = (sim_result.win, sim_result.tie, sim_result.lose)
         header = ['Win', 'Tie', 'Loss']
 
@@ -158,8 +159,7 @@ class MinskShell(cmd.Cmd):
             rows[i][offset] = hand.name
             rows[i][offset + 1] = '%.2f%%' % pct
 
-    def _print_input(self, state):
-        print('\nInput :')
+    def _print_game(self, state):
         table = self._build_input_table(state)
         header, columns = [], []
         for col_name in InputTableColumn:
@@ -202,8 +202,8 @@ class MinskShell(cmd.Cmd):
             if state.pot:
                 table[InputTableColumn.POT].append(state.pot)
                 if state.pot_growth:
-                    table[InputTableColumn.POT_GROWTH].append('%.0f%%' % (state.pot_growth * 100))
-
+                    cell = '%.0f%%' % (state.pot_growth * 100)
+                    table[InputTableColumn.POT_GROWTH].append(cell)
 
         row_num = max(len(col) for col in table.values())
         for col in table.values():
