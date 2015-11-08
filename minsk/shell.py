@@ -202,7 +202,8 @@ class MinskShell(cmd.Cmd):
             if state.pot:
                 table[InputTableColumn.POT].append(state.pot)
                 if state.pot_growth:
-                    cell = '%.0f%%' % (state.pot_growth * 100)
+                    pct_val = ((state.pot_growth - 1) * 100)
+                    cell = '%.0f%%' % pct_val
                     table[InputTableColumn.POT_GROWTH].append(cell)
 
         row_num = max(len(col) for col in table.values())
