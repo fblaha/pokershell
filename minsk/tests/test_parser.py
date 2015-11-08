@@ -7,7 +7,8 @@ class TestLineParser(unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.parse = parser.LineParser.parse_state
-        self.validate = parser.LineParser.validate_syntax
+        self.syntax = parser.LineParser.validate_syntax
+        self.semantics = parser.LineParser.validate_semantics
 
     @staticmethod
     def history(line):
@@ -38,13 +39,35 @@ class TestLineParser(unittest.TestCase):
         parsed = self.parse('As6c Ad8sAc 6d 7d')
         self.assertEqual(7, len(parsed.cards))
 
-    def test_validate(self):
-        self.assertTrue(self.validate('As6c Ad8sAc 6d 7d'))
-        self.assertTrue(self.validate('As6c Ad8sAc 3 3.0'))
-        self.assertTrue(self.validate('As6c; Ad 8s Ac 3 3.0'))
+    def test_semantics(self):
+        self.assertFalse(self.semantics('As6c'))
+        self.assertFalse(self.semantics('As6c Ad8sAc'))
+        self.assertFalse(self.semantics('As6c Ad8sAc 5 '))
+        self.assertFalse(self.semantics('As6c Ad8sAc 0.2'))
+        self.assertFalse(self.semantics('As6c Ad8sAc 0.2 5'))
+        self.assertFalse(self.semantics('As6c Ad8sAc 0.2 5; 2'))
 
-    def test_validate_negative(self):
-        self.assertFalse(self.validate('As 6cX'))
+    def test_semantics_negative(self):
+        self.assertEquals(1, self._error_count('AsAs 5 0.5'))
+        self.assertEquals(1, self._error_count('As 6c 5 6 '))
+        self.assertEquals(2, self._error_count('As 6c 0.6 6.; 3 4 '))
+        self.assertEquals(1, self._error_count('As 6c 0.6 2.'))
+        self.assertEquals(1, self._error_count('As 5 0.5'))
+
+    def _error_count(self, line):
+        errors = self.semantics(line)
+        print('-' * 20)
+        for err in errors:
+            print(err)
+        return len(errors)
+
+    def test_syntax(self):
+        self.assertTrue(self.syntax('As6c Ad8sAc 6d 7d'))
+        self.assertTrue(self.syntax('As6c Ad8sAc 3 3.0'))
+        self.assertTrue(self.syntax('As6c; Ad 8s Ac 3 3.0'))
+
+    def test_syntax_negative(self):
+        self.assertFalse(self.syntax('As 6cX'))
 
     def test_parse_history(self):
         history = self.history('As 6c Ad 8s Ac 6d 8 0.14; 7d 7 0.24; ')

@@ -38,10 +38,12 @@ class MinskShell(cmd.Cmd):
 
     def _parse_history(self, line):
         if parser.LineParser.validate_syntax(line):
-            try:
+            errors = parser.LineParser.validate_semantics(line)
+            if errors:
+                for err in errors:
+                    print(err)
+            else:
                 return parser.LineParser.parse_history(line)
-            except ValueError as e:
-                print(str(e))
         else:
             print("Invalid syntax '%s'" % line)
 
