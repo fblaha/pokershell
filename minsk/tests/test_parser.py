@@ -39,7 +39,7 @@ class TestLineParser(unittest.TestCase):
         parsed = self.parse('As6c Ad8sAc 6d 7d')
         self.assertEqual(7, len(parsed.cards))
 
-    def test_semantics(self):
+    def test_semantics_positive(self):
         self.assertFalse(self.semantics('As6c'))
         self.assertFalse(self.semantics('As6c Ad8sAc'))
         self.assertFalse(self.semantics('As6c Ad8sAc 5 '))
@@ -47,12 +47,26 @@ class TestLineParser(unittest.TestCase):
         self.assertFalse(self.semantics('As6c Ad8sAc 0.2 5'))
         self.assertFalse(self.semantics('As6c Ad8sAc 0.2 5; 2'))
 
-    def test_semantics_negative(self):
+    def test_semantics_dupl_cards(self):
         self.assertEquals(1, self._error_count('AsAs 5 0.5'))
-        self.assertEquals(1, self._error_count('As 6c 5 6 '))
-        self.assertEquals(2, self._error_count('As 6c 0.6 6.; 3 4 '))
+
+    def test_semantics_two_player_num(self):
+        self.assertEquals(1, self._error_count('As 6c 5 4 '))
+
+    def test_semantics_more_errors(self):
+        self.assertEquals(2, self._error_count('As 6c 0.6 6.;  4 3'))
+
+    def test_semantics_two_pots(self):
         self.assertEquals(1, self._error_count('As 6c 0.6 2.'))
+
+    def test_semantics_one_card(self):
         self.assertEquals(1, self._error_count('As 5 0.5'))
+
+    def test_semantics_player_num_growth(self):
+        self.assertEquals(1, self._error_count('AsAh 3 0.5;5'))
+
+    def test_semantics_pot_fall(self):
+        self.assertEquals(1, self._error_count('AsAh 3 0.5;0.1'))
 
     def _error_count(self, line):
         errors = self.semantics(line)

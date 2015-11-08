@@ -10,14 +10,9 @@ CARD_RE = '([2-9tjqka][hscd])+'
 class LineParser:
     @classmethod
     def parse_state(cls, line):
-        cards, params = cls._parse_raw(line)
-        pot, player_num = None, None
-        for param in params:
-            if '.' in param:
-                pot = float(param)
-            else:
-                player_num = int(param)
-                assert 2 <= player_num <= 10
+        cards, player_nums, pots = cls._parse_raw(line)
+        pot = pots[-1] if pots else None
+        player_num = player_nums[-1] if player_nums else None
         return game.GameState(model.Card.parse_cards(cards), player_num, pot)
 
     @staticmethod
@@ -28,7 +23,9 @@ class LineParser:
         joined = ''.join(cards)
         cards = list(zip(joined[::2], joined[1::2]))
         params = [token for token in tokens if re.fullmatch(NUM_RE, token)]
-        return cards, params
+        pots = [float(param) for param in params if '.' in param]
+        player_nums = [int(param) for param in params if '.' not in param]
+        return cards, player_nums, pots
 
     @classmethod
     def parse_history(cls, line):
@@ -56,7 +53,7 @@ class LineParser:
     @classmethod
     def validate_semantics(cls, line):
         errors = []
-        cards_str, _ = cls._parse_raw(line)
+        cards_str, player_nums, pots = cls._parse_raw(line)
         cards = model.Card.parse_cards(cards_str)
         if len(cards) != len(set(cards)):
             errors.append('Duplicate cards: {0}'.format(cards))
@@ -64,13 +61,18 @@ class LineParser:
         if not 2 <= card_num <= 7:
             errors.append('Card number is expected to be '
                           'between 2 and 7 (both included). Actual is %d' % card_num)
+        if any(a > b for a, b in zip(pots, pots[1:])):
+            errors.append('Pot size decay : %s' % pots)
+        if any(a < b for a, b in zip(player_nums, player_nums[1:])):
+            errors.append('Player number raised: %s' % player_nums)
         for chunk in cls._split_line(line):
-            _, params = cls._parse_raw(chunk)
-            pots = [pot for pot in params if '.' in pot]
+            _, player_nums, pots = cls._parse_raw(chunk)
             if len(pots) > 1:
-                errors.append('Ambiguous pot specification %s' % ', '.join(pots))
-            player_nums = [player_num for player_num in params if '.' not in player_num]
+                errors.append('Ambiguous pot specification %s' % pots)
             if len(player_nums) > 1:
-                joined = ', '.join(player_nums)
-                errors.append('Ambiguous player number specification %s' % joined)
+                errors.append('Ambiguous player number specification %s' % player_nums)
+            for player_num in player_nums:
+                if not 2 <= player_num <= 10:
+                    errors.append('Player number is expected to be between '
+                                  '2 and 10 (both included). Actual is %d' % player_num)
         return errors
