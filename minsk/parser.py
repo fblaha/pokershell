@@ -38,7 +38,7 @@ class LineParser:
         return last_state
 
     @staticmethod
-    def validate_line(line):
+    def validate_syntax(line):
         line = line.replace(';', ' ')
         return all(re.fullmatch(NUM_RE, token) or
                    re.fullmatch(CARD_RE, token, re.IGNORECASE)

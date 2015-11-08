@@ -37,7 +37,7 @@ class MinskShell(cmd.Cmd):
         self._sim_manager = simulation.SimulatorManager()
 
     def _parse_history(self, line):
-        if parser.LineParser.validate_line(line):
+        if parser.LineParser.validate_syntax(line):
             try:
                 return parser.LineParser.parse_history(line)
             except ValueError as e:
@@ -61,7 +61,7 @@ class MinskShell(cmd.Cmd):
             self.simulate(state, simulator)
 
     def default(self, line):
-        if parser.LineParser.validate_line(line):
+        if parser.LineParser.validate_syntax(line):
             self.do_eval(line)
         else:
             super().default(line)

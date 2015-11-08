@@ -7,7 +7,7 @@ class TestLineParser(unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.parse = parser.LineParser.parse_state
-        self.validate = parser.LineParser.validate_line
+        self.validate = parser.LineParser.validate_syntax
 
     @staticmethod
     def history(line):
