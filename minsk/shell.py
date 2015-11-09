@@ -219,6 +219,9 @@ class MinskShell(cmd.Cmd):
     def do_EOF(self, _):
         return True
 
+    def emptyline(self):
+        pass
+
 
 def main():
     parser = argparse.ArgumentParser(description='Minsk Shell')
