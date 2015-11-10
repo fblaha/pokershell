@@ -1,17 +1,17 @@
 import argparse
 import cmd
+import collections
 import enum
 import time
-import collections
 
 import prettytable
 
+import minsk.config as config
 import minsk.eval.bet as bet
 import minsk.eval.manager as manager
 import minsk.eval.simulation as simulation
 import minsk.model as model
 import minsk.parser as parser
-import minsk.config as config
 
 
 @enum.unique
@@ -141,8 +141,8 @@ class MinskShell(cmd.Cmd):
         self._print_hand_stats(sim_result)
 
     def _print_hand_stats(self, sim_result):
-        wining_hands = sim_result.get_wining_hands(3)
-        beating_hands = sim_result.get_beating_hands(3)
+        wining_hands = sim_result.get_wining_hands(config.hand_stats)
+        beating_hands = sim_result.get_beating_hands(config.hand_stats)
         row_num = max(len(wining_hands), len(beating_hands))
         if row_num:
             rows = [['-'] * 4 for _ in range(row_num)]
@@ -159,6 +159,7 @@ class MinskShell(cmd.Cmd):
         for i, (hand, count) in enumerate(hands):
             pct = count * 100 / total
             rows[i][offset] = hand.name
+            # TODO incorrect pct val
             rows[i][offset + 1] = '%.2f%%' % pct
 
     def _print_game(self, state):
@@ -226,9 +227,14 @@ class MinskShell(cmd.Cmd):
 def main():
     parser = argparse.ArgumentParser(description='Minsk Shell')
     parser.add_argument('-u', '--unicode', action='store_true', default=False)
+    parser.add_argument('-t', '--sim-cycle', metavar='N', type=int, default=config.sim_cycle)
+    parser.add_argument('-x', '--hand-stats', metavar='N', type=int, default=config.hand_stats)
     args = parser.parse_args()
     if args.unicode:
         model.enable_unicode = True
+        config.sim_cycle = args.sim_cycle
+    config.hand_stats = args.hand_stats
+
     MinskShell().cmdloop()
 
 
