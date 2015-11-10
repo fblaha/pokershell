@@ -56,10 +56,10 @@ class TestMonteCarloSimulator(unittest.TestCase, common.TestUtilsMixin):
         result = self.simulator.simulate(5, *cards)
         print(result)
         self.assertTrue(result.win / result.total > 0.9)
-        wining_hands = result.get_wining_hands(100)
-        self.assertEquals(1, len(wining_hands))
-        self.assertEquals(model.Hand.FULL_HOUSE, wining_hands[0][0])
-        self.assertEquals(result.win, wining_hands[0][1])
+        winning_hands = result.sorted_winning_hands
+        self.assertEquals(1, len(winning_hands))
+        self.assertEquals(model.Hand.FULL_HOUSE, winning_hands[0][0])
+        self.assertEquals(result.win, winning_hands[0][1])
 
     def test_calculator_comparison(self):
         cards = model.Card.parse_cards_line('4h 4d 8c 4c Qd')
@@ -73,8 +73,8 @@ class TestMonteCarloSimulator(unittest.TestCase, common.TestUtilsMixin):
         cards = model.Card.parse_cards_line('4h 4d 8c 4c Qd')
         result = self.simulator.simulate(5, *cards)
         print(result)
-        self.assertEquals(result.win, sum(result.win_by))
-        self.assertEquals(result.lose, sum(result.beaten_by))
+        self.assertEquals(result.win, sum(result.winning_hands))
+        self.assertEquals(result.lose, sum(result.beating_hands))
 
     def test_performance(self):
         cards = model.Card.parse_cards_line('As Ah Ad 8s Ac 7d')
@@ -146,7 +146,7 @@ class TestSimulationResult(unittest.TestCase):
     def test_beaten_by(self):
         beaten_by = [0, 0, 5824, 2736, 324, 849, 1478, 135, 6]
         result = simulation.SimulationResult(35000, 1600, 1100, None, beaten_by)
-        dangerous_hands = result.get_beating_hands(3)
+        dangerous_hands = result.sorted_beating_hands[:3]
         self.assertEqual(3, len(dangerous_hands))
         self.assertEqual(dangerous_hands[0][0], model.Hand.TWO_PAIR)
         self.assertEqual(dangerous_hands[0][1], 5824)

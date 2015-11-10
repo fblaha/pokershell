@@ -1,40 +1,50 @@
+import abc
 import functools
 import multiprocessing
-import abc
 import os
 import random
 import time
 
 import minsk.config as config
-import minsk.model as model
 import minsk.eval.manager as manager
+import minsk.model as model
 import minsk.utils as utils
 
 
 class SimulationResult(utils.CommonReprMixin):
-    def __init__(self, win, tie, lose, win_by, beaten_by):
+    def __init__(self, win, tie, lose, winning_hands, beating_hands):
         self.win = win
         self.tie = tie
         self.lose = lose
-        self.win_by = win_by
-        self.beaten_by = beaten_by
+        self._winning_hands = winning_hands
+        self._beating_hands = beating_hands
 
     @property
     def total(self):
         return self.win + self.tie + self.lose
 
-    def get_beating_hands(self, n):
-        return self._get_frequent(self.beaten_by, n)
+    @property
+    def beating_hands(self):
+        return self._beating_hands
 
-    def get_wining_hands(self, n):
-        return self._get_frequent(self.win_by, n)
+    @property
+    def winning_hands(self):
+        return self._winning_hands
+
+    @property
+    def sorted_beating_hands(self):
+        return self._get_frequent(self._beating_hands)
+
+    @property
+    def sorted_winning_hands(self):
+        return self._get_frequent(self._winning_hands)
 
     @staticmethod
-    def _get_frequent(lst, n):
+    def _get_frequent(lst):
         if lst:
             counts = [(hand, lst[hand]) for hand in model.Hand]
             counts.sort(key=lambda x: x[1], reverse=True)
-            return [cnt for cnt in counts[:n] if cnt[1]]
+            return [cnt for cnt in counts if cnt[1]]
         else:
             return []
 
@@ -57,14 +67,14 @@ class ParallelSimulatorMixin:
     def _simulate_parallel(cls, sim_fc, data):
         partial_results = multiprocessing.Pool().map(sim_fc, data)
         win, tie, lose = 0, 0, 0
-        beaten_by, win_by = [0] * len(model.Hand), [0] * len(model.Hand)
+        beating, winning = [0] * len(model.Hand), [0] * len(model.Hand)
         for result in partial_results:
             win += result.win
             tie += result.tie
             lose += result.lose
-            cls._add_list(result.beaten_by, beaten_by)
-            cls._add_list(result.win_by, win_by)
-        return SimulationResult(win, tie, lose, win_by, beaten_by)
+            cls._add_list(result.beating_hands, beating)
+            cls._add_list(result.winning_hands, winning)
+        return SimulationResult(win, tie, lose, winning, beating)
 
     @staticmethod
     def _add_list(target_lst, add_lst):

@@ -141,25 +141,24 @@ class MinskShell(cmd.Cmd):
         self._print_hand_stats(sim_result)
 
     def _print_hand_stats(self, sim_result):
-        wining_hands = sim_result.get_wining_hands(config.hand_stats)
-        beating_hands = sim_result.get_beating_hands(config.hand_stats)
-        row_num = max(len(wining_hands), len(beating_hands))
+        winning_hands = sim_result.sorted_winning_hands
+        beating_hands = sim_result.sorted_beating_hands
+        row_num = min(max(len(winning_hands), len(beating_hands)), config.hand_stats)
         if row_num:
             rows = [['-'] * 4 for _ in range(row_num)]
-            self._fill_table(rows, wining_hands)
-            self._fill_table(rows, beating_hands, 2)
-            header = ['Wining Hand', 'Win Freq', 'Beating Hand', 'Beat Freq']
+            self._fill_table(rows, winning_hands, row_num)
+            self._fill_table(rows, beating_hands, row_num, 2)
+            header = ['Winning Hand', 'Win Freq', 'Beating Hand', 'Beat Freq']
             stats_table = prettytable.PrettyTable(header)
             for row in rows:
                 stats_table.add_row(row)
             print(stats_table)
 
-    def _fill_table(self, rows, hands, offset=0):
+    def _fill_table(self, rows, hands, row_num, offset=0):
         total = sum(count for _, count in hands)
-        for i, (hand, count) in enumerate(hands):
+        for i, (hand, count) in enumerate(hands[:row_num]):
             pct = count * 100 / total
             rows[i][offset] = hand.name
-            # TODO incorrect pct val
             rows[i][offset + 1] = '%.2f%%' % pct
 
     def _print_game(self, state):
@@ -227,8 +226,10 @@ class MinskShell(cmd.Cmd):
 def main():
     parser = argparse.ArgumentParser(description='Minsk Shell')
     parser.add_argument('-u', '--unicode', action='store_true', default=False)
-    parser.add_argument('-t', '--sim-cycle', metavar='N', type=int, default=config.sim_cycle)
-    parser.add_argument('-x', '--hand-stats', metavar='N', type=int, default=config.hand_stats)
+    parser.add_argument('-t', '--sim-cycle', metavar='N', type=int,
+                        default=config.sim_cycle)
+    parser.add_argument('-x', '--hand-stats', metavar='N', type=int,
+                        default=config.hand_stats)
     args = parser.parse_args()
     if args.unicode:
         model.enable_unicode = True
