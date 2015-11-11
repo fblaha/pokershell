@@ -92,8 +92,17 @@ class MinskShell(cmd.Cmd):
         if not simulator:
             print('\nNo simulator found!\n')
             return
-        start = time.time()
         player_num = state.player_num or config.player_num
+        if player_num not in simulator.players_num:
+            print("\nSimulator does not support '%d' players!\n" % player_num)
+            return
+
+        cards_num = len(state.cards)
+        if cards_num not in simulator.cards_num:
+            print("\nSimulator does not support '%d' cards!\n" % cards_num)
+            return
+
+        start = time.time()
         result = simulator.simulate(player_num, *state.cards)
         print('\nSimulation :')
         self._print_simulation(state, result)
