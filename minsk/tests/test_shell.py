@@ -1,7 +1,7 @@
 import unittest
 
-import minsk.shell as shell
 import minsk.config as config
+import minsk.shell as shell
 
 
 class TestShell(unittest.TestCase):
@@ -50,9 +50,9 @@ class TestShell(unittest.TestCase):
         self.shell.do_eval('As 6c 8h')
 
     def test_sim_cycle(self):
-        self.shell.do_sim_cycle('33')
+        self.shell.do_set('sim_cycle 33')
         self.assertEqual(33, config.sim_cycle)
 
     def test_player_num(self):
-        self.shell.do_player_num('7')
+        self.shell.do_set('player_num 7')
         self.assertEqual(7, config.player_num)

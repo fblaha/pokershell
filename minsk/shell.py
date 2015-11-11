@@ -83,6 +83,17 @@ class MinskShell(cmd.Cmd):
             simulator = simulation.LookUpSimulator()
             self.simulate(state, simulator)
 
+    def do_set(self, line):
+        """set configuration property"""
+        key, val = line.split(maxsplit=2)
+        properties = config.get_config_properties()
+        if key in properties:
+            converter = properties[key]
+            # TODO handle conversion error
+            setattr(config, key, converter(val))
+        else:
+            print("No such configuration property '%s'" % key)
+
     def simulate(self, state, simulator):
         print('\nConfiguration :')
         self._print_configuration(simulator)
@@ -108,14 +119,6 @@ class MinskShell(cmd.Cmd):
         self._print_simulation(state, result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
-
-    def do_player_num(self, player_num):
-        """set player number"""
-        config.player_num = int(player_num)
-
-    def do_sim_cycle(self, sim_cycle):
-        """set simulation cycles number"""
-        config.sim_cycle = float(sim_cycle)
 
     def _print_configuration(self, simulator):
         t = prettytable.PrettyTable(['key', 'value'])
@@ -196,11 +199,12 @@ class MinskShell(cmd.Cmd):
             if len(cards) == 7:
                 table[InputTableColumn.RIVER].append(cards[6])
 
-            if state.player_num:
+            player_num = state.player_num or config.player_num
+            if player_num:
                 if state.fold_num:
-                    value = '%d(-%d)' % (state.player_num, state.fold_num)
+                    value = '%d(-%d)' % (player_num, state.fold_num)
                 else:
-                    value = '%d' % state.player_num
+                    value = '%d' % player_num
                 table[InputTableColumn.PLAYER_NUM].append(value)
 
             if len(cards) >= 5:
