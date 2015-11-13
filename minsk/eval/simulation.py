@@ -196,7 +196,7 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
 
     @classmethod
     def from_config(cls):
-        return cls(config.sim_cycle)
+        return cls(config.sim_cycle.value)
 
 
 class LookUpSimulator(AbstractSimulator):

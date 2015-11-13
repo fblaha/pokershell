@@ -59,7 +59,7 @@ class MinskShell(cmd.Cmd):
         state = self._parse_history(cards)
         if state:
             simulator = self._sim_manager.find_simulator(
-                state.player_num or config.player_num, *state.cards)
+                state.player_num or config.player_num.value, *state.cards)
             self.simulate(state, simulator)
 
     def default(self, line):
@@ -73,7 +73,7 @@ class MinskShell(cmd.Cmd):
         state = self._parse_history(cards)
         if state:
             simulator = simulation.MonteCarloSimulator(
-                config.sim_cycle)
+                config.sim_cycle.value)
             self.simulate(state, simulator)
 
     def do_look_up(self, cards):
@@ -86,11 +86,8 @@ class MinskShell(cmd.Cmd):
     def do_set(self, line):
         """set configuration property"""
         key, val = line.split(maxsplit=2)
-        properties = config.get_config_properties()
-        if key in properties:
-            converter = properties[key]
-            # TODO handle conversion error
-            setattr(config, key, converter(val))
+        if key in config.options:
+            config.options[key].value = val
         else:
             print("No such configuration property '%s'" % key)
 
@@ -103,7 +100,7 @@ class MinskShell(cmd.Cmd):
         if not simulator:
             print('\nNo simulator found!\n')
             return
-        player_num = state.player_num or config.player_num
+        player_num = state.player_num or config.player_num.value
         if player_num not in simulator.players_num:
             print("\nSimulator does not support '%d' players!\n" % player_num)
             return
@@ -122,7 +119,7 @@ class MinskShell(cmd.Cmd):
 
     def _print_configuration(self, simulator):
         t = prettytable.PrettyTable(['key', 'value'])
-        t.add_row(['sim_cycle', config.sim_cycle])
+        t.add_row(['sim_cycle', config.sim_cycle.value])
         if simulator:
             t.add_row(['simulator', simulator.name])
         print(t)
@@ -155,7 +152,8 @@ class MinskShell(cmd.Cmd):
     def _print_hand_stats(self, sim_result):
         winning_hands = sim_result.sorted_winning_hands
         beating_hands = sim_result.sorted_beating_hands
-        row_num = min(max(len(winning_hands), len(beating_hands)), config.hand_stats)
+        row_num = min(max(len(winning_hands), len(beating_hands)),
+                      config.hand_stats.value)
         if row_num:
             rows = [['-'] * 4 for _ in range(row_num)]
             self._fill_table(rows, winning_hands, row_num)
@@ -199,7 +197,7 @@ class MinskShell(cmd.Cmd):
             if len(cards) == 7:
                 table[InputTableColumn.RIVER].append(cards[6])
 
-            player_num = state.player_num or config.player_num
+            player_num = state.player_num or config.player_num.value
             if player_num:
                 if state.fold_num:
                     value = '%d(-%d)' % (player_num, state.fold_num)
@@ -239,15 +237,19 @@ class MinskShell(cmd.Cmd):
 def main():
     parser = argparse.ArgumentParser(description='Minsk Shell')
     parser.add_argument('-u', '--unicode', action='store_true', default=False)
-    parser.add_argument('-t', '--sim-cycle', metavar='N', type=int,
-                        default=config.sim_cycle)
-    parser.add_argument('-x', '--hand-stats', metavar='N', type=int,
-                        default=config.hand_stats)
+
+    for opt in config.options.values():
+        if opt.short:
+            parser.add_argument(opt.short, opt.long, type=opt.type, default=opt.value)
+        else:
+            parser.add_argument(opt.long, type=opt.type, default=opt.value)
+
     args = parser.parse_args()
     if args.unicode:
         model.enable_unicode = True
-        config.sim_cycle = args.sim_cycle
-    config.hand_stats = args.hand_stats
+
+    for opt in config.options.values():
+        opt.value = getattr(args, opt.python_name)
 
     MinskShell().cmdloop()
 

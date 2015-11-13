@@ -79,7 +79,7 @@ class TestMonteCarloSimulator(unittest.TestCase, common.TestUtilsMixin):
     def test_performance(self):
         cards = model.Card.parse_cards_line('As Ah Ad 8s Ac 7d')
         start_time = time.time()
-        simulation.MonteCarloSimulator(config.sim_cycle).simulate(6, *cards)
+        simulation.MonteCarloSimulator(config.sim_cycle.value).simulate(6, *cards)
         elapsed_time = time.time() - start_time
         print('Elapsed time : %f' % elapsed_time)
         self.assertTrue(elapsed_time < 10)

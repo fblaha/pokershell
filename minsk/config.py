@@ -1,9 +1,49 @@
-player_num = 2
+import collections
+
+import minsk.utils as utils
+
+ConfigOption = collections.namedtuple('ConfigOption', ['name', 'type', 'value', 'short'])
+
+
+class ConfigOption(utils.CommonReprMixin):
+    def __init__(self, name, type, value, short):
+        super().__init__()
+        self.name = name
+        self.type = type
+        self._value = value
+        self.short = short
+
+    @property
+    def value(self):
+        return self._value
+
+    @property
+    def python_name(self):
+        return self.name.replace('-', '_')
+
+    @property
+    def long(self):
+        return '--' + self.name
+
+    @value.setter
+    def value(self, val):
+        if type(val) != self.type:
+            self._value = self.type(val)
+        else:
+            self._value = val
+
+
+options = {}
+
+
+def register_option(name, type, value, short):
+    option = ConfigOption(name, type, value, short)
+    assert name not in options
+    options[name] = option
+    return option
+
+
+player_num = register_option(name='player-num', value=2, type=int, short='-p')
 # TODO simulator specific configuration
-sim_cycle = 1
-hand_stats = 3
-
-
-def get_config_properties():
-    return {k: type(v) for k, v in globals().items()
-            if not k.startswith('__') and not callable(v)}
+sim_cycle = register_option(name='sim-cycle', value=1, type=int, short='-t')
+hand_stats = register_option(name='hand-stats', value=3, type=int, short='-x')
