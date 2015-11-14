@@ -182,13 +182,14 @@ class MinskShell(cmd.Cmd):
                 header.append(col_name.value)
                 columns.append(col_data[::-1])
 
-        input_table = prettytable.PrettyTable(header)
+        game_table = prettytable.PrettyTable(header)
         for row in zip(*columns):
-            input_table.add_row(row)
-        print(input_table)
+            game_table.add_row(row)
+        print(game_table)
 
     def _build_input_table(self, state):
         table = collections.defaultdict(list)
+        max_player_num = 0
         for state in state.history:
             cards = state.cards
             table[InputTableColumn.HOLE].append(' '.join(map(repr, cards[0:2])))
@@ -199,13 +200,18 @@ class MinskShell(cmd.Cmd):
             if len(cards) == 7:
                 table[InputTableColumn.RIVER].append(cards[6])
 
-            player_num = state.player_num or config.player_num.value
-            if player_num:
+            if state.player_num:
+                max_player_num = max(max_player_num, state.player_num)
                 if state.fold_num:
-                    value = '%d(-%d)' % (player_num, state.fold_num)
+                    value = '%d(-%d)' % (state.player_num, state.fold_num)
                 else:
-                    value = '%d' % player_num
+                    value = '%d' % state.player_num
                 table[InputTableColumn.PLAYER_NUM].append(value)
+            else:
+                if max_player_num:
+                    table[InputTableColumn.PLAYER_NUM].append(str(max_player_num) + '+')
+                else:
+                    table[InputTableColumn.PLAYER_NUM].append(config.player_num.value)
 
             if len(cards) >= 5:
                 evaluator_manager = manager.EvaluatorManager()
