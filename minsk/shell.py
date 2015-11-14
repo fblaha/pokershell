@@ -93,7 +93,7 @@ class MinskShell(cmd.Cmd):
 
     def simulate(self, state, simulator):
         print('\nConfiguration :')
-        self._print_configuration(simulator)
+        self._print_configuration()
         print('\nGame :')
         self._print_game(state)
 
@@ -112,16 +112,15 @@ class MinskShell(cmd.Cmd):
 
         start = time.time()
         result = simulator.simulate(player_num, *state.cards)
-        print('\nSimulation :')
+        print('\nSimulation (%s):' % simulator.name)
         self._print_simulation(state, result)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
-    def _print_configuration(self, simulator):
-        t = prettytable.PrettyTable(['key', 'value'])
-        t.add_row(['sim_cycle', config.sim_cycle.value])
-        if simulator:
-            t.add_row(['simulator', simulator.name])
+    def _print_configuration(self):
+        t = prettytable.PrettyTable(['name', 'value'])
+        for opt in config.options.values():
+            t.add_row([opt.name, opt.value])
         print(t)
 
     def _print_simulation(self, state, sim_result):
