@@ -83,7 +83,7 @@ class MinskShell(cmd.Cmd):
             simulator = simulation.LookUpSimulator()
             self.simulate(state, simulator)
 
-    def do_set(self, line):
+    def do_set_config(self, line):
         """set configuration property"""
         key, val = line.split(maxsplit=2)
         if key in config.options:
@@ -91,9 +91,12 @@ class MinskShell(cmd.Cmd):
         else:
             print("No such configuration property '%s'" % key)
 
-    def simulate(self, state, simulator):
+    def do_show_config(self, _):
+        """show configuration properties"""
         print('\nConfiguration :')
         self._print_configuration()
+
+    def simulate(self, state, simulator):
         print('\nGame :')
         self._print_game(state)
 

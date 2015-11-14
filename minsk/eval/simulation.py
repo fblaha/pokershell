@@ -57,9 +57,8 @@ class AbstractSimulator(metaclass=abc.ABCMeta):
         pass
 
     @classmethod
-    @abc.abstractclassmethod
     def from_config(cls):
-        pass
+        return cls()
 
 
 class ParallelSimulatorMixin:
@@ -129,10 +128,6 @@ class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
                 tie += 1
         win_by[best_hand.hand] = win
         return SimulationResult(win, tie, lose, win_by, beaten_by)
-
-    @classmethod
-    def from_config(cls):
-        return cls()
 
 
 class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
@@ -245,10 +240,6 @@ class LookUpSimulator(AbstractSimulator):
     @staticmethod
     def _get_code(ranks):
         return ranks[0].value[0] + ranks[1].value[0]
-
-    @classmethod
-    def from_config(cls):
-        return cls()
 
 
 class SimulatorManager:
