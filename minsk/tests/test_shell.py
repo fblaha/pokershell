@@ -1,6 +1,7 @@
 import unittest
 
 import minsk.config as config
+import minsk.eval.simulation as simulation
 import minsk.shell as shell
 
 
@@ -9,7 +10,7 @@ class TestShell(unittest.TestCase):
         super().setUp()
         self.shell = shell.MinskShell()
         self._player_num = config.player_num
-        self._sim_cycle = config.sim_cycle
+        self._sim_cycle = simulation.MonteCarloSimulator.sim_cycle
 
     def tearDown(self):
         config.player_num = self._player_num
@@ -51,7 +52,7 @@ class TestShell(unittest.TestCase):
 
     def test_sim_cycle(self):
         self.shell.do_set_config('sim-cycle 33')
-        self.assertEqual(33, config.sim_cycle.value)
+        self.assertEqual(33, simulation.MonteCarloSimulator.sim_cycle.value)
 
     def test_player_num(self):
         self.shell.do_set_config('player-num 5')

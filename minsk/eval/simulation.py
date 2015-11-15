@@ -134,6 +134,7 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
     name = 'Monte Carlo'
     cards_num = set(range(2, 8))
     players_num = set(range(2, 11))
+    sim_cycle = config.register_option(name='sim-cycle', value=1, type=int, short='-t')
 
     def __init__(self, sim_cycle):
         super().__init__()
@@ -191,7 +192,7 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
 
     @classmethod
     def from_config(cls):
-        return cls(config.sim_cycle.value)
+        return cls(cls.sim_cycle.value)
 
 
 class LookUpSimulator(AbstractSimulator):

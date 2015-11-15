@@ -1,10 +1,11 @@
 import time
 import unittest
 
-import minsk.config as config
 import minsk.eval.simulation as simulation
 import minsk.model as model
 import minsk.tests.eval.common as common
+
+monte_carlo = simulation.MonteCarloSimulator
 
 
 class TestBruteForceSimulator(unittest.TestCase, common.TestUtilsMixin):
@@ -37,7 +38,7 @@ class TestBruteForceSimulator(unittest.TestCase, common.TestUtilsMixin):
 class TestMonteCarloSimulator(unittest.TestCase, common.TestUtilsMixin):
     def setUp(self):
         super().setUp()
-        self.simulator = simulation.MonteCarloSimulator(0.5)
+        self.simulator = monte_carlo(0.5)
 
     def test_hole_cards(self):
         cards = model.Card.parse_cards_line('As 6c')
@@ -79,7 +80,7 @@ class TestMonteCarloSimulator(unittest.TestCase, common.TestUtilsMixin):
     def test_performance(self):
         cards = model.Card.parse_cards_line('As Ah Ad 8s Ac 7d')
         start_time = time.time()
-        simulation.MonteCarloSimulator(config.sim_cycle.value).simulate(6, *cards)
+        monte_carlo(monte_carlo.sim_cycle.value).simulate(6, *cards)
         elapsed_time = time.time() - start_time
         print('Elapsed time : %f' % elapsed_time)
         self.assertTrue(elapsed_time < 10)
@@ -119,7 +120,7 @@ class TestSimulatorManager(unittest.TestCase):
     def test_flop(self):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac')
         simulator = self.manager.find_simulator(2, *cards)
-        self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
+        self.assertIsInstance(simulator, monte_carlo)
 
     def test_turn(self):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d')
@@ -134,12 +135,12 @@ class TestSimulatorManager(unittest.TestCase):
     def test_river_five_players(self):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d 5h')
         simulator = self.manager.find_simulator(5, *cards)
-        self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
+        self.assertIsInstance(simulator, monte_carlo)
 
     def test_turn_seven_players(self):
         cards = model.Card.parse_cards_line('As 6c Ad 8s Ac 4d')
         simulator = self.manager.find_simulator(7, *cards)
-        self.assertIsInstance(simulator, simulation.MonteCarloSimulator)
+        self.assertIsInstance(simulator, monte_carlo)
 
 
 class TestSimulationResult(unittest.TestCase):

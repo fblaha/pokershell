@@ -44,6 +44,5 @@ def register_option(name, type, value, short):
 
 
 player_num = register_option(name='player-num', value=2, type=int, short='-p')
-# TODO simulator specific configuration
-sim_cycle = register_option(name='sim-cycle', value=1, type=int, short='-t')
+
 hand_stats = register_option(name='hand-stats', value=3, type=int, short='-x')

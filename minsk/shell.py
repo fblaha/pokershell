@@ -51,7 +51,7 @@ class MinskShell(cmd.Cmd):
         """evaluate hand - brute force"""
         state = self._parse_history(cards)
         if state:
-            simulator = simulation.BruteForceSimulator()
+            simulator = simulation.BruteForceSimulator.from_config()
             self.simulate(state, simulator)
 
     def do_eval(self, cards):
@@ -72,15 +72,14 @@ class MinskShell(cmd.Cmd):
         """evaluate hand - monte carlo"""
         state = self._parse_history(cards)
         if state:
-            simulator = simulation.MonteCarloSimulator(
-                config.sim_cycle.value)
+            simulator = simulation.MonteCarloSimulator.from_config()
             self.simulate(state, simulator)
 
     def do_look_up(self, cards):
         """evaluate hand - loop up"""
         state = self._parse_history(cards)
         if state:
-            simulator = simulation.LookUpSimulator()
+            simulator = simulation.LookUpSimulator.from_config()
             self.simulate(state, simulator)
 
     def do_set_config(self, line):
