@@ -136,7 +136,7 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
     players_num = set(range(2, 11))
     sim_cycle = config.register_option(name='sim-cycle', value=1, type=int, short='-t')
 
-    def __init__(self, sim_cycle):
+    def __init__(self, sim_cycle=1):
         super().__init__()
         self._manager = manager.EvaluatorManager()
         if sim_cycle > 120:
