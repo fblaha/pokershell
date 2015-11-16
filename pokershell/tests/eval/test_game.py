@@ -1,7 +1,7 @@
 import unittest
 
-import minsk.eval.game as game
-import minsk.model as model
+import pokershell.eval.game as game
+import pokershell.model as model
 
 parse = model.Card.parse_cards_line
 

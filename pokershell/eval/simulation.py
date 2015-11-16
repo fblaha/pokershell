@@ -5,10 +5,10 @@ import os
 import random
 import time
 
-import minsk.config as config
-import minsk.eval.manager as manager
-import minsk.model as model
-import minsk.utils as utils
+import pokershell.config as config
+import pokershell.eval.manager as manager
+import pokershell.model as model
+import pokershell.utils as utils
 
 
 class SimulationResult(utils.CommonReprMixin):

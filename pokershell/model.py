@@ -1,9 +1,9 @@
 import enum
 import functools
-import random
 import itertools
+import random
 
-import minsk.utils as utils
+import pokershell.utils as utils
 
 enable_unicode = False
 

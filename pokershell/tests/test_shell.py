@@ -1,14 +1,14 @@
 import unittest
 
-import minsk.config as config
-import minsk.eval.simulation as simulation
-import minsk.shell as shell
+import pokershell.config as config
+import pokershell.eval.simulation as simulation
+import pokershell.shell as shell
 
 
 class TestShell(unittest.TestCase):
     def setUp(self):
         super().setUp()
-        self.shell = shell.MinskShell()
+        self.shell = shell.PokerShell()
         self._player_num = config.player_num
         self._sim_cycle = simulation.MonteCarloSimulator.sim_cycle
 

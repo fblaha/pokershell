@@ -1,9 +1,9 @@
 import collections
 import functools
 
-import minsk.eval.context as context
-import minsk.eval.evaluators as evaluators
-import minsk.model as model
+import pokershell.eval.context as context
+import pokershell.eval.evaluators as evaluators
+import pokershell.model as model
 
 
 @functools.total_ordering

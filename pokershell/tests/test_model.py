@@ -1,7 +1,7 @@
 import pickle
 import unittest
 
-import minsk.model as model
+import pokershell.model as model
 
 
 class TestRank(unittest.TestCase):

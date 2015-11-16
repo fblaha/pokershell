@@ -1,8 +1,8 @@
 import unittest
 
-import minsk.eval.manager as manager
-import minsk.tests.eval.common as common
-import minsk.model as model
+import pokershell.eval.manager as manager
+import pokershell.model as model
+import pokershell.tests.eval.common as common
 
 
 class TestEvalResult(unittest.TestCase):

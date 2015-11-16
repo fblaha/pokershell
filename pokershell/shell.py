@@ -6,12 +6,12 @@ import time
 
 import prettytable
 
-import minsk.config as config
-import minsk.eval.bet as bet
-import minsk.eval.manager as manager
-import minsk.eval.simulation as simulation
-import minsk.model as model
-import minsk.parser as parser
+import pokershell.config as config
+import pokershell.eval.bet as bet
+import pokershell.eval.manager as manager
+import pokershell.eval.simulation as simulation
+import pokershell.model as model
+import pokershell.parser as parser
 
 
 @enum.unique
@@ -28,9 +28,9 @@ class InputTableColumn(enum.Enum):
     POT_GROWTH = 'Pot Growth'
 
 
-class MinskShell(cmd.Cmd):
-    """Minsk shell"""
-    prompt = '(minsk) '
+class PokerShell(cmd.Cmd):
+    """Poker Shell"""
+    prompt = '(pokershell) '
 
     def __init__(self):
         super().__init__()
@@ -242,7 +242,7 @@ class MinskShell(cmd.Cmd):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Minsk Shell')
+    parser = argparse.ArgumentParser(description='Poker Shell')
     parser.add_argument('-u', '--unicode', action='store_true', default=False)
 
     for opt in config.options.values():
@@ -258,7 +258,7 @@ def main():
     for opt in config.options.values():
         opt.value = getattr(args, opt.python_name)
 
-    MinskShell().cmdloop()
+    PokerShell().cmdloop()
 
 
 if __name__ == '__main__':

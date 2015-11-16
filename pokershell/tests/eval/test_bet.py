@@ -1,6 +1,6 @@
 import unittest
 
-import minsk.eval.bet as bet
+import pokershell.eval.bet as bet
 
 
 class TestBetAdviser(unittest.TestCase):

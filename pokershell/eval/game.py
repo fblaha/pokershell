@@ -1,6 +1,6 @@
 import enum
 
-import minsk.utils as utils
+import pokershell.utils as utils
 
 
 @enum.unique

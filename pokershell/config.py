@@ -1,6 +1,6 @@
 import collections
 
-import minsk.utils as utils
+import pokershell.utils as utils
 
 ConfigOption = collections.namedtuple('ConfigOption', ['name', 'type', 'value', 'short'])
 

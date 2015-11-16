@@ -1,5 +1,5 @@
-import minsk.model as model
-import minsk.eval.context as context
+import pokershell.eval.context as context
+import pokershell.model as model
 
 
 class TestUtilsMixin:

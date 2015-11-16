@@ -1,5 +1,5 @@
-import minsk.model as model
-import minsk.eval as eval
+import pokershell.eval as eval
+import pokershell.model as model
 
 
 class KindEvaluator(eval.AbstractEvaluator):

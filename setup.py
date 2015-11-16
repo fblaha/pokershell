@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-PROJECT = 'minsk'
+PROJECT = 'pokershell'
 
 # Change docs/sphinx/conf.py too!
 VERSION = '0.1'
@@ -11,7 +11,7 @@ setup(
     name=PROJECT,
     version=VERSION,
 
-    description='Minsk Shell',
+    description='Poker Shell',
 
     author='Filip Blaha',
     author_email='blahaf@gmail.com',
@@ -27,12 +27,12 @@ setup(
     namespace_packages=[],
     packages=find_packages(),
     package_data={
-        'minsk.eval': ['preflop/*.txt']},
+        'pokershell.eval': ['preflop/*.txt']},
     include_package_data=True,
 
     entry_points={
         'console_scripts': [
-            'minsk = minsk.shell:main'
+            'pokershell = pokershell.shell:main'
         ]
     },
 

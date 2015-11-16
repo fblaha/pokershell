@@ -1,6 +1,6 @@
 import unittest
 
-import minsk.parser as parser
+import pokershell.parser as parser
 
 
 class TestLineParser(unittest.TestCase):

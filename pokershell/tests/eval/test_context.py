@@ -1,7 +1,7 @@
 import unittest
 
-import minsk.model as model
-import minsk.tests.eval.common as common
+import pokershell.model as model
+import pokershell.tests.eval.common as common
 
 
 class TestEvalContext(unittest.TestCase, common.TestUtilsMixin):

@@ -1,6 +1,6 @@
 import unittest
 
-import minsk.config as config
+import pokershell.config as config
 
 
 class TestConfig(unittest.TestCase):

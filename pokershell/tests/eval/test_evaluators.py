@@ -1,8 +1,8 @@
 import unittest
 
-import minsk.model as model
-import minsk.eval.evaluators as evaluators
-import minsk.tests.eval.common as common
+import pokershell.eval.evaluators as evaluators
+import pokershell.model as model
+import pokershell.tests.eval.common as common
 
 
 class TestFourEvaluator(unittest.TestCase, common.TestUtilsMixin):

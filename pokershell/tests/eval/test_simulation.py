@@ -1,9 +1,9 @@
 import time
 import unittest
 
-import minsk.eval.simulation as simulation
-import minsk.model as model
-import minsk.tests.eval.common as common
+import pokershell.eval.simulation as simulation
+import pokershell.model as model
+import pokershell.tests.eval.common as common
 
 monte_carlo = simulation.MonteCarloSimulator
 

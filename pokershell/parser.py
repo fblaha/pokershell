@@ -1,7 +1,7 @@
 import re
 
-import minsk.eval.game as game
-import minsk.model as model
+import pokershell.eval.game as game
+import pokershell.model as model
 
 NUM_RE = '\d+(\.(\d+)?)?'
 CARD_RE = '([2-9tjqka][hscd])+'
