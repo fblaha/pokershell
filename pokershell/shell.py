@@ -186,7 +186,8 @@ class PokerShell(cmd.Cmd):
             game_table.add_row(row)
         print(game_table)
 
-    def _build_input_table(self, state):
+    @staticmethod
+    def _build_input_table(state):
         table = collections.defaultdict(list)
         max_player_num = 0
         for state in state.history:
