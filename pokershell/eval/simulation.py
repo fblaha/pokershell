@@ -1,4 +1,5 @@
 import abc
+import contextlib
 import functools
 import multiprocessing
 import os
@@ -64,16 +65,17 @@ class AbstractSimulator(metaclass=abc.ABCMeta):
 class ParallelSimulatorMixin:
     @classmethod
     def _simulate_parallel(cls, sim_fc, data):
-        partial_results = multiprocessing.Pool().map(sim_fc, data)
-        win, tie, lose = 0, 0, 0
-        beating, winning = [0] * len(model.Hand), [0] * len(model.Hand)
-        for result in partial_results:
-            win += result.win
-            tie += result.tie
-            lose += result.lose
-            cls._add_list(result.beating_hands, beating)
-            cls._add_list(result.winning_hands, winning)
-        return SimulationResult(win, tie, lose, winning, beating)
+        with contextlib.closing(multiprocessing.Pool()) as pool:
+            partial_results = pool.map(sim_fc, data)
+            win, tie, lose = 0, 0, 0
+            beating, winning = [0] * len(model.Hand), [0] * len(model.Hand)
+            for result in partial_results:
+                win += result.win
+                tie += result.tie
+                lose += result.lose
+                cls._add_list(result.beating_hands, beating)
+                cls._add_list(result.winning_hands, winning)
+            return SimulationResult(win, tie, lose, winning, beating)
 
     @staticmethod
     def _add_list(target_lst, add_lst):
