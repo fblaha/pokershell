@@ -43,6 +43,9 @@ class TestEvaluatorManager(unittest.TestCase, common.TestUtilsMixin):
     def test_find_two_pairs(self):
         self._test_hand('2h 2c 5h Jh Jc', model.Hand.TWO_PAIR)
 
+    def test_find_two_pairs_best_teo(self):
+        self._test_hand('6c 6d jc 7h 7d Jd', model.Hand.TWO_PAIR)
+
     def _test_hand(self, cards_str, expected_hand):
         cards = model.Card.parse_cards_line(cards_str)
         best_hand = self.manager.find_best_hand(cards)

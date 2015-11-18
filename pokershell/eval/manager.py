@@ -46,7 +46,7 @@ class EvaluatorManager:
     def find_best_hand(self, cards, min_hand=None):
         ctx = context.EvalContext(*cards)
         for hand, evaluator in self._EVALUATORS.items():
-            if evaluator.required_rank_counts < ctx.rank_counts \
+            if evaluator.required_rank_counts <= ctx.rank_counts \
                     and ctx.max_suit_count >= evaluator.required_suit_count:
                 result = evaluator.find(ctx)
                 if result:
