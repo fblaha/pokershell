@@ -25,6 +25,10 @@ class SimulationResult(utils.CommonReprMixin):
         return self.win + self.tie + self.lose
 
     @property
+    def win_rate(self):
+        return self.win / self.total
+
+    @property
     def beating_hands(self):
         return self._beating_hands
 

@@ -115,7 +115,7 @@ class PokerShell(cmd.Cmd):
         start = time.time()
         result = simulator.simulate(player_num, *state.cards)
         print('\nSimulation (%s):' % simulator.name)
-        self._print_simulation(state, result)
+        self._print_simulation(state, result, player_num)
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
@@ -125,7 +125,7 @@ class PokerShell(cmd.Cmd):
             t.add_row([opt.name, opt.value])
         print(t)
 
-    def _print_simulation(self, state, sim_result):
+    def _print_simulation(self, state, sim_result, player_num):
         counts = (sim_result.win, sim_result.tie, sim_result.lose)
         header = ['Win', 'Tie', 'Loss']
 
@@ -137,12 +137,12 @@ class PokerShell(cmd.Cmd):
             row = ['%.2f%%' % val for val in pct]
 
         if state.pot:
-            win_chance = pct[0] / 100
-            equity = bet.BetAdviser.get_equity(win_chance, state.pot)
-            max_call = bet.BetAdviser.get_max_call(win_chance, state.pot)
+            equity = bet.BetAdviser.get_equity(sim_result.win_rate, state.pot)
+            header.append('Equity')
+            row.append(str(round(equity, 2)))
 
-            header.extend(['Equity', 'Max Call'])
-            row.extend([str(round(equity, 2)), str(round(max_call, 2))])
+        header.append('Leader')
+        row.append('yes' if sim_result.win_rate > 1 / player_num else 'no')
 
         out_table = prettytable.PrettyTable(header)
         out_table.add_row(row)

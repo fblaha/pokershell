@@ -9,16 +9,11 @@ class TestBetAdviser(unittest.TestCase):
         self.adviser = bet.BetAdviser()
 
     def test_equity(self):
-        self._test_func(self.adviser.get_equity)
-
-    def test_max_call(self):
-        self._test_func(self.adviser.get_max_call)
-
-    def _test_func(self, func):
-        self.assertTrue(func(0.3, 100) < 100)
-        self.assertTrue(func(0.1, 100) <
-                        func(0.2, 100) <
-                        func(0.3, 100) <
-                        func(0.4, 100) <
-                        func(0.5, 100) <
-                        func(0.6, 100))
+        fc = self.adviser.get_equity
+        self.assertTrue(fc(0.3, 100) < 100)
+        self.assertTrue(fc(0.1, 100) <
+                        fc(0.2, 100) <
+                        fc(0.3, 100) <
+                        fc(0.4, 100) <
+                        fc(0.5, 100) <
+                        fc(0.6, 100))
