@@ -59,6 +59,7 @@ class TwoPairsEvaluator(eval.AbstractEvaluator):
             def get_ranks():
                 complement = context.get_complement_ranks(1, ranks2[0], ranks2[1])
                 return ranks2[0], ranks2[1], complement[0]
+
             return get_ranks
 
 
@@ -75,6 +76,7 @@ class FlushEvaluator(eval.AbstractEvaluator):
                     card_rank = lambda card: card.rank
                     sorted_cards = sorted(biggest, key=card_rank, reverse=True)[0:5]
                     return tuple(card.rank for card in sorted_cards)
+
                 return get_ranks
 
 

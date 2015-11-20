@@ -1,4 +1,3 @@
-import collections
 import functools
 
 import pokershell.eval.context as context
@@ -30,23 +29,18 @@ class EvalResult:
         return self._complement_ranks
 
 
-# TODO manager should not be aware of all its evaluators
 class EvaluatorManager:
-    _EVALUATORS = collections.OrderedDict([
-        (model.Hand.STRAIGHT_FLUSH, evaluators.StraightFlushEvaluator()),
-        (model.Hand.FOUR_OF_KIND, evaluators.FourEvaluator()),
-        (model.Hand.FULL_HOUSE, evaluators.FullHouseEvaluator()),
-        (model.Hand.FLUSH, evaluators.FlushEvaluator()),
-        (model.Hand.STRAIGHT, evaluators.StraightEvaluator()),
-        (model.Hand.THREE_OF_KIND, evaluators.ThreeEvaluator()),
-        (model.Hand.TWO_PAIR, evaluators.TwoPairsEvaluator()),
-        (model.Hand.ONE_PAIR, evaluators.OnePairEvaluator()),
-        (model.Hand.HIGH_CARD, evaluators.HighCardEvaluator()),
-    ])
+    evaluators = [None] * len(model.Hand)
+
+    @classmethod
+    def register_evaluator(cls, hand, evaluator):
+        assert cls.evaluators[hand] is None
+        cls.evaluators[hand] = evaluator
 
     def find_best_hand(self, cards, min_hand=None):
         ctx = context.EvalContext(*cards)
-        for hand, evaluator in self._EVALUATORS.items():
+        for hand in reversed(model.Hand):
+            evaluator = self.evaluators[hand]
             if evaluator.required_rank_counts <= ctx.rank_counts \
                     and ctx.max_suit_count >= evaluator.required_suit_count:
                 result = evaluator.find(ctx)
@@ -54,3 +48,15 @@ class EvaluatorManager:
                     return EvalResult(hand, result)
             if min_hand and hand == min_hand:
                 return
+
+
+register = EvaluatorManager.register_evaluator
+register(model.Hand.STRAIGHT_FLUSH, evaluators.StraightFlushEvaluator())
+register(model.Hand.FOUR_OF_KIND, evaluators.FourEvaluator())
+register(model.Hand.FULL_HOUSE, evaluators.FullHouseEvaluator())
+register(model.Hand.FLUSH, evaluators.FlushEvaluator())
+register(model.Hand.STRAIGHT, evaluators.StraightEvaluator())
+register(model.Hand.THREE_OF_KIND, evaluators.ThreeEvaluator())
+register(model.Hand.TWO_PAIR, evaluators.TwoPairsEvaluator())
+register(model.Hand.ONE_PAIR, evaluators.OnePairEvaluator())
+register(model.Hand.HIGH_CARD, evaluators.HighCardEvaluator())
