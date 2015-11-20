@@ -12,6 +12,25 @@ import pokershell.model as model
 import pokershell.utils as utils
 
 
+class SimulatorManager:
+    simulators = []
+
+    @classmethod
+    def register_simulator(cls, sim_class):
+        cls.simulators.append(sim_class)
+
+    def find_simulator(self, player_num, *cards):
+        assert isinstance(player_num, int)
+        available = []
+        for simulator in self.simulators:
+            if player_num in simulator.players_num \
+                    and len(cards) in simulator.cards_num:
+                available.append(simulator)
+        if available:
+            best = sorted(available, key=lambda sim: sim.priority)[0]
+            return best.from_config()
+
+
 class SimulationResult(utils.CommonReprMixin):
     def __init__(self, win, tie, lose, winning_hands, beating_hands):
         self.win = win
@@ -249,18 +268,6 @@ class LookUpSimulator(AbstractSimulator):
         return ranks[0].value[0] + ranks[1].value[0]
 
 
-class SimulatorManager:
-    simulators = (LookUpSimulator,
-                  BruteForceSimulator,
-                  MonteCarloSimulator)
-
-    def find_simulator(self, player_num, *cards):
-        assert isinstance(player_num, int)
-        available = []
-        for simulator in self.simulators:
-            if player_num in simulator.players_num \
-                    and len(cards) in simulator.cards_num:
-                available.append(simulator)
-        if available:
-            best = sorted(available, key=lambda sim: sim.priority)[0]
-            return best.from_config()
+SimulatorManager.register_simulator(LookUpSimulator)
+SimulatorManager.register_simulator(BruteForceSimulator)
+SimulatorManager.register_simulator(MonteCarloSimulator)

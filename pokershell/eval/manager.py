@@ -30,6 +30,7 @@ class EvalResult:
         return self._complement_ranks
 
 
+# TODO manager should not be aware of all its evaluators
 class EvaluatorManager:
     _EVALUATORS = collections.OrderedDict([
         (model.Hand.STRAIGHT_FLUSH, evaluators.StraightFlushEvaluator()),
