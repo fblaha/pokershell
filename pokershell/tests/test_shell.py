@@ -51,9 +51,9 @@ class TestShell(unittest.TestCase):
         self.shell.do_eval('As 6c 8h')
 
     def test_sim_cycle(self):
-        self.shell.do_set_config('sim-cycle 33')
+        self.shell.do_option_set('sim-cycle 33')
         self.assertEqual(33, simulation.MonteCarloSimulator.sim_cycle.value)
 
     def test_player_num(self):
-        self.shell.do_set_config('player-num 5')
+        self.shell.do_option_set('player-num 5')
         self.assertEqual(5, config.player_num.value)

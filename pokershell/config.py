@@ -41,7 +41,7 @@ def register_option(name, type, value, short, description):
 
 
 player_num = register_option(name='player-num', value=2, type=int, short='-p',
-                             description='Default player number used when actual player '
-                                         'number is specified in hand simulation');
+                             description='default player number used when actual player '
+                                         'number is specified in hand simulation')
 hand_stats = register_option(name='hand-stats', value=3, type=int, short='-x',
-                             description='Length of hand statistics table')
+                             description='length of hand statistics table')

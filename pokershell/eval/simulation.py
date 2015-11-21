@@ -160,7 +160,8 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
     cards_num = set(range(2, 8))
     players_num = set(range(2, 11))
     sim_cycle = config.register_option(name='sim-cycle', value=1, type=int, short='-t',
-                                       description='Duration of Monte Carlo simulation in seconds')
+                                       description='Duration of Monte Carlo '
+                                                   'simulation in seconds')
 
     def __init__(self, sim_cycle=1):
         super().__init__()

@@ -82,17 +82,17 @@ class PokerShell(cmd.Cmd):
             simulator = simulation.LookUpSimulator.from_config()
             self._simulate(state, simulator)
 
-    def do_set_config(self, line):
-        """set configuration property"""
+    def do_option_set(self, line):
+        """set configuration option"""
         key, val = line.split(maxsplit=2)
         if key in config.options:
             config.options[key].value = val
         else:
             print("No such configuration property '%s'" % key)
 
-    def do_show_config(self, _):
-        """show configuration properties"""
-        print('\nConfiguration :')
+    def do_option_list(self, _):
+        """lists configuration options"""
+        print('\nConfiguration options:')
         self._print_configuration()
 
     def _simulate(self, state, simulator):
@@ -245,7 +245,7 @@ class PokerShell(cmd.Cmd):
 def main():
     parser = argparse.ArgumentParser(description='Poker Shell')
     parser.add_argument('-u', '--unicode', action='store_true', default=False,
-                        help='Enable unicode characters for card symbols in simulation '
+                        help='enable unicode characters for card symbols in simulation '
                              'output (requires unicode support in console window)')
 
     for opt in config.options.values():
