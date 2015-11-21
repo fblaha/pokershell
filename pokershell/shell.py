@@ -52,7 +52,7 @@ class PokerShell(cmd.Cmd):
         state = self._parse_history(cards)
         if state:
             simulator = simulation.BruteForceSimulator.from_config()
-            self.simulate(state, simulator)
+            self._simulate(state, simulator)
 
     def do_eval(self, cards):
         """evaluate hand"""
@@ -60,7 +60,7 @@ class PokerShell(cmd.Cmd):
         if state:
             simulator = self._sim_manager.find_simulator(
                 state.player_num or config.player_num.value, *state.cards)
-            self.simulate(state, simulator)
+            self._simulate(state, simulator)
 
     def default(self, line):
         if parser.LineParser.validate_syntax(line):
@@ -73,14 +73,14 @@ class PokerShell(cmd.Cmd):
         state = self._parse_history(cards)
         if state:
             simulator = simulation.MonteCarloSimulator.from_config()
-            self.simulate(state, simulator)
+            self._simulate(state, simulator)
 
     def do_look_up(self, cards):
         """evaluate hand - loop up"""
         state = self._parse_history(cards)
         if state:
             simulator = simulation.LookUpSimulator.from_config()
-            self.simulate(state, simulator)
+            self._simulate(state, simulator)
 
     def do_set_config(self, line):
         """set configuration property"""
@@ -95,7 +95,7 @@ class PokerShell(cmd.Cmd):
         print('\nConfiguration :')
         self._print_configuration()
 
-    def simulate(self, state, simulator):
+    def _simulate(self, state, simulator):
         print('\nGame :')
         self._print_game(state)
 
