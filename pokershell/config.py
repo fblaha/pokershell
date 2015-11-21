@@ -1,17 +1,14 @@
-import collections
-
 import pokershell.utils as utils
-
-ConfigOption = collections.namedtuple('ConfigOption', ['name', 'type', 'value', 'short'])
 
 
 class ConfigOption(utils.CommonReprMixin):
-    def __init__(self, name, type, value, short):
+    def __init__(self, name, type, value, short, description):
         super().__init__()
         self.name = name
         self.type = type
         self._value = value
         self.short = short
+        self.description = description
 
     @property
     def value(self):
@@ -36,13 +33,15 @@ class ConfigOption(utils.CommonReprMixin):
 options = {}
 
 
-def register_option(name, type, value, short):
-    option = ConfigOption(name, type, value, short)
+def register_option(name, type, value, short, description):
+    option = ConfigOption(name, type, value, short, description)
     assert name not in options
     options[name] = option
     return option
 
 
-player_num = register_option(name='player-num', value=2, type=int, short='-p')
-
-hand_stats = register_option(name='hand-stats', value=3, type=int, short='-x')
+player_num = register_option(name='player-num', value=2, type=int, short='-p',
+                             description='Default player number used when actual player '
+                                         'number is specified in hand simulation');
+hand_stats = register_option(name='hand-stats', value=3, type=int, short='-x',
+                             description='Length of hand statistics table')

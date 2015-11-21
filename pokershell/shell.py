@@ -244,13 +244,17 @@ class PokerShell(cmd.Cmd):
 
 def main():
     parser = argparse.ArgumentParser(description='Poker Shell')
-    parser.add_argument('-u', '--unicode', action='store_true', default=False)
+    parser.add_argument('-u', '--unicode', action='store_true', default=False,
+                        help='Enable unicode characters for card symbols in simulation '
+                             'output (requires unicode support in console window)')
 
     for opt in config.options.values():
         if opt.short:
-            parser.add_argument(opt.short, opt.long, type=opt.type, default=opt.value)
+            parser.add_argument(opt.short, opt.long, type=opt.type, default=opt.value,
+                                help=opt.description)
         else:
-            parser.add_argument(opt.long, type=opt.type, default=opt.value)
+            parser.add_argument(opt.long, type=opt.type, default=opt.value,
+                                help=opt.description)
 
     args = parser.parse_args()
     if args.unicode:
