@@ -93,7 +93,17 @@ class PokerShell(cmd.Cmd):
     def do_option_list(self, _):
         """lists configuration options"""
         print('\nConfiguration options:')
-        self._print_configuration()
+        self._print_options()
+
+    def do_simulator_list(self, _):
+        """lists available simulators"""
+        print('\nSimulators:')
+        t = prettytable.PrettyTable(['Name', 'Description', 'Number of players', 'Number of known cards'])
+        for simulator in simulation.SimulatorManager.simulators:
+            players_num = ', '.join(map(str, simulator.players_num))
+            cards_num = ', '.join(map(str, simulator.cards_num))
+            t.add_row([simulator.name, simulator.__doc__, players_num, cards_num])
+        print(t)
 
     def _simulate(self, state, simulator):
         print('\nGame :')
@@ -119,7 +129,7 @@ class PokerShell(cmd.Cmd):
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
-    def _print_configuration(self):
+    def _print_options(self):
         t = prettytable.PrettyTable(['name', 'value'])
         for opt in config.options.values():
             t.add_row([opt.name, opt.value])

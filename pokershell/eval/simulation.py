@@ -107,6 +107,11 @@ class ParallelSimulatorMixin:
 
 
 class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
+    """Uses brute force to simulate all possible game outcomes.
+    Simulator evaluates all permutations of unknown cards and gives accurate results.
+    From performance reason is usable only for limited unknown cards number.
+    Allows simulate game only with 2 players after turn.
+    """
     priority = 0
     name = 'Brute Force'
     cards_num = {6, 7}
@@ -156,6 +161,9 @@ class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
 
 
 class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
+    """Uses Monte Carlo method to calculate game outcome.
+    Simulator randomly samples unknown cards in game.
+    Results are inaccurate. Result accuracy depends on simulation duration."""
     name = 'Monte Carlo'
     cards_num = set(range(2, 8))
     players_num = set(range(2, 11))
@@ -223,6 +231,10 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
 
 
 class LookUpSimulator(AbstractSimulator):
+    """Uses database of simulated games outcomes.
+    Database contains simulation results only for pre-flop phase.
+    Simulator is intended to evaluate strength of player's hand before the flop.
+    """
     priority = 0
     name = 'Look Up'
     cards_num = {2}
