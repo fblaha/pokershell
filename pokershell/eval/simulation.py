@@ -113,7 +113,7 @@ class BruteForceSimulator(AbstractSimulator, ParallelSimulatorMixin):
     Allows simulate game only with 2 players after turn.
     """
     priority = 0
-    name = 'Brute Force'
+    name = 'brute-force'
     cards_num = {6, 7}
     players_num = {2}
 
@@ -164,7 +164,7 @@ class MonteCarloSimulator(AbstractSimulator, ParallelSimulatorMixin):
     """Uses Monte Carlo method to calculate game outcome.
     Simulator randomly samples unknown cards in game.
     Results are inaccurate. Result accuracy depends on simulation duration."""
-    name = 'Monte Carlo'
+    name = 'monte-carlo'
     cards_num = set(range(2, 8))
     players_num = set(range(2, 11))
     sim_cycle = config.register_option(name='sim-cycle', value=1, type=int, short='-t',
@@ -236,7 +236,7 @@ class LookUpSimulator(AbstractSimulator):
     Simulator is intended to evaluate strength of player's hand before the flop.
     """
     priority = 0
-    name = 'Look Up'
+    name = 'look-up'
     cards_num = {2}
     players_num = set(range(2, 11))
 

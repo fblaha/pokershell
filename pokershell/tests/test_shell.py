@@ -53,6 +53,12 @@ class TestShell(unittest.TestCase):
     def test_simulator_list(self):
         self.shell.do_simulator_list('')
 
+    def test_simulator_show(self):
+        self.shell.do_simulator_show(simulation.MonteCarloSimulator.name)
+
+    def test_option_show(self):
+        self.shell.do_option_show('sim-cycle')
+
     def test_sim_cycle(self):
         self.shell.do_option_set('sim-cycle 33')
         self.assertEqual(33, simulation.MonteCarloSimulator.sim_cycle.value)

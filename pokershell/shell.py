@@ -88,22 +88,59 @@ class PokerShell(cmd.Cmd):
         if key in config.options:
             config.options[key].value = val
         else:
-            print("No such configuration property '%s'" % key)
+            self._print_no_option(key)
+
+    def _print_no_option(self, key):
+        print("No such configuration option '%s'" % key)
 
     def do_option_list(self, _):
         """lists configuration options"""
         print('\nConfiguration options:')
-        self._print_options()
+        self._print_dict(config.options.values())
+
+    def do_option_show(self, name):
+        """lists configuration options"""
+        name = name.strip()
+        if name in config.options:
+            opt = config.options[name]
+
+            cli = ' / '.join([opt.long, opt.short]) if opt.short else opt.long
+            print_values = collections.OrderedDict([
+                ('Name', opt.name),
+                ('Value', opt.value),
+                ('Type', opt.type.__name__),
+                ('Command Line', cli),
+                ('Description', opt.description)
+            ])
+            self._print_dict(print_values)
+        else:
+            self._print_no_option(name)
 
     def do_simulator_list(self, _):
         """lists available simulators"""
         print('\nSimulators:')
-        t = prettytable.PrettyTable(['Name', 'Description', 'Number of players', 'Number of known cards'])
+        t = prettytable.PrettyTable(['Name', 'Description'])
         for simulator in simulation.SimulatorManager.simulators:
-            players_num = ', '.join(map(str, simulator.players_num))
-            cards_num = ', '.join(map(str, simulator.cards_num))
-            t.add_row([simulator.name, simulator.__doc__, players_num, cards_num])
+            t.add_row([simulator.name, simulator.__doc__.split('\n')[0]])
         print(t)
+
+    def do_simulator_show(self, name):
+        """show given simulator details"""
+        name = name.strip()
+        simulators = simulation.SimulatorManager.simulators
+        found = [simulator for simulator in simulators if simulator.name == name]
+        if found:
+            players_num = ', '.join(map(str, found[0].players_num))
+            cards_num = ', '.join(map(str, found[0].cards_num))
+            print_values = collections.OrderedDict([
+                ('Name', found[0].name),
+                ('Player Numbers', players_num),
+                ('Known Card Numbers', cards_num),
+                ('Description', found[0].__doc__)
+            ])
+            self._print_dict(print_values)
+        else:
+            print("No such simulator '%s'" % name)
 
     def _simulate(self, state, simulator):
         print('\nGame :')
@@ -129,10 +166,11 @@ class PokerShell(cmd.Cmd):
         elapsed = time.time() - start
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
-    def _print_options(self):
-        t = prettytable.PrettyTable(['name', 'value'])
-        for opt in config.options.values():
-            t.add_row([opt.name, opt.value])
+    @staticmethod
+    def _print_dict(values):
+        t = prettytable.PrettyTable(['Property', 'Value'])
+        for key, val in values.items():
+            t.add_row([key, val])
         print(t)
 
     def _print_simulation(self, state, sim_result, player_num):
