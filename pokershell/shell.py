@@ -96,7 +96,7 @@ class PokerShell(cmd.Cmd):
     def do_option_list(self, _):
         """lists configuration options"""
         print('\nConfiguration options:')
-        self._print_dict(config.options.values())
+        self._print_dict('Option', {k: v.value for k, v in config.options.items()})
 
     def do_option_show(self, name):
         """lists configuration options"""
@@ -112,7 +112,7 @@ class PokerShell(cmd.Cmd):
                 ('Command Line', cli),
                 ('Description', opt.description)
             ])
-            self._print_dict(print_values)
+            self._print_dict('Property', print_values)
         else:
             self._print_no_option(name)
 
@@ -138,7 +138,7 @@ class PokerShell(cmd.Cmd):
                 ('Known Card Numbers', cards_num),
                 ('Description', found[0].__doc__)
             ])
-            self._print_dict(print_values)
+            self._print_dict('Property', print_values)
         else:
             print("No such simulator '%s'" % name)
 
@@ -167,8 +167,8 @@ class PokerShell(cmd.Cmd):
         print('\nSimulation finished in %.2f seconds\n' % elapsed)
 
     @staticmethod
-    def _print_dict(values):
-        t = prettytable.PrettyTable(['Property', 'Value'])
+    def _print_dict(col_name, values):
+        t = prettytable.PrettyTable([col_name, 'Value'])
         for key, val in values.items():
             t.add_row([key, val])
         print(t)
