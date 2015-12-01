@@ -1,12 +1,12 @@
 # PokerShell
-Texas hold 'em command line calculator and simulator
-* easy to use CLI interface
-* handy tool for online poker players
+Texas hold 'em command line calculator and simulator. Handy tool for online poker players. Easy to use CLI interface
+provides handful information about possible game outcomes:
 * win/tie/lose probability for the player
 * statistics of winning hands - provides statistics of possible winning hands
 * statistics of beating hands - provides statistics of possible opponent's hands
 * covers all betting rounds/streets
 
+## Example
 ```
 (pokershell) jdqs 5 0.08;  5h6c5s 3 0.62; 7h 3 1.02
 
@@ -37,4 +37,3 @@ Simulation finished in 1.03 seconds
 
 (pokershell)
 ```
-
