@@ -13,6 +13,21 @@ import pokershell.eval.simulation as simulation
 import pokershell.model as model
 import pokershell.parser as parser
 
+INTRO = """
+Texas hold'em command line calculator and simulator.
+
+Example:
+JdJc 6 0.2; QdAc8h 4 1.0; Jh 1.5; 2h 3 3.2
+
+'JdJc' player's hand
+'5', '4', '2' number of players in given betting round
+'0.2', '1.0', '1.5', '3.2' pot size in given betting round
+';' separate betting rounds
+'QdAc8h' common cards flop
+'Jh' turn card
+'2h' river card
+"""
+
 
 @enum.unique
 class InputTableColumn(enum.Enum):
@@ -311,7 +326,7 @@ def main():
     for opt in config.options.values():
         opt.value = getattr(args, opt.python_name)
 
-    PokerShell().cmdloop()
+    PokerShell().cmdloop(INTRO)
 
 
 if __name__ == '__main__':
