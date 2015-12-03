@@ -157,6 +157,10 @@ class PokerShell(cmd.Cmd):
         else:
             print("No such simulator '%s'" % name)
 
+    def do_intro_show(self, name):
+        """show intro text"""
+        print(INTRO)
+
     def _simulate(self, state, simulator):
         print('\nGame :')
         self._print_game(state)
