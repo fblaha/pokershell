@@ -1,5 +1,6 @@
 language: python
-python: 34
+python:
+  - 3.4
 virtualenv:
   system_site_packages: true
 env:
