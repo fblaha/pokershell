@@ -16,7 +16,7 @@ import pokershell.parser as parser
 _intro = """
 Texas hold'em command line calculator and simulator.
 
-Example:
+Simulation command example:
 JdJc 6 0.2; QdAc8h 4 1.0; Jh 1.5; 2h 3 3.2
 """
 
@@ -24,10 +24,12 @@ JdJc 6 0.2; QdAc8h 4 1.0; Jh 1.5; 2h 3 3.2
 def print_intro():
     print(_intro)
     t = prettytable.PrettyTable(['Line Tokens', 'Explanation'])
-    t.max_width["Explanation"] = 80
-    t.add_row(["'JdJc'", "Player's face-down cards. "
-                         "These cards need to be specified before any other cards "
-                         "on command line."])
+    t.max_width["Explanation"] = 70
+    t.hrules = prettytable.ALL
+    t.add_row(["'JdJc'",
+               "Player's face-down cards. "
+               "These cards need to be specified before any other cards "
+               "on command line."])
     t.add_row(["'5' '4' '2'",
                "Number of players in given stage. The number is decreasing "
                "as players fold."])
@@ -38,7 +40,7 @@ def print_intro():
     t.add_row(["';'",
                "Separates game stages. The game stage means whenever game state "
                "changes with (new common card, pot increases by betting "
-               "or some player folds).The user can go back in command line history "
+               "or some player folds). The user can go back in command line history "
                "with up arrow and continue on previous line by writing separator ';' "
                "and after separator writes only what changed since previous state."])
     t.add_row(["'QdAc8h'", "Flop cards. Three common cards."])
