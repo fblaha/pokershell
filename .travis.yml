@@ -1,5 +1,7 @@
 language: python
 python: 34
+virtualenv:
+  system_site_packages: true
 env:
   - TOXENV=py34
   - TOXENV=flake8
