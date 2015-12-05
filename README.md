@@ -37,3 +37,5 @@ Simulation finished in 1.03 seconds
 
 (pokershell)
 ```
+## Tips
+TODO
