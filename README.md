@@ -1,4 +1,7 @@
 # PokerShell
+
+[![Build Status](https://api.travis-ci.org/fblaha/pokershell.svg?branch=master)](https://api.travis-ci.org/fblaha/pokershell)
+
 Texas hold 'em command line calculator and simulator. Handy tool for online poker players. Easy to use CLI interface
 provides handful information about possible game outcomes:
 * win/tie/lose probability for the player
@@ -37,5 +40,5 @@ Simulation finished in 1.03 seconds
 
 (pokershell)
 ```
-## Tips
+## Installation
 TODO

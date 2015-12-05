@@ -13,20 +13,24 @@ import pokershell.eval.simulation as simulation
 import pokershell.model as model
 import pokershell.parser as parser
 
-INTRO = """
+_intro = """
 Texas hold'em command line calculator and simulator.
 
 Example:
 JdJc 6 0.2; QdAc8h 4 1.0; Jh 1.5; 2h 3 3.2
-
-'JdJc' player's hand
-'5', '4', '2' number of players in given betting round
-'0.2', '1.0', '1.5', '3.2' pot size in given betting round
-';' separate betting rounds
-'QdAc8h' common cards flop
-'Jh' turn card
-'2h' river card
 """
+
+
+def print_intro():
+    print(_intro)
+    t = prettytable.PrettyTable(['Line Tokens', 'Explanation'])
+    t.add_row(["'JdJc'", "player's hand"])
+    t.add_row(["'5' '4' '2'", "number of players in given betting round"])
+    t.add_row(["'0.2' '1.0' '1.5' '3.2'", "pot size in given betting round"])
+    t.add_row(["';'", "separate betting rounds"])
+    t.add_row(["'Jh'", "turn card"])
+    t.add_row(["'2h'", "river card"])
+    print(t)
 
 
 @enum.unique
@@ -159,7 +163,7 @@ class PokerShell(cmd.Cmd):
 
     def do_intro_show(self, name):
         """show intro text"""
-        print(INTRO)
+        print_intro()
 
     def _simulate(self, state, simulator):
         print('\nGame :')
@@ -330,7 +334,8 @@ def main():
     for opt in config.options.values():
         opt.value = getattr(args, opt.python_name)
 
-    PokerShell().cmdloop(INTRO)
+    print_intro()
+    PokerShell().cmdloop()
 
 
 if __name__ == '__main__':
