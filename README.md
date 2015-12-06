@@ -41,4 +41,9 @@ Simulation finished in 1.03 seconds
 (pokershell)
 ```
 ## Installation
-TODO
+
+* [install Python 3.4 or 3.5](https://www.python.org/downloads/).
+* clone this repository via git client or use "Download ZIP" link to download this repository
+* go to root directory of downloaded repository
+* launch setup script `python setup.py install`
+* launch pokershell `pokershell` (use `-h` to display help)
