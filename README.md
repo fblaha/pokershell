@@ -11,7 +11,7 @@ provides handful information about possible game outcomes:
 
 ## Example
 ```
-(pokershell) jdqs 5 0.08;  5h6c5s 3 0.62; 7h 3 1.02
+(pokershell) jdqs 5 0.08;  5h6c5s 3 0.62; 7h 1.02
 
 Game :
 +-------+----------+------+------------+----------+--------------+------+------------+
