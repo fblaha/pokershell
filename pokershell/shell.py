@@ -49,7 +49,8 @@ class PokerShell(cmd.Cmd):
             print("Invalid syntax '%s'" % line)
 
     def do_eval_brute_force(self, cards):
-        """Launches simulation using 'brute-force' simulator.
+        """
+Launches simulation using 'brute-force' simulator.
 
 Example:
     eval_brute_force As6c AdAc6d 3 1.2; 7d 2 3.0
@@ -60,8 +61,9 @@ Example:
             self._simulate(state, simulator)
 
     def do_eval(self, cards):
-        """Launches simulation. Proper simulator is chosen automatically.
-'eval' is default command therefore 'eval' can be omitted.
+        """
+Launches simulation. Proper simulator is chosen automatically.
+Eval is default command therefore 'eval' can be omitted.
 
 Example:
     eval As6c AdAc6d 3 1.2; 7d 2 3.0
@@ -81,7 +83,8 @@ Example:
             super().default(line)
 
     def do_eval_monte_carlo(self, cards):
-        """Launches simulation using 'monte-carlo' simulator.
+        """
+Launches simulation using 'monte-carlo' simulator.
 
 Example:
     eval_monte_carlo As6c AdAc6d 3 1.2; 7d 2 3.0
@@ -92,7 +95,8 @@ Example:
             self._simulate(state, simulator)
 
     def do_eval_look_up(self, cards):
-        """Launches simulation using 'look-up' simulator.
+        """
+Launches simulation using 'look-up' simulator.
 
 Example:
     eval_look_up As6c 5 0.8
@@ -103,7 +107,8 @@ Example:
             self._simulate(state, simulator)
 
     def do_option_set(self, line):
-        """Set configuration option.
+        """
+Set configuration option.
 
 Example:
     option_set sim-cycle 2
@@ -118,7 +123,8 @@ Example:
         print("No such configuration option '%s'" % key)
 
     def do_option_list(self, _):
-        """Lists available configuration options.
+        """
+Lists available configuration options.
 
 Example:
     option_list
@@ -127,7 +133,8 @@ Example:
         self._print_dict('Option', {k: v.value for k, v in config.options.items()})
 
     def do_option_show(self, name):
-        """Shows detailed information about given option.
+        """
+Shows detailed information about given option.
 
 Example:
     option_show sim-cycle
@@ -149,7 +156,8 @@ Example:
             self._print_no_option(name)
 
     def do_simulator_list(self, _):
-        """Lists available simulators.
+        """
+Lists available simulators.
 
 Example:
     simulator_list
@@ -161,7 +169,8 @@ Example:
         print(t)
 
     def do_simulator_show(self, name):
-        """Shows detailed information about given simulator.
+        """
+Shows detailed information about given simulator.
 
 Example:
     simulator_show monte-carlo
@@ -183,7 +192,8 @@ Example:
             print("No such simulator '%s'" % name)
 
     def do_intro_show(self, name):
-        """Shows intro text.
+        """
+Shows intro text.
 
 Example:
     intro_show
