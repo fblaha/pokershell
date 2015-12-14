@@ -18,7 +18,7 @@ class TestShell(unittest.TestCase):
         return super().tearDown()
 
     def test_brute_force(self):
-        self.shell.do_brute_force('As 6c Ad 8s Ac 6d 7d')
+        self.shell.do_eval_brute_force('As 6c Ad 8s Ac 6d 7d')
 
     def test_pot_equity(self):
         self.shell.do_eval('As 6c 8c 8s qc 6d 7d 5 0.89')
@@ -27,13 +27,13 @@ class TestShell(unittest.TestCase):
         self.shell.do_eval('As 6c 6 0.2; 8c 8s qc 3 0.4; 6d 0.8;  7d 2 2.5')
 
     def test_monte_carlo(self):
-        self.shell.do_monte_carlo('As 6s')
+        self.shell.do_eval_monte_carlo('As 6s')
 
     def test_monte_carlo_eval(self):
         self.shell.do_eval('As 6s 5d 5')
 
     def test_look_up(self):
-        self.shell.do_look_up('As 6s 5')
+        self.shell.do_eval_look_up('As 6s 5')
 
     def test_eval(self):
         self.shell.do_eval('As 6c Ad 8s Ac 6d 7d')

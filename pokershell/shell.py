@@ -48,15 +48,22 @@ class PokerShell(cmd.Cmd):
         else:
             print("Invalid syntax '%s'" % line)
 
-    def do_brute_force(self, cards):
-        """evaluate hand - brute force"""
+    def do_eval_brute_force(self, cards):
+        """Launches simulation using 'brute-force' simulator.
+Example:
+    eval_brute_force As6c AdAc6d 3 1.2; 7d 2 3.0"""
         state = self._parse_history(cards)
         if state:
             simulator = simulation.BruteForceSimulator.from_config()
             self._simulate(state, simulator)
 
     def do_eval(self, cards):
-        """evaluate hand"""
+        """Launches simulation. Proper simulator is chosen automatically.
+'eval' is default command therefore 'eval' can be omitted.
+Example:
+    eval As6c AdAc6d 3 1.2; 7d 2 3.0
+    (or shorter form)
+    As6c AdAc6d 3 1.2; 7d 2 3.0"""
         state = self._parse_history(cards)
         if state:
             simulator = self._sim_manager.find_simulator(
@@ -69,22 +76,28 @@ class PokerShell(cmd.Cmd):
         else:
             super().default(line)
 
-    def do_monte_carlo(self, cards):
-        """evaluate hand - monte carlo"""
+    def do_eval_monte_carlo(self, cards):
+        """Launches simulation using 'monte-carlo' simulator.
+Example:
+    eval_monte_carlo As6c AdAc6d 3 1.2; 7d 2 3.0"""
         state = self._parse_history(cards)
         if state:
             simulator = simulation.MonteCarloSimulator.from_config()
             self._simulate(state, simulator)
 
-    def do_look_up(self, cards):
-        """evaluate hand - loop up"""
+    def do_eval_look_up(self, cards):
+        """Launches simulation using 'look-up' simulator.
+Example:
+    eval_look_up As6c 5 0.8"""
         state = self._parse_history(cards)
         if state:
             simulator = simulation.LookUpSimulator.from_config()
             self._simulate(state, simulator)
 
     def do_option_set(self, line):
-        """set configuration option"""
+        """Set configuration option.
+Example:
+    option_set sim-cycle 2"""
         key, val = line.split(maxsplit=2)
         if key in config.options:
             config.options[key].value = val
@@ -95,12 +108,16 @@ class PokerShell(cmd.Cmd):
         print("No such configuration option '%s'" % key)
 
     def do_option_list(self, _):
-        """lists configuration options"""
+        """Lists available configuration options.
+Example:
+    option_list"""
         print('\nConfiguration options:')
         self._print_dict('Option', {k: v.value for k, v in config.options.items()})
 
     def do_option_show(self, name):
-        """lists configuration options"""
+        """Shows detailed information about given option.
+Example:
+    option_show sim-cycle"""
         name = name.strip()
         if name in config.options:
             opt = config.options[name]
@@ -118,7 +135,9 @@ class PokerShell(cmd.Cmd):
             self._print_no_option(name)
 
     def do_simulator_list(self, _):
-        """lists available simulators"""
+        """Lists available simulators.
+Example:
+    simulator_list"""
         print('\nSimulators:')
         t = prettytable.PrettyTable(['Name', 'Description'])
         for simulator in simulation.SimulatorManager.simulators:
@@ -126,7 +145,9 @@ class PokerShell(cmd.Cmd):
         print(t)
 
     def do_simulator_show(self, name):
-        """show given simulator details"""
+        """Shows detailed information about given simulator.
+Example:
+    simulator_show monte-carlo"""
         name = name.strip()
         simulators = simulation.SimulatorManager.simulators
         found = [simulator for simulator in simulators if simulator.name == name]
@@ -144,7 +165,9 @@ class PokerShell(cmd.Cmd):
             print("No such simulator '%s'" % name)
 
     def do_intro_show(self, name):
-        """show intro text"""
+        """Shows intro text.
+Example:
+    intro_show"""
         print(intro.INTRO)
 
     def _simulate(self, state, simulator):
