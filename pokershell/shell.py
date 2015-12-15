@@ -209,12 +209,12 @@ Example:
             return
         player_num = state.player_num or config.player_num.value
         if player_num not in simulator.players_num:
-            print("\nSimulator does not support '%d' players!\n" % player_num)
+            print("\nSimulator '%s' does not support '%d' players!\n" % (simulator.name, player_num))
             return
 
         cards_num = len(state.cards)
         if cards_num not in simulator.cards_num:
-            print("\nSimulator does not support '%d' cards!\n" % cards_num)
+            print("\nSimulator '%s' does not support '%d' cards!\n" % (simulator.name, cards_num))
             return
 
         start = time.time()
@@ -271,7 +271,8 @@ Example:
                 stats_table.add_row(row)
             print(stats_table)
 
-    def _fill_table(self, rows, hands, row_num, offset=0):
+    @staticmethod
+    def _fill_table(rows, hands, row_num, offset=0):
         total = sum(count for _, count in hands)
         for i, (hand, count) in enumerate(hands[:row_num]):
             pct = count * 100 / total
