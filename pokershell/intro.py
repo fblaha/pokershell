@@ -23,7 +23,7 @@ JdJc 6 0.2; QdAc8h 4 1.0; Jh 1.5; 2h 3 3.2
                "as players fold."])
     t.add_row(["'0.2' '1.0' '1.5' '3.2'",
                "Pot size in given stage. The number is increasing "
-               "with continuous betting. The number must contain '.'"
+               "by continuous betting. The number must contain '.'"
                " to be distinguishable from number of players."])
     t.add_row(["';'",
                "Separates game stages. The game stage means whenever game state "

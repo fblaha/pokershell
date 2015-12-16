@@ -63,7 +63,7 @@ Example:
     def do_eval(self, cards):
         """
 Launches simulation. Proper simulator is chosen automatically.
-Eval is default command therefore 'eval' can be omitted.
+Eval is the default command therefore 'eval' can be omitted.
 
 Example:
     eval As6c AdAc6d 3 1.2; 7d 2 3.0
