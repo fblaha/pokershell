@@ -209,12 +209,14 @@ Example:
             return
         player_num = state.player_num or config.player_num.value
         if player_num not in simulator.players_num:
-            print("\nSimulator '%s' does not support '%d' players!\n" % (simulator.name, player_num))
+            print("\nSimulator '%s' does not support '%d' players!\n" %
+                  (simulator.name, player_num))
             return
 
         cards_num = len(state.cards)
         if cards_num not in simulator.cards_num:
-            print("\nSimulator '%s' does not support '%d' cards!\n" % (simulator.name, cards_num))
+            print("\nSimulator '%s' does not support '%d' cards!\n" %
+                  (simulator.name, cards_num))
             return
 
         start = time.time()
