@@ -73,8 +73,8 @@ class FlushEvaluator(eval.AbstractEvaluator):
             biggest = sorted_sets[0]
             if len(biggest) >= 5:
                 def get_ranks():
-                    card_rank = lambda card: card.rank
-                    sorted_cards = sorted(biggest, key=card_rank, reverse=True)[0:5]
+                    sorted_cards = sorted(biggest, key=lambda card: card.rank,
+                                          reverse=True)[0:5]
                     return tuple(card.rank for card in sorted_cards)
 
                 return get_ranks
