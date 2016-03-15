@@ -3,7 +3,7 @@
 import setuptools
 
 PROJECT = 'pokershell'
-VERSION = '0.1.2'
+VERSION = '0.1.4'
 
 setuptools.setup(
     name=PROJECT,
