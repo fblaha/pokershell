@@ -1,1 +1,1 @@
-recursive-include preflop/*.txt
+recursive-include pokershell preflop/*.txt
