@@ -8,9 +8,10 @@ VERSION = '0.1'
 setuptools.setup(
     name=PROJECT,
     version=VERSION,
-    description='Poker Shell',
+    description="Poker Shell - Texas hold 'em command line calculator and simulator",
     author='Filip Blaha',
     author_email='blahaf@gmail.com',
+    url='https://github.com/fblaha/pokershell',
     classifiers=['Environment :: Console', ],
     platforms=['Any'],
     namespace_packages=[],
@@ -23,5 +24,6 @@ setuptools.setup(
             'pokershell = pokershell.shell:main'
         ]
     },
-    zip_safe=False,
+    keywords=['poker'],
+    zip_safe=False
 )
