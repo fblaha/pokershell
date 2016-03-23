@@ -1,6 +1,8 @@
 # PokerShell
 
 [![Build Status](https://api.travis-ci.org/fblaha/pokershell.svg?branch=master)](https://api.travis-ci.org/fblaha/pokershell)
+[![PyPI version](https://img.shields.io/pypi/v/pokershell.svg)](https://pypi.python.org/pypi/pokershell)
+[![PyPI downloads](https://img.shields.io/pypi/dm/pokershell.svg)](https://pypi.python.org/pypi/pokershell)
 
 Texas hold 'em command line calculator and simulator. Handy tool for online poker players. Easy to use CLI interface
 provides handful information about possible game outcomes:
